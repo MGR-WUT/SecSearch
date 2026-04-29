@@ -1,0 +1,17 @@
+llm:
+  generator_model: gpt-4o-mini
+  auditor_model: gpt-4o-mini
+
+agents:
+  use_auditor: true
+
+execution:
+  max_iterations: 3
+  early_stop: true
+
+security:
+  sast: true
+  sca: true
+
+logging:
+  verbose: true
