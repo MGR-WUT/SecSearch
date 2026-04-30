@@ -1,0 +1,11 @@
+{
+    "gemini-3-flash-preview": {
+        "python": {
+            "bleu": 20.4404701730584,
+            "total_count": 351,
+            "vulnerable_percentage": 43.58974358974359,
+            "vulnerable_suggestion_count": 153,
+            "pass_rate": 56.41025641025641
+        }
+    }
+}

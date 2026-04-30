@@ -1,17 +1,14 @@
 llm:
-  generator_model: gpt-4o-mini
-  auditor_model: gpt-4o-mini
+  generator:
+    provider: openai
+    model: gpt-4o-mini
+
+  auditor:
+    provider: ollama
+    model: llama3
 
 agents:
   use_auditor: true
 
 execution:
   max_iterations: 3
-  early_stop: true
-
-security:
-  sast: true
-  sca: true
-
-logging:
-  verbose: true

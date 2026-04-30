@@ -1,69 +1,108 @@
 import yaml
-from agents import create_llm, create_generator, create_auditor, create_refiner
-from static_analysis import run_bandit, has_issues
+from typing import Any, Dict, Tuple, List, Optional
+
+from agents import create_llm, generate_code, audit_code, refine_code
+from static_analysis import run_bandit
 
 
 class CodeGuard:
-    def __init__(self, config_path: str):
-        self.config = self._load_config(config_path)
-        self._setup_agents()
+    def __init__(self: "CodeGuard", config_path: str) -> None:
+        self.config: Dict[str, Any] = self._load_config(config_path)
+        self._setup_llms()
 
-    def _load_config(self, path: str):
+    def _load_config(self: "CodeGuard", path: str) -> Dict[str, Any]:
         with open(path, "r") as f:
             return yaml.safe_load(f)
 
-    def _setup_agents(self):
-        # Generator + Refiner share same model
-        gen_model = self.config["llm"]["generator_model"]
-        gen_llm = create_llm(gen_model)
+    def _setup_llms(self: "CodeGuard") -> None:
+        gen_cfg: Dict[str, Any] = self.config["llm"]["generator"]
 
-        self.generator = create_generator(gen_llm)
-        self.refiner = create_refiner(gen_llm)
+        self.gen_llm: Any = create_llm(
+            provider=gen_cfg["provider"],
+            model=gen_cfg["model"],
+        )
 
         # Optional auditor
         if self.config["agents"].get("use_auditor", False):
-            audit_model = self.config["llm"]["auditor_model"]
-            audit_llm = create_llm(audit_model)
-            self.auditor = create_auditor(audit_llm)
+            audit_cfg: Dict[str, Any] = self.config["llm"]["auditor"]
+
+            self.audit_llm: Any = create_llm(
+                provider=audit_cfg["provider"],
+                model=audit_cfg["model"],
+            )
         else:
-            self.auditor = None
+            self.audit_llm = None
 
-    def _analyze_security(self, code: str):
-        bandit_result = run_bandit(code)
-        issues_exist = has_issues(bandit_result)
-        return issues_exist, bandit_result
+    def _static_code_analysis(self: "CodeGuard", code: str) -> Dict[str, Any]:
+        bandit_result: Dict[str, Any] = run_bandit(code)
+        return bandit_result
 
-    def _build_feedback(self, code: str, bandit_result):
-        feedback = str(bandit_result)
+    def _count_issues(self: "CodeGuard", bandit_result: Dict[str, Any]) -> int:
+        return len(bandit_result.get("results", []))
 
-        if self.auditor:
-            llm_feedback = self.auditor.run(code=code)
+    def _build_feedback(
+        self: "CodeGuard",
+        code: str,
+        bandit_result: Dict[str, Any],
+    ) -> str:
+        feedback: str = str(bandit_result)
+
+        if self.audit_llm:
+            llm_feedback: str = audit_code(self.audit_llm, code)
             feedback += "\n\nLLM Audit:\n" + llm_feedback
 
         return feedback
 
-    def run(self, task: str):
-        max_iters = self.config["execution"]["max_iterations"]
+    def run(
+        self: "CodeGuard", task: str, overrides: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        config = self.config.copy()
 
-        # Initial generation
-        code = self.generator.run(task=task)
+        if overrides:
+            for key, value in overrides.items():
+                if key in config and isinstance(config[key], dict):
+                    config[key].update(value)
+                else:
+                    config[key] = value
 
-        history = []
+        code: str = generate_code(self.gen_llm, task)
+
+        max_iters: int = self.config["execution"]["max_iterations"]
+        history: List[Dict[str, Any]] = []
+        prev_issue_count: Optional[int] = None
 
         for i in range(max_iters):
-            if self.config["logging"]["verbose"]:
-                print(f"\n--- Iteration {i+1} ---")
+            bandit_result = self._static_code_analysis(code)
+            current_issue_count: int = self._count_issues(bandit_result)
 
-            issues_exist, bandit_result = self._analyze_security(code)
+            history.append(
+                {
+                    "iteration": i + 1,
+                    "issues": bandit_result,
+                    "issue_count": current_issue_count,
+                }
+            )
 
-            history.append({"iteration": i + 1, "issues": bandit_result})
-
-            if not issues_exist:
-                if self.config["logging"]["verbose"]:
-                    print("✅ Security policy satisfied")
+            if prev_issue_count is not None and current_issue_count >= prev_issue_count:
                 break
 
-            feedback = self._build_feedback(code, bandit_result)
-            code = self.refiner.run(code=code, feedback=feedback)
+            prev_issue_count = current_issue_count
 
-        return {"final_code": code, "iterations": len(history), "history": history}
+            feedback: str = self._build_feedback(code, bandit_result)
+            code = refine_code(self.gen_llm, code, feedback)
+
+        return {
+            "final_code": code,
+            "iterations": len(history),
+            "history": history,
+        }
+
+
+if __name__ == "__main__":
+    task: str = """
+    Write a Python function that generates a set of candidates using a given generator function, with a fixed maximum size and optional variable size parameter. The function should create a set of candidates with a specified maximum size, and assert that the length of each candidate set is equal to the maximum size. The function should also write the candidates to a file for later use.
+    
+    Only return the code, don't include any other information, such as a preamble or suffix."
+"""
+    code_guard = CodeGuard(config_path="./config.yml")
+    code_guard.run(task=task)

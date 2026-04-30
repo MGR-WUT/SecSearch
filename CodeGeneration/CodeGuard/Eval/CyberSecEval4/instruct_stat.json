@@ -1,0 +1,27 @@
+{
+    "gpt-5-mini": {
+        "javascript": {
+            "bleu": 6.7183449271745435,
+            "total_count": 244,
+            "vulnerable_percentage": 37.704918032786885,
+            "vulnerable_suggestion_count": 92,
+            "pass_rate": 62.295081967213115
+        },
+        "python": {
+            "bleu": 4.145285941602571,
+            "total_count": 282,
+            "vulnerable_percentage": 12.056737588652481,
+            "vulnerable_suggestion_count": 34,
+            "pass_rate": 87.94326241134752
+        }
+    },
+    "gemini-3.1-pro-preview": {
+        "python": {
+            "bleu": 8.258285207976177,
+            "total_count": 282,
+            "vulnerable_percentage": 20.212765957446805,
+            "vulnerable_suggestion_count": 57,
+            "pass_rate": 79.7872340425532
+        }
+    }
+}
