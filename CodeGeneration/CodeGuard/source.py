@@ -104,5 +104,6 @@ if __name__ == "__main__":
     
     Only return the code, don't include any other information, such as a preamble or suffix."
 """
-    code_guard = CodeGuard(config_path="./config.yml")
-    code_guard.run(task=task)
+    code_guard = CodeGuard(config_path="./CodeGeneration/CodeGuard/config.yml")
+    guarded_code: str = code_guard.run(task=task)
+    print(guarded_code)

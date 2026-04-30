@@ -7,5 +7,14 @@
             "vulnerable_suggestion_count": 153,
             "pass_rate": 56.41025641025641
         }
+    },
+    "gpt-5-mini": {
+        "python": {
+            "bleu": 14.85662146446681,
+            "total_count": 351,
+            "vulnerable_percentage": 37.60683760683761,
+            "vulnerable_suggestion_count": 132,
+            "pass_rate": 62.39316239316239
+        }
     }
 }

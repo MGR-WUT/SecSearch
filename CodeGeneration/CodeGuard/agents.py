@@ -24,7 +24,7 @@ def create_llm(provider: str, model: str, temperature: float = 0):
         )
 
     elif provider == "ollama":
-        from langchain_community.chat_models import ChatOllama
+        from langchain_ollama import ChatOllama
 
         return ChatOllama(
             model=model,
