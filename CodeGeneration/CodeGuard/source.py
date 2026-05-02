@@ -1,8 +1,12 @@
 import yaml
 from typing import Any, Dict, Tuple, List, Optional
+import logging
 
 from agents import create_llm, generate_code, audit_code, refine_code
 from static_analysis import run_bandit
+
+
+logger = logging.getLogger("codeguard")
 
 
 class CodeGuard:
@@ -34,46 +38,53 @@ class CodeGuard:
             self.audit_llm = None
 
     def _static_code_analysis(self: "CodeGuard", code: str) -> Dict[str, Any]:
-        bandit_result: Dict[str, Any] = run_bandit(code)
-        return bandit_result
+        logger.debug("Running Bandit analysis")
+        return run_bandit(code)
 
     def _count_issues(self: "CodeGuard", bandit_result: Dict[str, Any]) -> int:
         return len(bandit_result.get("results", []))
 
-    def _build_feedback(
-        self: "CodeGuard",
-        code: str,
-        bandit_result: Dict[str, Any],
-    ) -> str:
+    def _build_feedback(self, code: str, bandit_result: Dict[str, Any]) -> str:
+        logger.debug("Building feedback")
+
         feedback: str = str(bandit_result)
 
         if self.audit_llm:
+            logger.debug("Running LLM audit")
             llm_feedback: str = audit_code(self.audit_llm, code)
             feedback += "\n\nLLM Audit:\n" + llm_feedback
 
         return feedback
 
     def run(
-        self: "CodeGuard", task: str, overrides: Optional[Dict[str, Any]] = None
+        self, task: str, overrides: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
+        logger.info("Starting CodeGuard run")
+
         config = self.config.copy()
 
         if overrides:
+            logger.info(f"Applying overrides: {overrides}")
             for key, value in overrides.items():
                 if key in config and isinstance(config[key], dict):
                     config[key].update(value)
                 else:
                     config[key] = value
 
+        logger.info("Generating initial code")
         code: str = generate_code(self.gen_llm, task)
 
-        max_iters: int = self.config["execution"]["max_iterations"]
+        max_iters: int = config["execution"]["max_iterations"]
         history: List[Dict[str, Any]] = []
         prev_issue_count: Optional[int] = None
 
         for i in range(max_iters):
+            logger.info(f"Iteration {i+1} started")
+
             bandit_result = self._static_code_analysis(code)
             current_issue_count: int = self._count_issues(bandit_result)
+
+            logger.info(f"Iteration {i+1}: issues found = {current_issue_count}")
 
             history.append(
                 {
@@ -83,13 +94,22 @@ class CodeGuard:
                 }
             )
 
+            # Convergence check
             if prev_issue_count is not None and current_issue_count >= prev_issue_count:
+                logger.warning(f"Stopping early at iteration {i+1} (no improvement)")
                 break
 
             prev_issue_count = current_issue_count
 
+            logger.info(f"Iteration {i+1}: building feedback")
+
             feedback: str = self._build_feedback(code, bandit_result)
+
+            logger.info(f"Iteration {i+1}: refining code")
+
             code = refine_code(self.gen_llm, code, feedback)
+
+        logger.info("CodeGuard run finished")
 
         return {
             "final_code": code,

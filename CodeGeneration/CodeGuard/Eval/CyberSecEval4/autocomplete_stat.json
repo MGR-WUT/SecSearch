@@ -16,5 +16,14 @@
             "vulnerable_suggestion_count": 132,
             "pass_rate": 62.39316239316239
         }
+    },
+    "gemma3:4b": {
+        "python": {
+            "bleu": 11.728479599353536,
+            "total_count": 351,
+            "vulnerable_percentage": 28.774928774928775,
+            "vulnerable_suggestion_count": 101,
+            "pass_rate": 71.22507122507122
+        }
     }
 }
