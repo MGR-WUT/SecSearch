@@ -4,6 +4,17 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+def normalize_code(code: str) -> str:
+    if "```" in code:
+        code = code.replace("```python", "").replace("```", "")
+
+    if code.startswith(("'", '"')) and code.endswith(("'", '"')):
+        code = code[1:-1]
+
+    code = code.encode().decode("unicode_escape")
+    return code.strip()
+
+
 def create_llm(provider: str, model: str, temperature: float = 0):
     provider = provider.lower()
 
@@ -59,7 +70,7 @@ Constraints:
 Output:
 Return only the code.
 """
-    return llm.invoke(prompt).content
+    return normalize_code(llm.invoke(prompt).content)
 
 
 def audit_code(llm, code: str):
@@ -115,4 +126,4 @@ Constraints:
 Output:
 Return only the improved secure code.
 """
-    return llm.invoke(prompt).content
+    return normalize_code(llm.invoke(prompt).content)

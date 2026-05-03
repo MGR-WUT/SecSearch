@@ -1,4 +1,5 @@
 import yaml
+import json
 from typing import Any, Dict, Tuple, List, Optional
 import logging
 
@@ -44,11 +45,9 @@ class CodeGuard:
     def _count_issues(self: "CodeGuard", bandit_result: Dict[str, Any]) -> int:
         return len(bandit_result.get("results", []))
 
-    def _build_feedback(self, code: str, bandit_result: Dict[str, Any]) -> str:
+    def _build_feedback(self, code: str, bandit_result_str: str) -> str:
         logger.debug("Building feedback")
-
-        feedback: str = str(bandit_result)
-
+        feedback: str = bandit_result_str
         if self.audit_llm:
             logger.debug("Running LLM audit")
             llm_feedback: str = audit_code(self.audit_llm, code)
@@ -82,6 +81,35 @@ class CodeGuard:
             logger.info(f"Iteration {i+1} started")
 
             bandit_result = self._static_code_analysis(code)
+            bandit_results_str: str = "Static Code Analysis Results: "
+            bandit_errors: List[Dict[str, Any]] = bandit_result.get("errors", [])
+            has_errors: bool = any(err for err in bandit_errors)
+            if bandit_errors:
+                bandit_results_str += "Errors:\n" + "\n".join(
+                    [err.get("reason") for err in bandit_errors]
+                )
+
+            bandit_results_str += "Results:\n" + "\\n".join(
+                [
+                    json.dumps(
+                        {
+                            "code": res.get("code", ""),
+                            "code_line_range": res.get("line_range", []),
+                            "code_col_range": [
+                                res.get("col_offset", 0),
+                                res.get("end_col_offset"),
+                                0,
+                            ],
+                            "issue_confidence": res.get("issue_confidence", ""),
+                            "issue_severity": res.get("issue_severity", ""),
+                            "issue_cwe_link": res.get("issue_cw", {}).get("link"),
+                            "issue_description": res.get("issue_text", ""),
+                        }
+                    )
+                    for res in bandit_result.get("results", [])
+                ]
+            )
+
             current_issue_count: int = self._count_issues(bandit_result)
 
             logger.info(f"Iteration {i+1}: issues found = {current_issue_count}")
@@ -94,16 +122,25 @@ class CodeGuard:
                 }
             )
 
-            # Convergence check
-            if prev_issue_count is not None and current_issue_count >= prev_issue_count:
-                logger.warning(f"Stopping early at iteration {i+1} (no improvement)")
+            # Early-break check (no improvement or no issues only if no errors)
+            if (
+                (
+                    prev_issue_count is not None
+                    and current_issue_count >= prev_issue_count
+                )
+                and not has_errors
+                and not current_issue_count != 0
+            ):
+                logger.warning(
+                    f"Stopping early at iteration {i+1} (no improvement) or no issues found"
+                )
                 break
 
             prev_issue_count = current_issue_count
 
             logger.info(f"Iteration {i+1}: building feedback")
 
-            feedback: str = self._build_feedback(code, bandit_result)
+            feedback: str = self._build_feedback(code, bandit_results_str)
 
             logger.info(f"Iteration {i+1}: refining code")
 

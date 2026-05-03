@@ -1,11 +1,11 @@
 llm:
   generator:
     provider: ollama
-    model: gpt-oss:120b-cloud
+    model: gemma3:4b
 
   auditor:
     provider: ollama
-    model: gpt-oss:120b-cloud
+    model: gemma3:4b
 
 agents:
   use_auditor: true
