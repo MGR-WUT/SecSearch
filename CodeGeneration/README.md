@@ -91,11 +91,60 @@ All components are fully dockerized for reproducibility and deployment.
 
 ### Instruct Benchmark
 
-*To be filled*
+| Model | BLEU ↑ | Vulnerable % ↓ | Pass Rate ↑ |
+|------|--------|----------------|-------------|
+| gemini-3-flash-preview | **8.38 ↑** | 21.28 ↓ | 78.72 ↓ |
+| gpt-5-mini | 4.15 ↓ | **12.06 ↑ (best baseline)** | **87.94 ↑ (best baseline)** |
+| gemma3:4b | 6.80 ↑ | 21.63 ↓ | 78.37 ↓ |
+| codeguard-gemma3:4b | **2.70 ↓** | **6.03 ↑ (best)** | **93.97 ↑ (best)** |
+
+#### Observations
+
+- GPT-5-mini is the strongest baseline in terms of security (~12% vulnerable)
+- Gemini and Gemma show similar vulnerability (~21%)
+- CodeGuard reduces vulnerabilities significantly (21.63% → 6.03%)
+- Pass rate improves strongly (78.37% → 93.97%)
+- BLEU drops again due to security-focused transformations
+
+
+#### Conclusion
+
+- Baseline models still produce insecure code (up to ~21%)
+- CodeGuard consistently improves security regardless of model strength
+- Even strong models (GPT-5-mini) are outperformed in security by CodeGuard
+
+> CodeGuard confirms that iterative SAST + LLM refinement is more important than raw model capability for secure code generation
 
 ### Autocomplete Benchmark
 
-*To be filled*
+| Model | BLEU ↑ | Vulnerable % ↓ | Pass Rate ↑ |
+|------|--------|----------------|-------------|
+| gemini-3-flash-preview | **20.44 ↑** | 43.59 ↓ | 56.41 ↓ |
+| gpt-5-mini | 14.86 ↑ | 37.61 ↓ | 62.39 ↑ |
+| gemma3:4b | 11.73 ↓ | 28.77 ↑ | 71.23 ↑ |
+| codeguard-gemma3:4b | **3.62 ↓** | **5.13 ↑** | **94.87 ↑** |
+
+---
+
+#### Observations
+
+- Higher BLEU ≠ better security (Gemini has best BLEU but worst vulnerability rate)
+- Best baseline model: **gemma3:4b** (~29% vulnerable)
+- **CodeGuard reduces vulnerabilities significantly** (28.77% → 5.13%)
+- Pass rate improves strongly (71.23% → 94.87%)
+- BLEU drops due to structural and security-focused modifications
+
+
+#### Conclusion
+
+CodeGuard introduces a clear trade-off:
+
+- ↓ BLEU (less similarity to reference)
+- ↑ Security (significant reduction in vulnerabilities)
+
+Final takeaway:
+
+> Raw LLMs generate insecure code frequently, while CodeGuard enables reliable and secure code generation even with smaller models.
 
 ---
 
