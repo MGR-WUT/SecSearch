@@ -37,7 +37,6 @@ It supports Ollama, OpenAI, and Google Gemini via provider-based LLM settings an
 - `POST /query` with payload:
   - `question`: user question
 - `POST /query_v2` for Neo4j GraphRAG Python + vector retrieval (`nomic-embed-text`)
-- `POST /query/compare` for side-by-side response comparison (`/query` vs `/query_v2`)
 - `POST /temporal/update` to trigger stale-source refresh
 
 ## LLM usage and cost map
@@ -45,14 +44,11 @@ It supports Ollama, OpenAI, and Google Gemini via provider-based LLM settings an
 ```mermaid
 flowchart TD
     A["POST /ingest (per document)"] --> B["ExtractionService<br/>uses llm_extract_model<br/>~1 call / document"]
-    B --> C["MitreMapper fallback<br/>uses llm_extract_model<br/>0..N calls / document<br/>(only when catalog match fails)"]
     A --> D["GraphRAG v2 chunk indexing<br/>uses llm_embed_model<br/>1 call / chunk-batch"]
 
     E["POST /query"] --> F["QueryAgent (Cypher QA)<br/>uses llm_chat_model<br/>~1 call / request"]
     G["POST /query_v2"] --> H["Retriever embedding<br/>uses llm_embed_model<br/>~1 call / request"]
     H --> I["Answer generation<br/>uses llm_chat_model<br/>~1 call / request"]
-    J["POST /query/compare"] --> F
-    J --> H
 ```
 
 - `llm_extract_model` is used during ingestion/extraction, usually the highest cost for large ingest jobs.
@@ -61,10 +57,9 @@ flowchart TD
 
 Approximate call counts:
 
-- One `POST /ingest` for one document: `extract_model ~= 1 + mapper_fallbacks`, `embed_model ~= 1` (for chunk batch embedding).
+- One `POST /ingest` for one document: `extract_model ~= 1`, `embed_model ~= 1` (for chunk batch embedding).
 - One `POST /query`: `chat_model ~= 1`.
 - One `POST /query_v2`: `embed_model ~= 1` and `chat_model ~= 1`.
-- One `POST /query/compare`: combines both query paths, so roughly `chat_model ~= 2` and `embed_model ~= 1`.
 
 Quick monthly estimate:
 
@@ -79,19 +74,21 @@ Quick monthly estimate:
 
 ## Evaluation
 
-Run baseline evaluation:
+Run evaluation on a real benchmark dataset:
 
-- `PYTHONPATH=. python scripts/run_evaluation.py`
+- `PYTHONPATH=. python eval/run.py --dataset /absolute/path/to/benchmark_dataset.json`
 
 Artifacts:
 
-- `data/eval/report.json`: local multi-hop, faithfulness, and latency metrics
-- `data/eval/sota_comparison.json`: gap vs larger SOTA references
-- `data/eval/sample_multihop_dataset.json`: starter multi-hop dataset
+- Use benchmark-scoped folders under `eval/`, for example:
+  - `eval/WildGraphBench/*.json`
+  - `eval/<benchmarkName>/*.json`
+- Default report output is `eval/benchmarkName/report.json` (override with `--output`).
+- The repository no longer ships synthetic/sample benchmark JSON files; keep only real benchmark datasets and generated evaluation outputs.
 
 WildGraphBench integration:
 
-- Use `app/eval/wildgraphbench.py` to export predictions and compare with benchmark/SOTA outputs.
+- Use `eval/wildgraphbench.py` to export predictions and compare with external benchmark/SOTA outputs.
 
 ## GraphRAG v2 notes
 

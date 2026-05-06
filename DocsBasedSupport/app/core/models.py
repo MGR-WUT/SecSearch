@@ -36,12 +36,6 @@ class QueryResponse(BaseModel):
     citations: list[ClaimCitation]
 
 
-class QueryComparisonResponse(BaseModel):
-    question: str
-    baseline_v1: QueryResponse
-    graphrag_v2: QueryResponse
-
-
 class TemporalCheckResult(BaseModel):
     source_id: str
     source_url: str

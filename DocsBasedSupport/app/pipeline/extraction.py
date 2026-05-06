@@ -6,7 +6,6 @@ from typing import Any
 
 from app.core.llm_factory import build_chat_llm
 from app.graph.neo4j_store import GraphEntity, GraphRelation, Neo4jStore
-from app.ontology.mitre_mapper import MitreMapper
 from app.pipeline.ingestion import IngestedDocument
 
 ALLOWED_REL_TYPES = {"MITIGATES", "AFFECTS", "DEPENDS_ON", "INTEGRATES_WITH"}
@@ -16,14 +15,12 @@ class ExtractionService:
     def __init__(
         self,
         graph_store: Neo4jStore,
-        mitre_mapper: MitreMapper,
         llm_provider: str,
         llm_base_url: str | None,
         llm_api_key: str | None,
         model: str,
     ) -> None:
         self.graph_store = graph_store
-        self.mitre_mapper = mitre_mapper
         self.llm = build_chat_llm(
             provider=llm_provider,
             model=model,
@@ -43,17 +40,7 @@ class ExtractionService:
         )
 
         for entity in extraction["entities"]:
-            mapped = None
-            if entity["label"] in {"CVE", "MitigationStep", "Policy"}:
-                mapped = self.mitre_mapper.map_item(entity["name"])
             entity_props = dict(entity.get("properties", {}))
-            if mapped is not None:
-                entity_props["mitre_framework"] = mapped.get("framework")
-                entity_props["mitre_technique_id"] = mapped.get("technique_id")
-                entity_props["mitre_technique_name"] = mapped.get("technique_name")
-                entity_props["mitre_mapping_method"] = mapped.get("mapping_method")
-                entity_props["mitre_confidence"] = mapped.get("confidence")
-                entity_props["mitre_ontology_version"] = mapped.get("ontology_version")
             self.graph_store.upsert_entity(
                 GraphEntity(
                     label=entity["label"],

@@ -7,9 +7,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI, HTTPException
 
 from app.core.config import get_settings
-from app.core.models import IngestRequest, QueryComparisonResponse, QueryRequest, QueryResponse
+from app.core.models import IngestRequest, QueryRequest, QueryResponse
 from app.graph.neo4j_store import Neo4jStore
-from app.ontology.mitre_mapper import MitreMapper
 from app.pipeline.extraction import ExtractionService
 from app.pipeline.ingestion import IngestionService
 from app.pipeline.query_agent import QueryAgent
@@ -34,16 +33,8 @@ async def lifespan(_: FastAPI):
     store.ensure_schema()
     app.state.graph_store = store
     app.state.ingestion_service = IngestionService(timeout_seconds=settings.temporal_http_timeout_seconds)
-    app.state.mitre_mapper = MitreMapper(
-        catalog_path="data/ontologies/mitre_d3fend_catalog.json",
-        llm_provider=settings.llm_provider,
-        llm_base_url=settings.llm_base_url,
-        llm_api_key=settings.llm_api_key,
-        model=settings.llm_extract_model,
-    )
     app.state.extraction_service = ExtractionService(
         graph_store=store,
-        mitre_mapper=app.state.mitre_mapper,
         llm_provider=settings.llm_provider,
         llm_base_url=settings.llm_base_url,
         llm_api_key=settings.llm_api_key,
@@ -123,25 +114,6 @@ def query_v2(payload: QueryRequest) -> QueryResponse:
     if not payload.question.strip():
         raise HTTPException(status_code=400, detail="Question must not be empty.")
     return app.state.query_agent_v2.answer(payload.question)
-
-
-@app.post("/query/compare", response_model=QueryComparisonResponse)
-def query_compare(payload: QueryRequest) -> QueryComparisonResponse:
-    if not payload.question.strip():
-        raise HTTPException(status_code=400, detail="Question must not be empty.")
-    try:
-        baseline = app.state.query_agent.answer(payload.question)
-    except Exception as exc:
-        baseline = QueryResponse(
-            answer=f"Baseline v1 query failed: {exc}",
-            evidence_path=[],
-            citations=[],
-        )
-    return QueryComparisonResponse(
-        question=payload.question,
-        baseline_v1=baseline,
-        graphrag_v2=app.state.query_agent_v2.answer(payload.question),
-    )
 
 
 @app.post("/temporal/update")
