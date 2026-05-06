@@ -1,0 +1,19 @@
+{
+  "models": [
+    {
+      "name": "gpt-4.1",
+      "multi_hop_accuracy": 0.79,
+      "faithfulness_ragas": 0.84
+    },
+    {
+      "name": "claude-3.7-sonnet",
+      "multi_hop_accuracy": 0.76,
+      "faithfulness_ragas": 0.82
+    },
+    {
+      "name": "gemini-1.5-pro",
+      "multi_hop_accuracy": 0.75,
+      "faithfulness_ragas": 0.81
+    }
+  ]
+}

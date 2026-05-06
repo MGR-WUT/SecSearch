@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+langchain
+langchain-community
+langchain-ollama
+langchain-neo4j
+neo4j
+pydantic
+pydantic-settings
+python-dotenv
+PyYAML
+httpx
+beautifulsoup4
+pypdf
+apscheduler
+ragas
+datasets

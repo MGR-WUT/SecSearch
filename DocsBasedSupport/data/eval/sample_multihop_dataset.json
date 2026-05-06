@@ -1,0 +1,12 @@
+[
+  {
+    "question": "Which policy in the Palo Alto docs mitigates CVE-2024-12345 and what feature does it depend on?",
+    "expected_entities": ["CVE-2024-12345", "PolicyHardening", "ThreatPrevention"],
+    "expected_answer_contains": ["mitigates", "depends"]
+  },
+  {
+    "question": "What integration step in XSOAR helps reduce impact of CVE-2023-99999?",
+    "expected_entities": ["CVE-2023-99999", "XSOAR", "MitigationPlaybook"],
+    "expected_answer_contains": ["integration", "mitigation"]
+  }
+]

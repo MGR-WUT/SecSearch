@@ -1,0 +1,19 @@
+app_name: docs-graph-rag
+app_env: local
+app_allow_remote_providers: false
+
+ollama_base_url: http://localhost:11434
+ollama_chat_model: deepseek-r1:8b
+ollama_extract_model: gemma3:4b
+ollama_embed_model: nomic-embed-text
+
+neo4j_uri: bolt://localhost:7687
+neo4j_username: neo4j
+neo4j_password: neo4j_password
+neo4j_database: neo4j
+
+temporal_refresh_minutes: 360
+temporal_http_timeout_seconds: 20
+graphrag_v2_index_name: chunk-vector-index
+graphrag_v2_top_k: 5
+graphrag_v2_embedding_dims: 768
