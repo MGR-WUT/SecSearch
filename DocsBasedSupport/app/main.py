@@ -11,7 +11,6 @@ from app.core.models import IngestRequest, QueryRequest, QueryResponse
 from app.graph.neo4j_store import Neo4jStore
 from app.pipeline.extraction import ExtractionService
 from app.pipeline.ingestion import IngestionService
-from app.pipeline.query_agent import QueryAgent
 from app.pipeline.query_agent_v2 import GraphRAGV2Service
 from app.pipeline.temporal_update import TemporalUpdateService
 
@@ -45,17 +44,6 @@ async def lifespan(_: FastAPI):
         ingestion_service=app.state.ingestion_service,
         extraction_service=app.state.extraction_service,
         timeout_seconds=settings.temporal_http_timeout_seconds,
-    )
-    app.state.query_agent = QueryAgent(
-        graph_store=store,
-        neo4j_uri=settings.neo4j_uri,
-        neo4j_username=settings.neo4j_username,
-        neo4j_password=settings.neo4j_password,
-        neo4j_database=settings.neo4j_database,
-        llm_provider=settings.llm_provider,
-        llm_base_url=settings.llm_base_url,
-        llm_api_key=settings.llm_api_key,
-        model=settings.llm_chat_model,
     )
     app.state.query_agent_v2 = GraphRAGV2Service(
         graph_store=store,
@@ -100,13 +88,6 @@ def ingest(payload: IngestRequest) -> dict[str, object]:
         extracted["v2_chunks_indexed"] = app.state.query_agent_v2.index_document_chunks(doc)
         results.append(extracted)
     return {"ingested": len(results), "details": results}
-
-
-@app.post("/query", response_model=QueryResponse)
-def query(payload: QueryRequest) -> QueryResponse:
-    if not payload.question.strip():
-        raise HTTPException(status_code=400, detail="Question must not be empty.")
-    return app.state.query_agent.answer(payload.question)
 
 
 @app.post("/query_v2", response_model=QueryResponse)

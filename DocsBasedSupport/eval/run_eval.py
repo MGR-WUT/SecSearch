@@ -12,7 +12,7 @@ from datasets import Dataset
 from ragas import evaluate
 from ragas.metrics import faithfulness
 
-from app.pipeline.query_agent import QueryAgent
+from app.pipeline.query_agent_v2 import GraphRAGV2Service
 
 
 @dataclass
@@ -63,7 +63,7 @@ def _ragas_faithfulness(samples: list[EvalSample], outputs: list[dict[str, Any]]
     return float(result["faithfulness"])
 
 
-def run(query_agent: QueryAgent, dataset_path: Path, output_path: Path) -> dict[str, Any]:
+def run(query_agent: GraphRAGV2Service, dataset_path: Path, output_path: Path) -> dict[str, Any]:
     samples = _load_samples(dataset_path)
     outputs: list[dict[str, Any]] = []
     latencies: list[float] = []
@@ -97,7 +97,7 @@ def main() -> None:
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
     raise SystemExit(
-        "Instantiate QueryAgent from app context and call run(...) from a service-aware script. "
+        "Instantiate GraphRAGV2Service from app context and call run(...) from a service-aware script. "
         "This CLI keeps eval utilities isolated from runtime dependency injection."
     )
 

@@ -17,3 +17,6 @@ pypdf
 apscheduler
 ragas
 datasets
+matplotlib
+networkx
+ipywidgets

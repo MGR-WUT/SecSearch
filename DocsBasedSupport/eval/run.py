@@ -5,7 +5,7 @@ from pathlib import Path
 
 from app.core.config import get_settings
 from app.graph.neo4j_store import Neo4jStore
-from app.pipeline.query_agent import QueryAgent
+from app.pipeline.query_agent_v2 import GraphRAGV2Service
 from eval.run_eval import run
 
 
@@ -30,16 +30,16 @@ def main() -> None:
         password=settings.neo4j_password,
         database=settings.neo4j_database,
     )
-    agent = QueryAgent(
+    agent = GraphRAGV2Service(
         graph_store=store,
-        neo4j_uri=settings.neo4j_uri,
-        neo4j_username=settings.neo4j_username,
-        neo4j_password=settings.neo4j_password,
-        neo4j_database=settings.neo4j_database,
         llm_provider=settings.llm_provider,
         llm_base_url=settings.llm_base_url,
         llm_api_key=settings.llm_api_key,
-        model=settings.llm_chat_model,
+        embed_model=settings.llm_embed_model,
+        chat_model=settings.llm_chat_model,
+        index_name=settings.graphrag_v2_index_name,
+        embedding_dims=settings.graphrag_v2_embedding_dims,
+        top_k=settings.graphrag_v2_top_k,
     )
     dataset_path = Path(args.dataset)
     report_path = Path(args.output)

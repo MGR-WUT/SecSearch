@@ -1,7 +1,7 @@
 # Dynamic Local GraphRAG for Cybersecurity Docs
 
 This service builds and queries a Neo4j knowledge graph from cybersecurity PDFs and vendor URLs.
-It supports Ollama, OpenAI, and Google Gemini via provider-based LLM settings and exposes a FastAPI interface for ingestion, temporal refresh, and multi-hop QA.
+It supports Ollama, OpenAI, and Google Gemini via provider-based LLM settings and exposes a FastAPI interface for ingestion, temporal refresh, and GraphRAG v2 QA.
 
 ## Privacy and safety guarantees
 
@@ -12,7 +12,6 @@ It supports Ollama, OpenAI, and Google Gemini via provider-based LLM settings an
 ## Stack
 
 - FastAPI backend
-- LangChain + `GraphCypherQAChain`
 - Neo4j graph database
 - Provider-based LLM integration (`ollama`, `openai`, `gemini`)
 - RAGAS-based faithfulness metric and WildGraphBench-compatible output adapter
@@ -34,8 +33,6 @@ It supports Ollama, OpenAI, and Google Gemini via provider-based LLM settings an
 - `POST /ingest` with payload:
   - `pdf_paths`: local file paths
   - `urls`: vendor documentation URLs
-- `POST /query` with payload:
-  - `question`: user question
 - `POST /query_v2` for Neo4j GraphRAG Python + vector retrieval (`nomic-embed-text`)
 - `POST /temporal/update` to trigger stale-source refresh
 
@@ -46,20 +43,28 @@ flowchart TD
     A["POST /ingest (per document)"] --> B["ExtractionService<br/>uses llm_extract_model<br/>~1 call / document"]
     A --> D["GraphRAG v2 chunk indexing<br/>uses llm_embed_model<br/>1 call / chunk-batch"]
 
-    E["POST /query"] --> F["QueryAgent (Cypher QA)<br/>uses llm_chat_model<br/>~1 call / request"]
     G["POST /query_v2"] --> H["Retriever embedding<br/>uses llm_embed_model<br/>~1 call / request"]
     H --> I["Answer generation<br/>uses llm_chat_model<br/>~1 call / request"]
 ```
 
 - `llm_extract_model` is used during ingestion/extraction, usually the highest cost for large ingest jobs.
 - `llm_embed_model` is used for vector indexing and vector retrieval.
-- `llm_chat_model` is used for `/query` answers and `/query_v2` final answer synthesis.
+- `llm_chat_model` is used for `/query_v2` final answer synthesis.
 
 Approximate call counts:
 
 - One `POST /ingest` for one document: `extract_model ~= 1`, `embed_model ~= 1` (for chunk batch embedding).
-- One `POST /query`: `chat_model ~= 1`.
 - One `POST /query_v2`: `embed_model ~= 1` and `chat_model ~= 1`.
+
+## v1 deprecation note
+
+The legacy v1 Cypher QA path (`/query`, `GraphCypherQAChain`) was tested and removed from this repository.
+
+Observed behavior in local tests after URL/PDF ingestion:
+- It frequently failed to produce valid Cypher for ingested resources.
+- This caused unstable query execution and unreliable graph-based answers.
+
+The project now keeps only GraphRAG v2 (`/query_v2`) for ingestion/query workflows.
 
 Quick monthly estimate:
 
