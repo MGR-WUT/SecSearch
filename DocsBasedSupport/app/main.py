@@ -36,14 +36,18 @@ async def lifespan(_: FastAPI):
     app.state.ingestion_service = IngestionService(timeout_seconds=settings.temporal_http_timeout_seconds)
     app.state.mitre_mapper = MitreMapper(
         catalog_path="data/ontologies/mitre_d3fend_catalog.json",
-        ollama_base_url=settings.ollama_base_url,
-        model=settings.ollama_extract_model,
+        llm_provider=settings.llm_provider,
+        llm_base_url=settings.llm_base_url,
+        llm_api_key=settings.llm_api_key,
+        model=settings.llm_extract_model,
     )
     app.state.extraction_service = ExtractionService(
         graph_store=store,
         mitre_mapper=app.state.mitre_mapper,
-        ollama_base_url=settings.ollama_base_url,
-        model=settings.ollama_extract_model,
+        llm_provider=settings.llm_provider,
+        llm_base_url=settings.llm_base_url,
+        llm_api_key=settings.llm_api_key,
+        model=settings.llm_extract_model,
     )
     app.state.temporal_service = TemporalUpdateService(
         graph_store=store,
@@ -57,17 +61,21 @@ async def lifespan(_: FastAPI):
         neo4j_username=settings.neo4j_username,
         neo4j_password=settings.neo4j_password,
         neo4j_database=settings.neo4j_database,
-        ollama_base_url=settings.ollama_base_url,
-        model=settings.ollama_chat_model,
+        llm_provider=settings.llm_provider,
+        llm_base_url=settings.llm_base_url,
+        llm_api_key=settings.llm_api_key,
+        model=settings.llm_chat_model,
     )
     app.state.query_agent_v2 = GraphRAGV2Service(
         graph_store=store,
         index_name=settings.graphrag_v2_index_name,
         embedding_dims=settings.graphrag_v2_embedding_dims,
         top_k=settings.graphrag_v2_top_k,
-        ollama_base_url=settings.ollama_base_url,
-        embed_model=settings.ollama_embed_model,
-        chat_model=settings.ollama_chat_model,
+        llm_provider=settings.llm_provider,
+        llm_base_url=settings.llm_base_url,
+        llm_api_key=settings.llm_api_key,
+        embed_model=settings.llm_embed_model,
+        chat_model=settings.llm_chat_model,
     )
     scheduler.add_job(
         app.state.temporal_service.run_update_cycle,

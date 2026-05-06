@@ -4,15 +4,27 @@ import json
 from pathlib import Path
 from typing import Any
 
-from langchain_ollama import ChatOllama
+from app.core.llm_factory import build_chat_llm
 
 
 class MitreMapper:
-    def __init__(self, catalog_path: str, ollama_base_url: str, model: str) -> None:
+    def __init__(
+        self,
+        catalog_path: str,
+        llm_provider: str,
+        llm_base_url: str | None,
+        llm_api_key: str | None,
+        model: str,
+    ) -> None:
         self.catalog_path = Path(catalog_path)
         with self.catalog_path.open("r", encoding="utf-8") as fh:
             self.catalog = json.load(fh)
-        self.llm = ChatOllama(model=model, base_url=ollama_base_url, temperature=0)
+        self.llm = build_chat_llm(
+            provider=llm_provider,
+            model=model,
+            base_url=llm_base_url,
+            api_key=llm_api_key,
+        )
 
     def map_item(self, text: str) -> dict[str, Any]:
         lowered = text.lower()

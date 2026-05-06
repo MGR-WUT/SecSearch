@@ -10,10 +10,12 @@ class Settings(BaseSettings):
     app_env: str | None = None
     app_allow_remote_providers: bool | None = None
 
-    ollama_base_url: str | None = None
-    ollama_chat_model: str | None = None
-    ollama_extract_model: str | None = None
-    ollama_embed_model: str | None = None
+    llm_provider: str | None = None
+    llm_base_url: str | None = None
+    llm_api_key: str | None = None
+    llm_chat_model: str | None = None
+    llm_extract_model: str | None = None
+    llm_embed_model: str | None = None
 
     neo4j_uri: str | None = None
     neo4j_username: str | None = None
@@ -36,19 +38,27 @@ class Settings(BaseSettings):
         allow_remote = bool(self.app_allow_remote_providers)
         if allow_remote:
             return
-        if not self.ollama_base_url:
-            raise ValueError("OLLAMA_BASE_URL must be provided by env or settings YAML.")
-        if not self.ollama_base_url.startswith("http://localhost") and not self.ollama_base_url.startswith("http://127.0.0.1"):
-            raise ValueError("Remote LLM provider is disabled. Use a local Ollama base URL.")
+        if self.llm_provider != "ollama":
+            raise ValueError(
+                "Remote LLM provider is disabled. Set LLM_PROVIDER=ollama."
+            )
+        if not self.llm_base_url:
+            raise ValueError("LLM_BASE_URL must be provided for Ollama.")
+        if not self.llm_base_url.startswith(
+            "http://localhost"
+        ) and not self.llm_base_url.startswith("http://127.0.0.1"):
+            raise ValueError(
+                "Remote LLM provider is disabled. Use a local Ollama base URL."
+            )
 
     def validate_required(self) -> None:
         required_fields = [
             "app_name",
             "app_env",
-            "ollama_base_url",
-            "ollama_chat_model",
-            "ollama_extract_model",
-            "ollama_embed_model",
+            "llm_provider",
+            "llm_chat_model",
+            "llm_extract_model",
+            "llm_embed_model",
             "neo4j_uri",
             "neo4j_username",
             "neo4j_password",
@@ -59,11 +69,19 @@ class Settings(BaseSettings):
             "graphrag_v2_top_k",
             "graphrag_v2_embedding_dims",
         ]
-        missing = [name for name in required_fields if getattr(self, name) in (None, "")]
-        if missing:
+        if missing := [
+            name for name in required_fields if getattr(self, name) in (None, "")
+        ]:
             raise ValueError(
-                "Missing required settings (set via .env or YAML): " + ", ".join(missing)
+                "Missing required settings (set via .env or YAML): "
+                + ", ".join(missing)
             )
+        if self.llm_provider not in {"ollama", "openai", "gemini"}:
+            raise ValueError("LLM_PROVIDER must be one of: ollama, openai, gemini.")
+        if self.llm_provider == "ollama" and not self.llm_base_url:
+            raise ValueError("LLM_BASE_URL is required when LLM_PROVIDER=ollama.")
+        if self.llm_provider in {"openai", "gemini"} and not self.llm_api_key:
+            raise ValueError("LLM_API_KEY is required for remote providers.")
 
 
 def _load_yaml_settings() -> dict[str, object]:
@@ -83,4 +101,3 @@ def get_settings() -> Settings:
     settings.validate_required()
     settings.validate_local_only()
     return settings
-

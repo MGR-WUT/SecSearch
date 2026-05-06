@@ -7,8 +7,8 @@ try:
 except ImportError:
     from langchain_community.chains.graph_qa.cypher import GraphCypherQAChain
 from langchain_neo4j import Neo4jGraph
-from langchain_ollama import ChatOllama
 
+from app.core.llm_factory import build_chat_llm
 from app.core.models import ClaimCitation, EvidenceEdge, QueryResponse
 from app.graph.neo4j_store import Neo4jStore
 
@@ -21,11 +21,18 @@ class QueryAgent:
         neo4j_username: str,
         neo4j_password: str,
         neo4j_database: str,
-        ollama_base_url: str,
+        llm_provider: str,
+        llm_base_url: str | None,
+        llm_api_key: str | None,
         model: str,
     ) -> None:
         self.graph_store = graph_store
-        llm = ChatOllama(model=model, base_url=ollama_base_url, temperature=0)
+        llm = build_chat_llm(
+            provider=llm_provider,
+            model=model,
+            base_url=llm_base_url,
+            api_key=llm_api_key,
+        )
         graph = Neo4jGraph(
             url=neo4j_uri,
             username=neo4j_username,

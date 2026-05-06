@@ -1,7 +1,7 @@
 # Dynamic Local GraphRAG for Cybersecurity Docs
 
-This service builds and queries a local Neo4j knowledge graph from cybersecurity PDFs and vendor URLs.
-It runs fully local with Ollama + Neo4j and exposes a FastAPI interface for ingestion, temporal refresh, and multi-hop QA.
+This service builds and queries a Neo4j knowledge graph from cybersecurity PDFs and vendor URLs.
+It supports Ollama, OpenAI, and Google Gemini via provider-based LLM settings and exposes a FastAPI interface for ingestion, temporal refresh, and multi-hop QA.
 
 ## Privacy and safety guarantees
 
@@ -14,7 +14,7 @@ It runs fully local with Ollama + Neo4j and exposes a FastAPI interface for inge
 - FastAPI backend
 - LangChain + `GraphCypherQAChain`
 - Neo4j graph database
-- Ollama local LLMs (`deepseek-r1:8b` / `gemma3:4b`)
+- Provider-based LLM integration (`ollama`, `openai`, `gemini`)
 - RAGAS-based faithfulness metric and WildGraphBench-compatible output adapter
 
 ## Quick start
@@ -39,6 +39,37 @@ It runs fully local with Ollama + Neo4j and exposes a FastAPI interface for inge
 - `POST /query_v2` for Neo4j GraphRAG Python + vector retrieval (`nomic-embed-text`)
 - `POST /query/compare` for side-by-side response comparison (`/query` vs `/query_v2`)
 - `POST /temporal/update` to trigger stale-source refresh
+
+## LLM usage and cost map
+
+```mermaid
+flowchart TD
+    A["POST /ingest (per document)"] --> B["ExtractionService<br/>uses llm_extract_model<br/>~1 call / document"]
+    B --> C["MitreMapper fallback<br/>uses llm_extract_model<br/>0..N calls / document<br/>(only when catalog match fails)"]
+    A --> D["GraphRAG v2 chunk indexing<br/>uses llm_embed_model<br/>1 call / chunk-batch"]
+
+    E["POST /query"] --> F["QueryAgent (Cypher QA)<br/>uses llm_chat_model<br/>~1 call / request"]
+    G["POST /query_v2"] --> H["Retriever embedding<br/>uses llm_embed_model<br/>~1 call / request"]
+    H --> I["Answer generation<br/>uses llm_chat_model<br/>~1 call / request"]
+    J["POST /query/compare"] --> F
+    J --> H
+```
+
+- `llm_extract_model` is used during ingestion/extraction, usually the highest cost for large ingest jobs.
+- `llm_embed_model` is used for vector indexing and vector retrieval.
+- `llm_chat_model` is used for `/query` answers and `/query_v2` final answer synthesis.
+
+Approximate call counts:
+
+- One `POST /ingest` for one document: `extract_model ~= 1 + mapper_fallbacks`, `embed_model ~= 1` (for chunk batch embedding).
+- One `POST /query`: `chat_model ~= 1`.
+- One `POST /query_v2`: `embed_model ~= 1` and `chat_model ~= 1`.
+- One `POST /query/compare`: combines both query paths, so roughly `chat_model ~= 2` and `embed_model ~= 1`.
+
+Quick monthly estimate:
+
+- `monthly_cost ~= sum(model_calls_i * avg_tokens_i / 1_000_000 * price_per_1M_tokens_i)`
+- For precise numbers, add request logging of token usage per endpoint and aggregate by model.
 
 ## Temporal update loop
 
@@ -66,4 +97,5 @@ WildGraphBench integration:
 
 - v2 uses `neo4j-graphrag-python` retriever flow with chunk embeddings stored on `Chunk.embedding`.
 - Default embedding model is `nomic-embed-text` (configure in `settings.yaml`).
+- Native GraphRAG generation currently runs with Ollama; for other providers, v2 falls back to vector retrieval + provider chat synthesis.
 - Ensure vector dimensions in settings match the selected embedding model.

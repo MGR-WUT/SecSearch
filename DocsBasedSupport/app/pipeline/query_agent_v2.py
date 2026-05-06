@@ -4,12 +4,12 @@ import hashlib
 import re
 from typing import Any
 
-from langchain_ollama import ChatOllama, OllamaEmbeddings
 from neo4j_graphrag.generation import GraphRAG
 from neo4j_graphrag.indexes import create_vector_index
 from neo4j_graphrag.llm import OllamaLLM
 from neo4j_graphrag.retrievers import VectorRetriever
 
+from app.core.llm_factory import build_chat_llm, build_embedder
 from app.core.models import ClaimCitation, EvidenceEdge, QueryResponse
 from app.graph.neo4j_store import Neo4jStore
 from app.pipeline.ingestion import IngestedDocument
@@ -22,7 +22,9 @@ class GraphRAGV2Service:
         index_name: str,
         embedding_dims: int,
         top_k: int,
-        ollama_base_url: str,
+        llm_provider: str,
+        llm_base_url: str | None,
+        llm_api_key: str | None,
         embed_model: str,
         chat_model: str,
     ) -> None:
@@ -30,14 +32,27 @@ class GraphRAGV2Service:
         self.index_name = index_name
         self.embedding_dims = embedding_dims
         self.top_k = top_k
-        self.embedder = OllamaEmbeddings(model=embed_model, base_url=ollama_base_url)
-        self.fallback_chat = ChatOllama(model=chat_model, base_url=ollama_base_url, temperature=0)
+        self.llm_provider = llm_provider.lower()
+        self.embedder = build_embedder(
+            provider=self.llm_provider,
+            model=embed_model,
+            base_url=llm_base_url,
+            api_key=llm_api_key,
+        )
+        self.fallback_chat = build_chat_llm(
+            provider=self.llm_provider,
+            model=chat_model,
+            base_url=llm_base_url,
+            api_key=llm_api_key,
+        )
         self._ensure_vector_index()
         self.retriever = VectorRetriever(self.graph_store.driver, self.index_name, self.embedder)
-        self.rag = GraphRAG(
-            retriever=self.retriever,
-            llm=OllamaLLM(model_name=chat_model, model_params={"temperature": 0}),
-        )
+        self.rag = None
+        if self.llm_provider == "ollama":
+            self.rag = GraphRAG(
+                retriever=self.retriever,
+                llm=OllamaLLM(model_name=chat_model, model_params={"temperature": 0}),
+            )
 
     def _ensure_vector_index(self) -> None:
         create_vector_index(
@@ -67,8 +82,11 @@ class GraphRAGV2Service:
         return len(rows)
 
     def answer(self, question: str) -> QueryResponse:
-        search_result = self.rag.search(query_text=question, retriever_config={"top_k": self.top_k})
-        raw_answer = getattr(search_result, "answer", "").strip()
+        search_result: Any = None
+        raw_answer = ""
+        if self.rag is not None:
+            search_result = self.rag.search(query_text=question, retriever_config={"top_k": self.top_k})
+            raw_answer = getattr(search_result, "answer", "").strip()
         retrieval_items = self._retrieve_context(question, search_result, raw_answer)
 
         if not raw_answer:
@@ -102,10 +120,8 @@ class GraphRAGV2Service:
             raw_answer = f"{raw_answer}\n\nRecommendation: Validate this hypothesis with a human analyst before remediation."
         return QueryResponse(answer=raw_answer, evidence_path=evidence_path, citations=citations)
 
-    def _retrieve_context(
-        self, question: str, search_result: Any, answer_text: str
-    ) -> list[dict[str, str]]:
-        retrieval_items = self._extract_retrieval_items(search_result)
+    def _retrieve_context(self, question: str, search_result: Any, answer_text: str) -> list[dict[str, str]]:
+        retrieval_items = self._extract_retrieval_items(search_result) if search_result is not None else []
         if retrieval_items:
             return retrieval_items
 

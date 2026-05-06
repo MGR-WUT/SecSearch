@@ -23,8 +23,10 @@ def main() -> None:
         neo4j_username=settings.neo4j_username,
         neo4j_password=settings.neo4j_password,
         neo4j_database=settings.neo4j_database,
-        ollama_base_url=settings.ollama_base_url,
-        model=settings.ollama_chat_model,
+        llm_provider=settings.llm_provider,
+        llm_base_url=settings.llm_base_url,
+        llm_api_key=settings.llm_api_key,
+        model=settings.llm_chat_model,
     )
     report_path = Path("data/eval/report.json")
     report = run(agent, Path("data/eval/sample_multihop_dataset.json"), report_path)

@@ -2,10 +2,12 @@ app_name: docs-graph-rag
 app_env: local
 app_allow_remote_providers: false
 
-ollama_base_url: http://localhost:11434
-ollama_chat_model: deepseek-r1:8b
-ollama_extract_model: gemma3:4b
-ollama_embed_model: nomic-embed-text
+llm_provider: ollama
+llm_base_url: http://localhost:11434
+llm_api_key:
+llm_chat_model: deepseek-r1:8b
+llm_extract_model: gemma3:4b
+llm_embed_model: nomic-embed-text
 
 neo4j_uri: bolt://localhost:7687
 neo4j_username: neo4j

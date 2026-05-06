@@ -4,8 +4,7 @@ import json
 import re
 from typing import Any
 
-from langchain_ollama import ChatOllama
-
+from app.core.llm_factory import build_chat_llm
 from app.graph.neo4j_store import GraphEntity, GraphRelation, Neo4jStore
 from app.ontology.mitre_mapper import MitreMapper
 from app.pipeline.ingestion import IngestedDocument
@@ -18,12 +17,19 @@ class ExtractionService:
         self,
         graph_store: Neo4jStore,
         mitre_mapper: MitreMapper,
-        ollama_base_url: str,
+        llm_provider: str,
+        llm_base_url: str | None,
+        llm_api_key: str | None,
         model: str,
     ) -> None:
         self.graph_store = graph_store
         self.mitre_mapper = mitre_mapper
-        self.llm = ChatOllama(model=model, base_url=ollama_base_url, temperature=0)
+        self.llm = build_chat_llm(
+            provider=llm_provider,
+            model=model,
+            base_url=llm_base_url,
+            api_key=llm_api_key,
+        )
 
     def extract_and_store(self, document: IngestedDocument) -> dict[str, Any]:
         extraction = self._extract_graph_elements(document.content)

@@ -3,6 +3,8 @@ uvicorn
 langchain
 langchain-community
 langchain-ollama
+langchain-openai
+langchain-google-genai
 langchain-neo4j
 neo4j
 pydantic
