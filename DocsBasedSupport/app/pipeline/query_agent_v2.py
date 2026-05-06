@@ -81,7 +81,7 @@ class GraphRAGV2Service:
             self.graph_store.set_chunk_embeddings(embedding_rows)
         return len(rows)
 
-    def answer(self, question: str) -> QueryResponse:
+    def answer(self, question: str, benchmark_strict: bool = False) -> QueryResponse:
         search_result: Any = None
         raw_answer = ""
         if self.rag is not None:
@@ -90,7 +90,7 @@ class GraphRAGV2Service:
         retrieval_items = self._retrieve_context(question, search_result, raw_answer)
 
         if not raw_answer:
-            raw_answer = self._fallback_answer(question, retrieval_items)
+            raw_answer = self._fallback_answer(question, retrieval_items, benchmark_strict=benchmark_strict)
 
         evidence_path = [
             EvidenceEdge(
@@ -117,7 +117,10 @@ class GraphRAGV2Service:
                 "Ingest additional data and verify vector indexing."
             )
         else:
-            raw_answer = f"{raw_answer}\n\nRecommendation: Validate this hypothesis with a human analyst before remediation."
+            if benchmark_strict:
+                raw_answer = self._normalize_for_benchmark(question, retrieval_items, raw_answer)
+            else:
+                raw_answer = f"{raw_answer}\n\nRecommendation: Validate this hypothesis with a human analyst before remediation."
         return QueryResponse(answer=raw_answer, evidence_path=evidence_path, citations=citations)
 
     def _retrieve_context(self, question: str, search_result: Any, answer_text: str) -> list[dict[str, str]]:
@@ -166,12 +169,38 @@ class GraphRAGV2Service:
             )
         return contexts
 
-    def _fallback_answer(self, question: str, retrieval_items: list[dict[str, str]]) -> str:
+    def _fallback_answer(self, question: str, retrieval_items: list[dict[str, str]], benchmark_strict: bool) -> str:
+        context = "\n\n".join(item.get("text", "") for item in retrieval_items[: self.top_k])
+        if benchmark_strict:
+            prompt = (
+                "Answer based only on the retrieved context.\n"
+                "Do not add facts that are not explicitly present in the context.\n"
+                "Respond with 3-6 concise factual bullet points.\n"
+                "Avoid hedging, recommendations, and policy advice.\n"
+                "If evidence is insufficient, say exactly: 'Insufficient grounded evidence.'\n\n"
+                f"Question: {question}\n\nContext:\n{context}"
+            )
+        else:
+            prompt = (
+                "Answer based only on the retrieved context.\n"
+                "If context is insufficient, say so.\n\n"
+                f"Question: {question}\n\nContext:\n{context}"
+            )
+        return self.fallback_chat.invoke(prompt).content.strip()
+
+    def _normalize_for_benchmark(
+        self, question: str, retrieval_items: list[dict[str, str]], draft_answer: str
+    ) -> str:
         context = "\n\n".join(item.get("text", "") for item in retrieval_items[: self.top_k])
         prompt = (
-            "Answer based only on the retrieved context.\n"
-            "If context is insufficient, say so.\n\n"
-            f"Question: {question}\n\nContext:\n{context}"
+            "Rewrite the draft into a strict benchmark answer.\n"
+            "Rules:\n"
+            "- Keep only facts explicitly supported by the context.\n"
+            "- Remove speculation, recommendations, and unrelated details.\n"
+            "- Prefer 3-6 concise bullet points.\n"
+            "- Do not add any facts absent from context.\n"
+            "- If context is insufficient, return exactly: 'Insufficient grounded evidence.'\n\n"
+            f"Question: {question}\n\nDraft answer:\n{draft_answer}\n\nContext:\n{context}"
         )
         return self.fallback_chat.invoke(prompt).content.strip()
 

@@ -94,6 +94,32 @@ Artifacts:
 WildGraphBench integration:
 
 - Use `eval/wildgraphbench.py` to export predictions and compare with external benchmark/SOTA outputs.
+- Use `eval/wildgraphbench_run.py` for end-to-end WildGraphBench runs:
+  1. Build graph from `corpus/*/*/reference_pages/*.txt`
+  2. Run QA from `QA/*/questions.jsonl`
+  3. Export predictions JSONL for official WildGraphBench scoring
+
+Example:
+
+- API mode (recommended, uses `/ingest` and `/query_v2`; requires running FastAPI server):
+  - `PYTHONPATH=. python eval/wildgraphbench_run.py --mode api --api-base-url http://localhost:8000 --wildgraphbench-root /absolute/path/to/WildGraphBench --domain technology --output-dir eval/WildGraphBench`
+- Local in-process mode:
+  - `PYTHONPATH=. python eval/wildgraphbench_run.py --mode local --wildgraphbench-root /absolute/path/to/WildGraphBench --domain technology --output-dir eval/WildGraphBench`
+
+Configuration override options for benchmark runs:
+
+- Use alternate YAML settings file:
+  - `... python eval/wildgraphbench_run.py ... --settings-yaml /absolute/path/to/benchmark_settings.yaml`
+- Override individual settings directly in CLI (takes precedence over YAML and defaults):
+  - `... python eval/wildgraphbench_run.py ... --neo4j-uri bolt://localhost:7687 --neo4j-username neo4j --neo4j-password pass --llm-provider ollama --llm-base-url http://localhost:11434 --llm-chat-model qwen2.5:14b`
+
+Then run official benchmark scoring against generated predictions:
+
+- `python tools/eval.py --gold /absolute/path/to/WildGraphBench/QA/technology/questions.jsonl --pred eval/WildGraphBench/predictions_technology.jsonl --outdir eval/WildGraphBench/official_scores_technology`
+
+For reproducible experiment tracking (run folders, logs, parameter card template), see:
+
+- `eval/README.md` ("Reproducible experiment logging")
 
 ## GraphRAG v2 notes
 

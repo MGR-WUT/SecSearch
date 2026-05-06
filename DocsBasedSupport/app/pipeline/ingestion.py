@@ -67,6 +67,26 @@ class IngestionService:
                 )
         return docs
 
+    def load_text_files(self, text_paths: list[str]) -> list[IngestedDocument]:
+        docs: list[IngestedDocument] = []
+        for text_path in text_paths:
+            path = Path(text_path)
+            text = path.read_text(encoding="utf-8")
+            content_hash = self._hash(text)
+            source_digest = hashlib.sha256(str(path).encode("utf-8")).hexdigest()[:12]
+            docs.append(
+                IngestedDocument(
+                    source_id=f"text:{path.stem}:{source_digest}",
+                    source_uri=str(path),
+                    source_type="text",
+                    content=text,
+                    last_updated=datetime.now(timezone.utc).isoformat(),
+                    etag=None,
+                    content_hash=content_hash,
+                )
+            )
+        return docs
+
     @staticmethod
     def _hash(value: str) -> str:
         return hashlib.sha256(value.encode("utf-8")).hexdigest()

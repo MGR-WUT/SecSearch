@@ -9,6 +9,7 @@ RelationshipType = Literal["MITIGATES", "AFFECTS", "DEPENDS_ON", "INTEGRATES_WIT
 class IngestRequest(BaseModel):
     pdf_paths: list[str] = Field(default_factory=list)
     urls: list[str] = Field(default_factory=list)
+    text_paths: list[str] = Field(default_factory=list)
 
 
 class EvidenceEdge(BaseModel):
@@ -28,6 +29,7 @@ class ClaimCitation(BaseModel):
 
 class QueryRequest(BaseModel):
     question: str
+    benchmark_strict: bool = False
 
 
 class QueryResponse(BaseModel):

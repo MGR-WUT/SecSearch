@@ -81,7 +81,11 @@ def health() -> dict[str, str]:
 
 @app.post("/ingest")
 def ingest(payload: IngestRequest) -> dict[str, object]:
-    docs = app.state.ingestion_service.load_pdfs(payload.pdf_paths) + app.state.ingestion_service.load_urls(payload.urls)
+    docs = (
+        app.state.ingestion_service.load_pdfs(payload.pdf_paths)
+        + app.state.ingestion_service.load_urls(payload.urls)
+        + app.state.ingestion_service.load_text_files(payload.text_paths)
+    )
     results = []
     for doc in docs:
         extracted = app.state.extraction_service.extract_and_store(doc)
@@ -94,7 +98,7 @@ def ingest(payload: IngestRequest) -> dict[str, object]:
 def query_v2(payload: QueryRequest) -> QueryResponse:
     if not payload.question.strip():
         raise HTTPException(status_code=400, detail="Question must not be empty.")
-    return app.state.query_agent_v2.answer(payload.question)
+    return app.state.query_agent_v2.answer(payload.question, benchmark_strict=payload.benchmark_strict)
 
 
 @app.post("/temporal/update")
