@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import re
-from typing import Any
+from typing import Any, Callable, TypeVar
 
+import neo4j.exceptions
 from neo4j_graphrag.generation import GraphRAG
 from neo4j_graphrag.indexes import create_vector_index
 from neo4j_graphrag.llm import OllamaLLM
@@ -13,6 +14,8 @@ from app.core.llm_factory import build_chat_llm, build_embedder
 from app.core.models import ClaimCitation, EvidenceEdge, QueryResponse
 from app.graph.neo4j_store import Neo4jStore
 from app.pipeline.ingestion import IngestedDocument
+
+T = TypeVar("T")
 
 
 class GraphRAGV2Service:
@@ -46,7 +49,12 @@ class GraphRAGV2Service:
             api_key=llm_api_key,
         )
         self._ensure_vector_index()
-        self.retriever = VectorRetriever(self.graph_store.driver, self.index_name, self.embedder)
+        self.retriever = VectorRetriever(
+            self.graph_store.driver,
+            self.index_name,
+            self.embedder,
+            neo4j_database=self.graph_store.database,
+        )
         self.rag = None
         if self.llm_provider == "ollama":
             self.rag = GraphRAG(
@@ -62,7 +70,18 @@ class GraphRAGV2Service:
             embedding_property="embedding",
             dimensions=self.embedding_dims,
             similarity_fn="cosine",
+            neo4j_database=self.graph_store.database,
         )
+
+    def _retry_vector_index_once(self, fn: Callable[[], T]) -> T:
+        try:
+            return fn()
+        except neo4j.exceptions.ClientError as exc:
+            message = (exc.message or str(exc)).lower()
+            if "no such vector" in message or "vector schema index" in message:
+                self._ensure_vector_index()
+                return fn()
+            raise
 
     def index_document_chunks(self, document: IngestedDocument, chunk_size: int = 1200, overlap: int = 150) -> int:
         chunks = self._split_text(document.content, chunk_size=chunk_size, overlap=overlap)
@@ -85,7 +104,9 @@ class GraphRAGV2Service:
         search_result: Any = None
         raw_answer = ""
         if self.rag is not None:
-            search_result = self.rag.search(query_text=question, retriever_config={"top_k": self.top_k})
+            search_result = self._retry_vector_index_once(
+                lambda: self.rag.search(query_text=question, retriever_config={"top_k": self.top_k})
+            )
             raw_answer = getattr(search_result, "answer", "").strip()
         retrieval_items = self._retrieve_context(question, search_result, raw_answer)
 
@@ -129,10 +150,12 @@ class GraphRAGV2Service:
             return retrieval_items
 
         query_embedding = self.embedder.embed_query(question)
-        vector_hits = self.graph_store.query_chunk_vector_index(
-            index_name=self.index_name,
-            query_embedding=query_embedding,
-            top_k=self.top_k,
+        vector_hits = self._retry_vector_index_once(
+            lambda: self.graph_store.query_chunk_vector_index(
+                index_name=self.index_name,
+                query_embedding=query_embedding,
+                top_k=self.top_k,
+            )
         )
         if vector_hits:
             return [

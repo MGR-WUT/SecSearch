@@ -1,0 +1,63 @@
+{
+  "benchmark": "WildGraphBench",
+  "mode": "api",
+  "api_base_url": "http://localhost:8000",
+  "domain": "technology",
+  "wildgraphbench_root": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/eval/WildGraphBenchDataset",
+  "skip_ingest": false,
+  "ingestion": {
+    "ingested_pages": 432,
+    "failed_pages": 9,
+    "entity_count_total": 2414,
+    "relation_count_total": 2073,
+    "indexed_chunks_total": 11142,
+    "ingest_time_seconds": 9737.45002983301,
+    "ingest_failures": [
+      {
+        "path": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/eval/WildGraphBenchDataset/corpus/technology/Steam(service)/reference_pages/Court rules Valve broke Australian consumer law.txt",
+        "error": "Server error '500 Internal Server Error' for url 'http://localhost:8000/ingest'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500"
+      },
+      {
+        "path": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/eval/WildGraphBenchDataset/corpus/technology/Steam(service)/reference_pages/How Steam key Reselling is Killing the Little Guys.txt",
+        "error": "Server error '500 Internal Server Error' for url 'http://localhost:8000/ingest'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500"
+      },
+      {
+        "path": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/eval/WildGraphBenchDataset/corpus/technology/Steam(service)/reference_pages/Report Steams 30 Cut Is Actually the Industry Standard.txt",
+        "error": "Server error '500 Internal Server Error' for url 'http://localhost:8000/ingest'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500"
+      },
+      {
+        "path": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/eval/WildGraphBenchDataset/corpus/technology/Steam(service)/reference_pages/Steam Makes A Big Change To How Review Scores Are Calculated.txt",
+        "error": "Server error '500 Internal Server Error' for url 'http://localhost:8000/ingest'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500"
+      },
+      {
+        "path": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/eval/WildGraphBenchDataset/corpus/technology/Steam(service)/reference_pages/Steam and Uplay are both getting fined in France for bad refund policies.txt",
+        "error": "Server error '500 Internal Server Error' for url 'http://localhost:8000/ingest'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500"
+      },
+      {
+        "path": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/eval/WildGraphBenchDataset/corpus/technology/Steam(service)/reference_pages/Steam tweaks privacy settings will soon let you be invisible while online.txt",
+        "error": "Server error '500 Internal Server Error' for url 'http://localhost:8000/ingest'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500"
+      },
+      {
+        "path": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/eval/WildGraphBenchDataset/corpus/technology/Steam(service)/reference_pages/Steams content-driven freeze on game approvals expected to last for months.txt",
+        "error": "Server error '500 Internal Server Error' for url 'http://localhost:8000/ingest'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500"
+      },
+      {
+        "path": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/eval/WildGraphBenchDataset/corpus/technology/Steam(service)/reference_pages/Updates to User Review Scores Based on Language.txt",
+        "error": "Server error '500 Internal Server Error' for url 'http://localhost:8000/ingest'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500"
+      },
+      {
+        "path": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/eval/WildGraphBenchDataset/corpus/technology/Steam(service)/reference_pages/Valve bans all Steam games that force players to watch advertisements.txt",
+        "error": "Server error '500 Internal Server Error' for url 'http://localhost:8000/ingest'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500"
+      }
+    ]
+  },
+  "qa": {
+    "questions_count": 113,
+    "avg_latency_seconds": 9.392620903017429,
+    "avg_evidence_edges": 5,
+    "answer_non_empty_rate": 1.0
+  },
+  "artifacts": {
+    "predictions_jsonl": "eval/WildGraphBench/runs/gpt-oss:120b_e2e/predictions_technology.jsonl"
+  }
+}

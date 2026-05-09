@@ -189,20 +189,45 @@ class Neo4jStore:
         with self.driver.session(database=self.database) as session:
             return [dict(record) for record in session.run(query, chunk_ids=chunk_ids)]
 
+    def enrich_graph_offline(self) -> None:
+        statements = [
+            "CALL gds.graph.project('rag_graph', ['Entity', 'Chunk'], '*')",
+            "CALL gds.pageRank.write('rag_graph', {writeProperty: 'pagerank'})",
+            "CALL gds.louvain.write('rag_graph', {writeProperty: 'community'})",
+            "CALL gds.graph.drop('rag_graph')",
+        ]
+        with self.driver.session(database=self.database) as session:
+            for statement in statements:
+                session.run(statement)
+
+    def resolve_duplicate_entities(self) -> int:
+        query = """
+        MATCH (e1:Entity), (e2:Entity)
+        WHERE e1.name = e2.name AND e1.label = e2.label AND id(e1) < id(e2)
+        WITH [e1, e2] AS nodes
+        CALL apoc.refactor.mergeNodes(nodes, {properties: 'combine', mergeRels: true})
+        YIELD node
+        RETURN count(node) AS merged_count
+        """
+        with self.driver.session(database=self.database) as session:
+            record = session.run(query).single()
+            return int(record["merged_count"]) if record is not None else 0
+
     def query_chunk_vector_index(
         self, index_name: str, query_embedding: list[float], top_k: int
     ) -> list[dict[str, Any]]:
         query = """
         CALL db.index.vector.queryNodes($index_name, $top_k, $embedding)
         YIELD node, score
-        OPTIONAL MATCH (s:Source)-[:HAS_CHUNK]->(node)
+        OPTIONAL MATCH (node)<-[:HAS_CHUNK]-(s:Source)-[:CONTAINS]->(e:Entity)
         RETURN
             node.chunk_id AS chunk_id,
             node.text AS text,
             node.source_id AS source_id,
             s.source_uri AS source_uri,
-            score
-        ORDER BY score DESC
+            score,
+            coalesce(max(e.pagerank), 0) AS max_pagerank
+        ORDER BY score DESC, max_pagerank DESC
         """
         with self.driver.session(database=self.database) as session:
             return [

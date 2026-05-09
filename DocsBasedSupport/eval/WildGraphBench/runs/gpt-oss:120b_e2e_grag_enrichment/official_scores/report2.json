@@ -1,0 +1,28 @@
+{
+  "total_items": 113,
+  "single_fact": {
+    "num": 56,
+    "correct": 37,
+    "accuracy": 0.6607
+  },
+  "multi_fact": {
+    "num": 33,
+    "correct": 19,
+    "accuracy": 0.5758
+  },
+  "summary": {
+    "num": 24,
+    "correct": 0,
+    "accuracy_binary": 0.0,
+    "coverage_avg": 0.0743,
+    "statement_accuracy_avg": 0.0,
+    "statement_f1_avg": 0.0
+  },
+  "overall_accuracy": 0.4956,
+  "details": {
+    "scored_file": "eval/WildGraphBench/runs/gpt-oss:120b_e2e_grag_enrichment/official_scores/scored2.jsonl",
+    "judge_model": "gpt-5-mini",
+    "max_concurrent": 10,
+    "grading_method": "Type1/2: binary exact; Type3: statement-level coverage/accuracy via answer-vs-statement entailment + strict binary"
+  }
+}

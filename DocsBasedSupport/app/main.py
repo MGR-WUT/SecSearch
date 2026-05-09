@@ -31,6 +31,7 @@ async def lifespan(_: FastAPI):
     )
     store.ensure_schema()
     app.state.graph_store = store
+    app.state.ingest_count = 0
     app.state.ingestion_service = IngestionService(timeout_seconds=settings.temporal_http_timeout_seconds)
     app.state.extraction_service = ExtractionService(
         graph_store=store,
@@ -91,6 +92,15 @@ def ingest(payload: IngestRequest) -> dict[str, object]:
         extracted = app.state.extraction_service.extract_and_store(doc)
         extracted["v2_chunks_indexed"] = app.state.query_agent_v2.index_document_chunks(doc)
         results.append(extracted)
+        app.state.ingest_count += 1
+        if app.state.ingest_count % 10 == 0:
+            merged_count = app.state.graph_store.resolve_duplicate_entities()
+            app.state.graph_store.enrich_graph_offline()
+            logger.info(
+                "Graph maintenance completed after %d ingestions (merged_duplicates=%d).",
+                app.state.ingest_count,
+                merged_count,
+            )
     return {"ingested": len(results), "details": results}
 
 

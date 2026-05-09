@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import logging
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -8,6 +9,8 @@ from pathlib import Path
 import httpx
 from bs4 import BeautifulSoup
 from langchain_community.document_loaders import PyPDFLoader
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -71,7 +74,7 @@ class IngestionService:
         docs: list[IngestedDocument] = []
         for text_path in text_paths:
             path = Path(text_path)
-            text = path.read_text(encoding="utf-8")
+            text = self._read_text_file(path)
             content_hash = self._hash(text)
             source_digest = hashlib.sha256(str(path).encode("utf-8")).hexdigest()[:12]
             docs.append(
@@ -90,4 +93,16 @@ class IngestionService:
     @staticmethod
     def _hash(value: str) -> str:
         return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+    @staticmethod
+    def _read_text_file(path: Path) -> str:
+        encodings = ("utf-8", "utf-8-sig", "cp1252", "latin-1")
+        for encoding in encodings:
+            try:
+                return path.read_text(encoding=encoding)
+            except UnicodeDecodeError:
+                continue
+        # Keep ingestion resilient for benchmark corpora with mixed encodings.
+        logger.warning("Falling back to UTF-8 replacement decode for %s", path)
+        return path.read_text(encoding="utf-8", errors="replace")
 

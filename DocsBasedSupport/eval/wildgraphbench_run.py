@@ -310,6 +310,8 @@ def _ingest_reference_pages_via_api(
     log_every: int,
     show_progress_bar: bool,
 ) -> dict[str, Any]:
+    max_retries = 3
+    backoff_seconds = 1.5
     start = time.perf_counter()
     ingested = 0
     failed = 0
@@ -323,14 +325,37 @@ def _ingest_reference_pages_via_api(
     with httpx.Client(base_url=api_base_url, timeout=request_timeout_seconds) as client:
         for idx, page in enumerate(pages, start=1):
             try:
-                response = client.post("/ingest", json={"pdf_paths": [], "urls": [], "text_paths": [str(page)]})
-                response.raise_for_status()
-                payload = response.json()
-                details = payload.get("details", [])
-                ingested += int(payload.get("ingested", 0))
-                extracted_entities += sum(int(item.get("entity_count", 0)) for item in details)
-                extracted_relations += sum(int(item.get("relation_count", 0)) for item in details)
-                indexed_chunks += sum(int(item.get("v2_chunks_indexed", 0)) for item in details)
+                last_exc: Exception | None = None
+                for attempt in range(1, max_retries + 2):
+                    try:
+                        response = client.post("/ingest", json={"pdf_paths": [], "urls": [], "text_paths": [str(page)]})
+                        response.raise_for_status()
+                        payload = response.json()
+                        details = payload.get("details", [])
+                        ingested += int(payload.get("ingested", 0))
+                        extracted_entities += sum(int(item.get("entity_count", 0)) for item in details)
+                        extracted_relations += sum(int(item.get("relation_count", 0)) for item in details)
+                        indexed_chunks += sum(int(item.get("v2_chunks_indexed", 0)) for item in details)
+                        break
+                    except httpx.HTTPStatusError as exc:
+                        retryable = exc.response.status_code >= 500
+                        last_exc = exc
+                        if not retryable or attempt > max_retries:
+                            raise
+                    except httpx.RequestError as exc:
+                        last_exc = exc
+                        if attempt > max_retries:
+                            raise
+
+                    sleep_seconds = backoff_seconds * (2 ** (attempt - 1))
+                    logger.warning(
+                        "INGEST retry %d/%d for %s after error: %s",
+                        attempt,
+                        max_retries,
+                        page,
+                        last_exc,
+                    )
+                    time.sleep(sleep_seconds)
             except Exception as exc:  # noqa: BLE001
                 failed += 1
                 failures.append({"path": str(page), "error": str(exc)})
