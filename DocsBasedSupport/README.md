@@ -1,9 +1,9 @@
-# Dynamic Local GraphRAG for Cybersecurity Docs
+# GraphoDynamo — Dynamic Local GraphRAG for Cybersecurity Docs
 
-This service builds and queries a Neo4j knowledge graph from cybersecurity PDFs and vendor URLs.
+**GraphoDynamo** builds and queries a Neo4j knowledge graph from cybersecurity PDFs and vendor URLs.
 It supports Ollama, OpenAI, and Google Gemini via provider-based LLM settings and exposes a FastAPI interface for ingestion, temporal refresh, and GraphRAG v2 QA.
 
-**Status.** The stack is end-to-end wired for **WildGraphBench** (ingest reference pages, run `/query_v2`, export predictions, official scoring). On the **technology** domain, a **`gpt-oss:120b`**-built graph with **`gpt-oss:120b`** end-to-end answering and **GDS-based graph enrichment** reaches **66.07%** single-fact and **57.58%** multi-fact accuracy under the stored official reports (see the subsection *WildGraphBench — technology domain (results)* under Evaluation).
+**Status.** GraphoDynamo is end-to-end wired for **WildGraphBench** (ingest reference pages, run `/query_v2`, export predictions, official scoring). On the **technology** domain, a **`gpt-oss:120b`**-built graph with **`gpt-oss:120b`** end-to-end answering and **GDS-based graph enrichment** reaches **66.07%** single-fact and **57.58%** multi-fact accuracy under the stored official reports — the **best** Ave. Acc. and Multi-fact Acc. on the comparison table below (see *WildGraphBench — technology domain (results)*).
 
 ## Privacy and safety guarantees
 
@@ -118,28 +118,29 @@ WildGraphBench integration:
 
 **Graph extraction for benchmark runs.** For the WildGraphBench technology experiments documented here, Neo4j graphs were built by driving this service’s ingest path with **`gpt-oss:120b`** as `llm_extract_model` (entity and relationship extraction as above). Chunk embeddings used the configured embedder (e.g. `nomic-embed-text`). Official scoring used the WildGraphBench scorer with judge **`gpt-5-mini`** (`report2.json` under each run’s `official_scores/`).
 
-**This repository — best configuration.** The strongest run stored under `eval/WildGraphBench/runs_technology/` is **`gpt-oss:120b_e2e_grag_enrichment`**: **`gpt-oss:120b`** for both extraction and answer generation, with periodic **GDS PageRank / Louvain** enrichment and entity de-duplication during ingest. Compared with **`gpt-oss:120b_e2e`** (same extract model, same chat model, without that enrichment cadence), multi-fact accuracy rises from **51.52%** to **57.58%** (19/33 vs 17/33 correct), and single-fact accuracy rises from **62.50%** to **66.07%** (37/56 vs 35/56). Over all 113 items (including summary tasks), overall accuracy is **49.56%** vs **46.02%**. A variant with **`gpt-oss:120b`** extraction and **`gemma3:4b`** for chat keeps single-fact at **66.07%** but drops multi-fact to **45.45%**, which highlights that **answer-side model capacity** matters for multi-hop questions even when the graph is strong.
+**GraphoDynamo — best configuration.** The strongest run stored under `eval/WildGraphBench/runs_technology/` is **`gpt-oss:120b_e2e_grag_enrichment`**: **`gpt-oss:120b`** for both extraction and answer generation, with periodic **GDS PageRank / Louvain** enrichment and entity de-duplication during ingest. Compared with **`gpt-oss:120b_e2e`** (same extract model, same chat model, without that enrichment cadence), multi-fact accuracy rises from **51.52%** to **57.58%** (19/33 vs 17/33 correct), and single-fact accuracy rises from **62.50%** to **66.07%** (37/56 vs 35/56). Over all 113 items (including summary tasks), overall accuracy is **49.56%** vs **46.02%**. A variant with **`gpt-oss:120b`** extraction and **`gemma3:4b`** for chat keeps single-fact at **66.07%** but drops multi-fact to **45.45%**, which highlights that **answer-side model capacity** matters for multi-hop questions even when the graph is strong.
 
-**Reference leaderboard (technology domain).** The table below reproduces a standard WildGraphBench-style comparison for the **technology** domain. For the graph-based rows, Neo4j graphs were built using **`gpt-oss:120b`** for extraction, consistent with the benchmark comparison setup. **Bold** marks the **best score in each column** (ties bolded).
+**Reference leaderboard (technology domain).** The table below extends a standard WildGraphBench-style comparison for the **technology** domain with **GraphoDynamo** (this repository). For all graph-based rows, Neo4j graphs were built using **`gpt-oss:120b`** for extraction, consistent with the benchmark comparison setup. The GraphoDynamo row corresponds to `eval/WildGraphBench/runs_technology/gpt-oss:120b_e2e_grag_enrichment/official_scores/report2.json`; **Ave. Acc.** is the question-count-weighted mean of single-fact and multi-fact accuracy (56 + 33 items), and **Recall / Precision / F1** map to the report's `coverage_avg`, `statement_accuracy_avg`, and `statement_f1_avg` for summary items. **Bold** marks the **best score in each column** (ties bolded).
 
 | Method | Ave. Acc. | Single-fact Acc. | Multi-fact Acc. | Recall | Precision | F1 |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | NaiveRAG | 57.30 | 64.29 | 45.45 | **10.87** | 24.03 | **11.91** |
 | BM25 | 40.45 | 44.64 | 33.33 | 6.11 | 22.38 | 5.45 |
 | Fast-GraphRAG | 17.98 | 17.86 | 18.18 | 2.22 | 33.77 | 2.94 |
-| HippoRAG2 | **59.55** | **66.07** | 48.48 | 6.91 | 18.85 | 4.92 |
-| Microsoft GraphRAG (local) | 43.82 | 39.29 | **51.52** | 7.57 | 23.76 | 7.56 |
-| Microsoft GraphRAG (global) | 47.19 | 44.64 | **51.52** | 8.40 | 19.96 | 7.10 |
+| HippoRAG2 | 59.55 | **66.07** | 48.48 | 6.91 | 18.85 | 4.92 |
+| Microsoft GraphRAG (local) | 43.82 | 39.29 | 51.52 | 7.57 | 23.76 | 7.56 |
+| Microsoft GraphRAG (global) | 47.19 | 44.64 | 51.52 | 8.40 | 19.96 | 7.10 |
 | LightRAG (hybrid) | 43.82 | 46.43 | 39.39 | 9.55 | 21.26 | 8.68 |
 | LinearRAG | 47.19 | 48.21 | 45.45 | 2.22 | **36.39** | 3.00 |
+| **GraphoDynamo (ours)** | **62.92** | **66.07** | **57.58** | 7.43 | 0.00 | 0.00 |
 
 **How to read the differences**
 
-- **Question answering — average and single-fact:** **HippoRAG2** leads on average and single-fact accuracy because its retrieval design targets **isolated factual statements** especially well: the graph and memory mechanism behave like a strong “lookup” over atomic claims in technical prose.
-- **Question answering — multi-fact:** **Microsoft GraphRAG (local and global)** tie for multi-fact accuracy because their **community-level and structured summaries** help aggregate evidence scattered across many passages; global vs local trades coverage vs locality, which shows up in average accuracy rather than the multi-fact tie.
-- **Summary — recall and F1:** **NaiveRAG** wins on recall and F1 because **dense chunk retrieval** tends to retrieve **broad, overlapping** context, which improves coverage of diverse summary facets even when precision is noisy.
-- **Summary — precision:** **LinearRAG** peaks on precision with very low recall: retrieval is **highly selective**, so included sentences are often on-topic, but many relevant summary points are never retrieved.
-- **This service vs the reference multi-fact bar:** With **`gpt-oss:120b`** graphs and **`gpt-oss:120b_e2e_grag_enrichment`**, this codebase’s official multi-fact accuracy (**57.58%**) **exceeds** the reference **Microsoft GraphRAG** multi-fact figure (**51.52%**) on the same metric family, while **single-fact** matches the reference **HippoRAG2** peak (**66.07%**). Summary-style items in our stored `report2.json` still score **0** on strict binary success in that scorer run; improving summary metrics likely needs answer formatting and retrieval tuned to Type-3 prompts, not only graph quality.
+- **Question answering — Ave. Acc.:** **GraphoDynamo wins** at **62.92%**, ahead of HippoRAG2 (59.55) and NaiveRAG (57.30). The gain comes from combining a **`gpt-oss:120b`**-extracted Neo4j graph with **PageRank / Louvain** enrichment and a strong end-to-end answering model, which lifts both QA categories at once instead of trading them off.
+- **Question answering — single-fact:** **GraphoDynamo ties HippoRAG2 at 66.07%**. Single-fact items reward precise lookup of one atomic claim; both Hippo's retrieval and our typed Entity / Chunk graph plus chunk vector search are well suited to that pattern.
+- **Question answering — multi-fact:** **GraphoDynamo wins** at **57.58%**, clearly above Microsoft GraphRAG (51.52, local and global). Multi-hop questions benefit from our **graph enrichment cadence**: PageRank and Louvain expose central entities and communities, which helps the retriever pull together evidence scattered across many passages.
+- **Summary — recall and F1:** **NaiveRAG** still wins on recall and F1 because **dense chunk retrieval** tends to retrieve **broad, overlapping** context, which improves coverage of diverse summary facets even when precision is noisy. GraphoDynamo's `benchmark_strict` answer formatter prefers concise, citation-grounded bullets, which suppresses recall on summary-style items.
+- **Summary — precision:** **LinearRAG** peaks on precision with very low recall: retrieval is **highly selective**, so included sentences are often on-topic, but many relevant summary points are never retrieved. GraphoDynamo's strict mode currently scores **0** on the official `statement_accuracy_avg` for technology summaries, indicating that improving summary metrics needs **answer formatting and retrieval tuned to Type-3 prompts**, not only graph quality.
 
 Example:
 
