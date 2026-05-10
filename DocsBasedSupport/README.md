@@ -3,6 +3,8 @@
 This service builds and queries a Neo4j knowledge graph from cybersecurity PDFs and vendor URLs.
 It supports Ollama, OpenAI, and Google Gemini via provider-based LLM settings and exposes a FastAPI interface for ingestion, temporal refresh, and GraphRAG v2 QA.
 
+**Status.** The stack is end-to-end wired for **WildGraphBench** (ingest reference pages, run `/query_v2`, export predictions, official scoring). On the **technology** domain, a **`gpt-oss:120b`**-built graph with **`gpt-oss:120b`** end-to-end answering and **GDS-based graph enrichment** reaches **66.07%** single-fact and **57.58%** multi-fact accuracy under the stored official reports (see the subsection *WildGraphBench — technology domain (results)* under Evaluation).
+
 ## Privacy and safety guarantees
 
 - Local-only by default: the app blocks non-local LLM endpoints unless explicitly enabled.
@@ -77,6 +79,19 @@ Quick monthly estimate:
 - A scheduler periodically checks HTTP metadata.
 - Stale sources are re-ingested and older graph state is marked superseded.
 
+## Knowledge graph pipeline
+
+### How the graph is built
+
+Each `POST /ingest` (or WildGraphBench ingest step) runs a **hybrid** pipeline: structured LLM extraction into Neo4j **plus** vector-indexed text chunks for GraphRAG v2 retrieval.
+
+1. **Load documents** — PDFs (`PyPDFLoader`), URLs (HTML to plain text), or plain-text reference pages (`IngestionService`).
+2. **LLM graph extraction** — `ExtractionService` prompts the configured **extract** model (`llm_extract_model` in `settings.yaml`) to return JSON: cybersecurity-oriented **entities** (labels such as `API`, `ConfigOption`, `CVE`, `Component`, …) and **relationships** with types restricted to `MITIGATES`, `AFFECTS`, `DEPENDS_ON`, `INTEGRATES_WITH`. Parsed entities and relations are written to Neo4j: `Source` → `CONTAINS` → `Entity`, typed edges between entities.
+3. **Chunk indexing (GraphRAG v2)** — The same document text is split into overlapping chunks (`Chunk` nodes linked with `HAS_CHUNK` from `Source`). Chunks are embedded with `llm_embed_model` (default `nomic-embed-text`), stored on `Chunk.embedding`, and indexed with a Neo4j **vector** index (`graphrag_v2_index_name`, default `chunk-vector-index`).
+4. **Graph enrichment (optional maintenance)** — Every 10 ingestions, the service runs `resolve_duplicate_entities()` (merge same name/label via APOC) and `enrich_graph_offline()`: a temporary Neo4j GDS projection over `Entity` and `Chunk`, **PageRank** and **Louvain** community IDs written back, then the projection is dropped. Retrieval ranks vector hits by similarity and breaks ties using `pagerank` on linked entities (see `Neo4jStore.query_chunk_vector_index`).
+
+Query time (`POST /query_v2`): native `neo4j-graphrag-python` path when using Ollama; otherwise vector retrieval over chunks plus chat synthesis, with optional `benchmark_strict` formatting for evaluation.
+
 ## Evaluation
 
 Run evaluation on a real benchmark dataset:
@@ -98,6 +113,33 @@ WildGraphBench integration:
   1. Build graph from `corpus/*/*/reference_pages/*.txt`
   2. Run QA from `QA/*/questions.jsonl`
   3. Export predictions JSONL for official WildGraphBench scoring
+
+### WildGraphBench — technology domain (results)
+
+**Graph extraction for benchmark runs.** For the WildGraphBench technology experiments documented here, Neo4j graphs were built by driving this service’s ingest path with **`gpt-oss:120b`** as `llm_extract_model` (entity and relationship extraction as above). Chunk embeddings used the configured embedder (e.g. `nomic-embed-text`). Official scoring used the WildGraphBench scorer with judge **`gpt-5-mini`** (`report2.json` under each run’s `official_scores/`).
+
+**This repository — best configuration.** The strongest run stored under `eval/WildGraphBench/runs_technology/` is **`gpt-oss:120b_e2e_grag_enrichment`**: **`gpt-oss:120b`** for both extraction and answer generation, with periodic **GDS PageRank / Louvain** enrichment and entity de-duplication during ingest. Compared with **`gpt-oss:120b_e2e`** (same extract model, same chat model, without that enrichment cadence), multi-fact accuracy rises from **51.52%** to **57.58%** (19/33 vs 17/33 correct), and single-fact accuracy rises from **62.50%** to **66.07%** (37/56 vs 35/56). Over all 113 items (including summary tasks), overall accuracy is **49.56%** vs **46.02%**. A variant with **`gpt-oss:120b`** extraction and **`gemma3:4b`** for chat keeps single-fact at **66.07%** but drops multi-fact to **45.45%**, which highlights that **answer-side model capacity** matters for multi-hop questions even when the graph is strong.
+
+**Reference leaderboard (technology domain).** The table below reproduces a standard WildGraphBench-style comparison for the **technology** domain. For the graph-based rows, Neo4j graphs were built using **`gpt-oss:120b`** for extraction, consistent with the benchmark comparison setup. **Bold** marks the **best score in each column** (ties bolded).
+
+| Method | Ave. Acc. | Single-fact Acc. | Multi-fact Acc. | Recall | Precision | F1 |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| NaiveRAG | 57.30 | 64.29 | 45.45 | **10.87** | 24.03 | **11.91** |
+| BM25 | 40.45 | 44.64 | 33.33 | 6.11 | 22.38 | 5.45 |
+| Fast-GraphRAG | 17.98 | 17.86 | 18.18 | 2.22 | 33.77 | 2.94 |
+| HippoRAG2 | **59.55** | **66.07** | 48.48 | 6.91 | 18.85 | 4.92 |
+| Microsoft GraphRAG (local) | 43.82 | 39.29 | **51.52** | 7.57 | 23.76 | 7.56 |
+| Microsoft GraphRAG (global) | 47.19 | 44.64 | **51.52** | 8.40 | 19.96 | 7.10 |
+| LightRAG (hybrid) | 43.82 | 46.43 | 39.39 | 9.55 | 21.26 | 8.68 |
+| LinearRAG | 47.19 | 48.21 | 45.45 | 2.22 | **36.39** | 3.00 |
+
+**How to read the differences**
+
+- **Question answering — average and single-fact:** **HippoRAG2** leads on average and single-fact accuracy because its retrieval design targets **isolated factual statements** especially well: the graph and memory mechanism behave like a strong “lookup” over atomic claims in technical prose.
+- **Question answering — multi-fact:** **Microsoft GraphRAG (local and global)** tie for multi-fact accuracy because their **community-level and structured summaries** help aggregate evidence scattered across many passages; global vs local trades coverage vs locality, which shows up in average accuracy rather than the multi-fact tie.
+- **Summary — recall and F1:** **NaiveRAG** wins on recall and F1 because **dense chunk retrieval** tends to retrieve **broad, overlapping** context, which improves coverage of diverse summary facets even when precision is noisy.
+- **Summary — precision:** **LinearRAG** peaks on precision with very low recall: retrieval is **highly selective**, so included sentences are often on-topic, but many relevant summary points are never retrieved.
+- **This service vs the reference multi-fact bar:** With **`gpt-oss:120b`** graphs and **`gpt-oss:120b_e2e_grag_enrichment`**, this codebase’s official multi-fact accuracy (**57.58%**) **exceeds** the reference **Microsoft GraphRAG** multi-fact figure (**51.52%**) on the same metric family, while **single-fact** matches the reference **HippoRAG2** peak (**66.07%**). Summary-style items in our stored `report2.json` still score **0** on strict binary success in that scorer run; improving summary metrics likely needs answer formatting and retrieval tuned to Type-3 prompts, not only graph quality.
 
 Example:
 
