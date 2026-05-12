@@ -1,11 +1,11 @@
 llm:
   generator:
     provider: ollama
-    model: gemma3:4b
+    model: glm-5.1:cloud
 
   auditor:
     provider: ollama
-    model: gemma3:4b
+    model: glm-5.1:cloud
 
 agents:
   use_auditor: true

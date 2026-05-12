@@ -85,6 +85,88 @@ The implementation also includes logging for:
 
 All components are fully dockerized for reproducibility and deployment.
 
+### CodeGuard solution architecture
+
+The diagrams below summarize how HTTP clients reach the FastAPI surface, how `CodeGuard` in [`source.py`](./CodeGuard/source.py) orchestrates the generator and optional auditor LLMs (via [`agents.py`](./CodeGuard/agents.py)), and how [Bandit](https://github.com/PyCQA/bandit) is invoked from [`static_analysis.py`](./CodeGuard/static_analysis.py). Configuration is loaded from [`config.yml`](./CodeGuard/config.yml) at service startup.
+
+```mermaid
+flowchart TB
+    subgraph Clients
+        HTTP[HTTP clients / eval scripts]
+    end
+
+    subgraph "CodeGuard service (Docker / uvicorn)"
+        API["FastAPI (api/main.py)"]
+        CG["CodeGuard (source.py)"]
+        API -->|POST /run task + overrides| CG
+    end
+
+    subgraph "LLM layer (agents.py)"
+        GenLLM[Generator LLM\nOpenAI / Gemini / Ollama]
+        AudLLM[Auditor LLM\noptional]
+    end
+
+    subgraph Analysis
+        Bandit["Bandit subprocess (static_analysis.py)"]
+    end
+
+    subgraph Config
+        YML["config.yml\nmodels, use_auditor, max_iterations"]
+    end
+
+    HTTP --> API
+    YML -.->|load at startup| CG
+    CG -->|generate_code| GenLLM
+    CG -->|run_bandit on temp .py| Bandit
+    CG -->|audit_code if use_auditor| AudLLM
+    CG -->|refine_code| GenLLM
+    Bandit -->|JSON findings| CG
+    AudLLM -->|text findings| CG
+```
+
+#### Refinement loop (`CodeGuard.run`)
+
+Each iteration merges Bandit output (and, when enabled, LLM audit text) into feedback, then **`refine_code`** runs on the **generator** model. The loop stops after `execution.max_iterations` or when the early-stop rule in `source.py` applies (no improvement while there are no Bandit errors).
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant API as FastAPI
+    participant CG as CodeGuard
+    participant G as Generator LLM
+    participant B as Bandit
+    participant A as Auditor LLM
+
+    C->>API: POST /run { task, overrides? }
+    API->>CG: run(task, overrides)
+    CG->>G: generate_code(task)
+    G-->>CG: initial code
+
+    loop Up to max_iterations
+        CG->>B: run_bandit(code)
+        B-->>CG: JSON results / errors
+        alt use_auditor
+            CG->>A: audit_code(code)
+            A-->>CG: LLM audit text
+        end
+        CG->>G: refine_code(code, feedback)
+        G-->>CG: updated code
+    end
+
+    CG-->>API: { final_code, iterations, history }
+    API-->>C: JSON response
+```
+
+#### Module map
+
+| Path | Role |
+|------|------|
+| [`api/main.py`](./CodeGuard/api/main.py) | HTTP surface: health check and `/run`. |
+| [`source.py`](./CodeGuard/source.py) | `CodeGuard` class: config, loop, aggregation of Bandit + optional audit. |
+| [`agents.py`](./CodeGuard/agents.py) | LLM factory and prompts: generate, audit, refine, normalize. |
+| [`static_analysis.py`](./CodeGuard/static_analysis.py) | Writes code to a temp file and invokes Bandit with JSON output. |
+| [`config.yml`](./CodeGuard/config.yml) | Generator/auditor providers and models, flags, iteration cap. |
+
 ---
 
 ## Evaluation Results on CyberSecEval4
