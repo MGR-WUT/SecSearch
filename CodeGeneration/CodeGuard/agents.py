@@ -1,4 +1,6 @@
 import os
+from typing import Optional
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -15,7 +17,12 @@ def normalize_code(code: str) -> str:
     return code.strip()
 
 
-def create_llm(provider: str, model: str, temperature: float = 0):
+def create_llm(
+    provider: str,
+    model: str,
+    temperature: float = 0,
+    base_url: Optional[str] = None,
+):
     provider = provider.lower()
 
     if provider == "openai":
@@ -40,7 +47,7 @@ def create_llm(provider: str, model: str, temperature: float = 0):
         return ChatOllama(
             model=model,
             temperature=temperature,
-            base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
+            base_url=base_url or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
         )
 
     else:

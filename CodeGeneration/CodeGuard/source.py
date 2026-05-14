@@ -1,7 +1,9 @@
-import yaml
+import copy
 import json
-from typing import Any, Dict, Tuple, List, Optional
 import logging
+from typing import Any, Dict, List, Optional, Tuple
+
+import yaml
 
 from agents import create_llm, generate_code, audit_code, refine_code
 from static_analysis import run_bandit
@@ -13,30 +15,31 @@ logger = logging.getLogger("codeguard")
 class CodeGuard:
     def __init__(self: "CodeGuard", config_path: str) -> None:
         self.config: Dict[str, Any] = self._load_config(config_path)
-        self._setup_llms()
+        self.gen_llm, self.audit_llm = self._llms_from_config(self.config)
 
     def _load_config(self: "CodeGuard", path: str) -> Dict[str, Any]:
         with open(path, "r") as f:
             return yaml.safe_load(f)
 
-    def _setup_llms(self: "CodeGuard") -> None:
-        gen_cfg: Dict[str, Any] = self.config["llm"]["generator"]
-
-        self.gen_llm: Any = create_llm(
+    def _llms_from_config(self: "CodeGuard", config: Dict[str, Any]) -> Tuple[Any, Any]:
+        gen_cfg: Dict[str, Any] = config["llm"]["generator"]
+        gen_llm: Any = create_llm(
             provider=gen_cfg["provider"],
             model=gen_cfg["model"],
+            base_url=gen_cfg.get("base_url"),
         )
 
-        # Optional auditor
-        if self.config["agents"].get("use_auditor", False):
-            audit_cfg: Dict[str, Any] = self.config["llm"]["auditor"]
-
-            self.audit_llm: Any = create_llm(
+        if config["agents"].get("use_auditor", False):
+            audit_cfg: Dict[str, Any] = config["llm"]["auditor"]
+            audit_llm: Any = create_llm(
                 provider=audit_cfg["provider"],
                 model=audit_cfg["model"],
+                base_url=audit_cfg.get("base_url"),
             )
         else:
-            self.audit_llm = None
+            audit_llm = None
+
+        return gen_llm, audit_llm
 
     def _static_code_analysis(self: "CodeGuard", code: str) -> Dict[str, Any]:
         logger.debug("Running Bandit analysis")
@@ -45,12 +48,17 @@ class CodeGuard:
     def _count_issues(self: "CodeGuard", bandit_result: Dict[str, Any]) -> int:
         return len(bandit_result.get("results", []))
 
-    def _build_feedback(self, code: str, bandit_result_str: str) -> str:
+    def _build_feedback(
+        self,
+        code: str,
+        bandit_result_str: str,
+        audit_llm: Optional[Any],
+    ) -> str:
         logger.debug("Building feedback")
         feedback: str = bandit_result_str
-        if self.audit_llm:
+        if audit_llm:
             logger.debug("Running LLM audit")
-            llm_feedback: str = audit_code(self.audit_llm, code)
+            llm_feedback: str = audit_code(audit_llm, code)
             feedback += "\n\nLLM Audit:\n" + llm_feedback
 
         return feedback
@@ -60,7 +68,7 @@ class CodeGuard:
     ) -> Dict[str, Any]:
         logger.info("Starting CodeGuard run")
 
-        config = self.config.copy()
+        config = copy.deepcopy(self.config)
 
         if overrides:
             logger.info(f"Applying overrides: {overrides}")
@@ -70,8 +78,10 @@ class CodeGuard:
                 else:
                     config[key] = value
 
+        gen_llm, audit_llm = self._llms_from_config(config)
+
         logger.info("Generating initial code")
-        code: str = generate_code(self.gen_llm, task)
+        code: str = generate_code(gen_llm, task)
 
         max_iters: int = config["execution"]["max_iterations"]
         history: List[Dict[str, Any]] = []
@@ -140,11 +150,11 @@ class CodeGuard:
 
             logger.info(f"Iteration {i+1}: building feedback")
 
-            feedback: str = self._build_feedback(code, bandit_results_str)
+            feedback: str = self._build_feedback(code, bandit_results_str, audit_llm)
 
             logger.info(f"Iteration {i+1}: refining code")
 
-            code = refine_code(self.gen_llm, code, feedback)
+            code = refine_code(gen_llm, code, feedback)
 
         logger.info("CodeGuard run finished")
 

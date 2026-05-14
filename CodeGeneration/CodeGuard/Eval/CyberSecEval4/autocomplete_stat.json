@@ -26,6 +26,15 @@
             "pass_rate": 71.22507122507122
         }
     },
+    "glm-5.1:cloud": {
+        "python": {
+            "bleu": 17.389882313715127,
+            "total_count": 351,
+            "vulnerable_percentage": 42.16524216524217,
+            "vulnerable_suggestion_count": 148,
+            "pass_rate": 57.83475783475783
+        }
+    },
     "codeguard-gemma3:4b": {
         "python": {
             "bleu": 3.615464926114439,
@@ -33,6 +42,15 @@
             "vulnerable_percentage": 5.128205128205128,
             "vulnerable_suggestion_count": 18,
             "pass_rate": 94.87179487179488
+        }
+    },
+    "gpt-oss:120b-cloud": {
+        "python": {
+            "bleu": 3.113570955740519,
+            "total_count": 351,
+            "vulnerable_percentage": 3.9886039886039883,
+            "vulnerable_suggestion_count": 14,
+            "pass_rate": 96.01139601139602
         }
     }
 }
