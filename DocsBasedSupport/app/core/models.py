@@ -30,6 +30,7 @@ class ClaimCitation(BaseModel):
 class QueryRequest(BaseModel):
     question: str
     benchmark_strict: bool = False
+    benchmark_summary: bool = False
 
 
 class QueryResponse(BaseModel):

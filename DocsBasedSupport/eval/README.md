@@ -15,8 +15,9 @@ Notes:
 
 WildGraphBench end-to-end:
 
-- Build and query through API endpoints (recommended; requires `uvicorn app.main:app --reload`):
-  - `PYTHONPATH=. python eval/wildgraphbench_run.py --mode api --api-base-url http://localhost:8000 --wildgraphbench-root /absolute/path/to/WildGraphBench --domain technology --output-dir eval/WildGraphBench`
+- Build and query through API endpoints (DocsBasedSupport defaults to **8008**; CodeGuard uses 8000):
+  - `cd DocsBasedSupport && PYTHONPATH=. python -m app.main`
+  - `PYTHONPATH=. python eval/wildgraphbench_run.py --mode api --api-base-url http://localhost:8008 --wildgraphbench-root /absolute/path/to/WildGraphBench --domain technology --output-dir eval/WildGraphBench`
 - Build and query with local in-process pipeline:
   - `PYTHONPATH=. python eval/wildgraphbench_run.py --mode local --wildgraphbench-root /absolute/path/to/WildGraphBench --domain technology --output-dir eval/WildGraphBench`
 - Use custom benchmark settings YAML:

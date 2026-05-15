@@ -236,7 +236,11 @@ def _evaluate_questions(
     for idx, q in enumerate(questions, start=1):
         start = time.perf_counter()
         is_summary = any(item.lower() == "summary" for item in q.question_type)
-        result = query_agent.answer(q.question, benchmark_strict=bool(is_summary))
+        result = query_agent.answer(
+            q.question,
+            benchmark_strict=False,
+            benchmark_summary=is_summary,
+        )
         elapsed = time.perf_counter() - start
         latencies.append(elapsed)
         evidence_counts.append(len(result.evidence_path))
@@ -427,7 +431,11 @@ def _evaluate_questions_via_api(
             is_summary = any(item.lower() == "summary" for item in q.question_type)
             response = client.post(
                 "/query_v2",
-                json={"question": q.question, "benchmark_strict": bool(is_summary)},
+                json={
+                    "question": q.question,
+                    "benchmark_strict": False,
+                    "benchmark_summary": is_summary,
+                },
             )
             response.raise_for_status()
             result = response.json()
@@ -496,6 +504,62 @@ def _evaluate_questions_via_api(
         "answer_non_empty_rate": (non_empty_answers / len(questions)) if questions else 0.0,
     }
     return predictions, stats
+
+
+def _question_matches_types(question: WildGraphQuestion, question_types: set[str] | None) -> bool:
+    if not question_types:
+        return True
+    normalized = {item.lower() for item in question.question_type}
+    return bool(normalized & question_types)
+
+
+def _filter_questions(
+    questions: list[WildGraphQuestion],
+    question_types: set[str] | None,
+) -> list[WildGraphQuestion]:
+    if not question_types:
+        return questions
+    return [q for q in questions if _question_matches_types(q, question_types)]
+
+
+def _load_predictions_jsonl(path: Path) -> tuple[dict[str, dict[str, Any]], list[str]]:
+    by_question: dict[str, dict[str, Any]] = {}
+    order: list[str] = []
+    with path.open("r", encoding="utf-8") as fh:
+        for line in fh:
+            payload = (line or "").strip()
+            if not payload:
+                continue
+            row = json.loads(payload)
+            question = (row.get("question") or "").strip()
+            if question:
+                by_question[question] = row
+                order.append(question)
+    return by_question, order
+
+
+def _merge_predictions(
+    base_predictions: dict[str, dict[str, Any]],
+    updated_rows: list[dict[str, Any]],
+    base_order: list[str] | None = None,
+) -> list[dict[str, Any]]:
+    merged = dict(base_predictions)
+    for row in updated_rows:
+        question = (row.get("question") or "").strip()
+        if question:
+            merged[question] = row
+    if base_order:
+        rows: list[dict[str, Any]] = []
+        seen: set[str] = set()
+        for question in base_order:
+            if question in merged:
+                rows.append(merged[question])
+                seen.add(question)
+        for question, row in merged.items():
+            if question not in seen:
+                rows.append(row)
+        return rows
+    return list(merged.values())
 
 
 def _load_domain_questions(wgb_root: Path, domain: str | None, max_questions: int | None) -> list[WildGraphQuestion]:
@@ -614,13 +678,13 @@ def main() -> None:
     parser.add_argument(
         "--mode",
         choices=("local", "api"),
-        default="api",
-        help="Execution mode: 'api' uses HTTP endpoints, 'local' runs services in-process.",
+        default="local",
+        help="Execution mode: 'local' runs GraphRAG in-process (default); 'api' calls DocsBasedSupport HTTP endpoints.",
     )
     parser.add_argument(
         "--api-base-url",
-        default="http://localhost:8000",
-        help="Base URL for API mode.",
+        default="http://localhost:8008",
+        help="DocsBasedSupport API base URL (not CodeGuard on :8000). Start with: python -m app.main",
     )
     parser.add_argument(
         "--request-timeout-seconds",
@@ -637,6 +701,14 @@ def main() -> None:
         "--no-progress-bar",
         action="store_true",
         help="Disable in-place progress bar output.",
+    )
+    parser.add_argument(
+        "--question-types",
+        help="Comma-separated question types to run (e.g. summary). Others are skipped unless --merge-predictions is set.",
+    )
+    parser.add_argument(
+        "--merge-predictions",
+        help="Path to an existing predictions JSONL; non-run questions are copied from this file.",
     )
     parser.add_argument(
         "--settings-yaml",
@@ -678,14 +750,27 @@ def main() -> None:
         pages = _collect_reference_pages(corpus_root, args.domain)
         if args.max_reference_pages is not None:
             pages = pages[: args.max_reference_pages]
-    questions = _load_domain_questions(wgb_root, args.domain, args.max_questions)
+    all_questions = _load_domain_questions(wgb_root, args.domain, args.max_questions)
+    question_types_filter: set[str] | None = None
+    if args.question_types:
+        question_types_filter = {item.strip().lower() for item in args.question_types.split(",") if item.strip()}
+    questions = _filter_questions(all_questions, question_types_filter)
+    base_predictions: dict[str, dict[str, Any]] = {}
+    base_prediction_order: list[str] = []
+    if args.merge_predictions:
+        merge_path = Path(args.merge_predictions).resolve()
+        if not merge_path.exists():
+            raise ValueError(f"Merge predictions file not found: {merge_path}")
+        base_predictions, base_prediction_order = _load_predictions_jsonl(merge_path)
     logger.info(
-        "Setup summary | mode=%s | domain=%s | skip_ingest=%s | reference_pages=%d | questions=%d | provider=%s | extract_model=%s | chat_model=%s | embed_model=%s | neo4j_db=%s | api_base_url=%s",
+        "Setup summary | mode=%s | domain=%s | skip_ingest=%s | reference_pages=%d | questions=%d/%d | types=%s | provider=%s | extract_model=%s | chat_model=%s | embed_model=%s | neo4j_db=%s | api_base_url=%s",
         args.mode,
         args.domain or "all",
         bool(args.skip_ingest),
         len(pages),
         len(questions),
+        len(all_questions),
+        ",".join(sorted(question_types_filter)) if question_types_filter else "all",
         settings.llm_provider,
         settings.llm_extract_model,
         settings.llm_chat_model,
@@ -760,8 +845,15 @@ def main() -> None:
 
     stem = args.domain or "all_domains"
     pred_path = output_dir / f"predictions_{stem}.jsonl"
+    output_rows = predictions
+    if base_predictions:
+        output_rows = _merge_predictions(
+            base_predictions,
+            predictions,
+            base_order=base_prediction_order,
+        )
     with pred_path.open("w", encoding="utf-8") as fh:
-        for row in predictions:
+        for row in output_rows:
             fh.write(json.dumps(row, ensure_ascii=True) + "\n")
 
     report = {
@@ -771,6 +863,8 @@ def main() -> None:
         "domain": args.domain or "all",
         "wildgraphbench_root": str(wgb_root),
         "skip_ingest": bool(args.skip_ingest),
+        "question_types_filter": sorted(question_types_filter) if question_types_filter else None,
+        "merge_predictions": str(Path(args.merge_predictions).resolve()) if args.merge_predictions else None,
         "ingestion": ingest_stats,
         "qa": qa_stats,
         "artifacts": {"predictions_jsonl": str(pred_path)},

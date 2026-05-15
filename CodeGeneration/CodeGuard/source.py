@@ -1,7 +1,7 @@
 import copy
 import json
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar
 
 import yaml
 
@@ -10,6 +10,11 @@ from static_analysis import run_bandit
 
 
 logger = logging.getLogger("codeguard")
+
+T = TypeVar("T")
+
+# Retries when no code exists yet; if code was already produced, return it on first LLM failure.
+_LLM_MAX_ATTEMPTS = 3
 
 
 class CodeGuard:
@@ -48,6 +53,41 @@ class CodeGuard:
     def _count_issues(self: "CodeGuard", bandit_result: Dict[str, Any]) -> int:
         return len(bandit_result.get("results", []))
 
+    def _llm_call(
+        self,
+        label: str,
+        fn: Callable[..., T],
+        *args: Any,
+        existing_code: str = "",
+        max_attempts: int = _LLM_MAX_ATTEMPTS,
+    ) -> T:
+        """
+        Run an LLM step. If it fails and we already have generated code, return that code
+        (for str-returning callables). Otherwise retry up to max_attempts.
+        """
+        last_error: Optional[Exception] = None
+        for attempt in range(1, max_attempts + 1):
+            try:
+                return fn(*args)
+            except Exception as exc:
+                last_error = exc
+                logger.warning(
+                    "%s failed (attempt %s/%s): %s",
+                    label,
+                    attempt,
+                    max_attempts,
+                    exc,
+                )
+        if existing_code and existing_code.strip():
+            logger.info(
+                "Returning previously generated code after %s failed %s time(s).",
+                label,
+                max_attempts,
+            )
+            return existing_code  # type: ignore[return-value]
+        assert last_error is not None
+        raise last_error
+
     def _build_feedback(
         self,
         code: str,
@@ -58,8 +98,14 @@ class CodeGuard:
         feedback: str = bandit_result_str
         if audit_llm:
             logger.debug("Running LLM audit")
-            llm_feedback: str = audit_code(audit_llm, code)
-            feedback += "\n\nLLM Audit:\n" + llm_feedback
+            try:
+                llm_feedback: str = audit_code(audit_llm, code)
+                feedback += "\n\nLLM Audit:\n" + llm_feedback
+            except Exception as exc:
+                logger.warning(
+                    "LLM audit failed; continuing with Bandit feedback only: %s",
+                    exc,
+                )
 
         return feedback
 
@@ -81,13 +127,20 @@ class CodeGuard:
         gen_llm, audit_llm = self._llms_from_config(config)
 
         logger.info("Generating initial code")
-        code: str = generate_code(gen_llm, task)
+        code: str = self._llm_call(
+            "generate_code",
+            generate_code,
+            gen_llm,
+            task,
+            existing_code="",
+        )
 
         max_iters: int = config["execution"]["max_iterations"]
         history: List[Dict[str, Any]] = []
         prev_issue_count: Optional[int] = None
 
         for i in range(max_iters):
+            iteration_failed = False
             logger.info(f"Iteration {i+1} started")
 
             bandit_result = self._static_code_analysis(code)
@@ -142,10 +195,27 @@ class CodeGuard:
                     "running audit/refine once, then finishing."
                 )
                 prev_issue_count = current_issue_count
-                logger.info(f"Iteration {i+1}: building feedback")
-                feedback = self._build_feedback(code, bandit_results_str, audit_llm)
-                logger.info(f"Iteration {i+1}: refining code")
-                code = refine_code(gen_llm, code, feedback)
+                try:
+                    logger.info(f"Iteration {i+1}: building feedback")
+                    feedback = self._build_feedback(
+                        code, bandit_results_str, audit_llm
+                    )
+                    logger.info(f"Iteration {i+1}: refining code")
+                    code = self._llm_call(
+                        "refine_code",
+                        refine_code,
+                        gen_llm,
+                        code,
+                        feedback,
+                        existing_code=code,
+                    )
+                except Exception as exc:
+                    logger.error(
+                        "Iteration %s failed during feedback/refine: %s",
+                        i + 1,
+                        exc,
+                    )
+                    iteration_failed = True
                 break
 
             # Early-break check (no improvement or no issues only if no errors)
@@ -164,13 +234,39 @@ class CodeGuard:
 
             prev_issue_count = current_issue_count
 
-            logger.info(f"Iteration {i+1}: building feedback")
+            try:
+                logger.info(f"Iteration {i+1}: building feedback")
+                feedback = self._build_feedback(code, bandit_results_str, audit_llm)
+                logger.info(f"Iteration {i+1}: refining code")
+                code = self._llm_call(
+                    "refine_code",
+                    refine_code,
+                    gen_llm,
+                    code,
+                    feedback,
+                    existing_code=code,
+                )
+            except Exception as exc:
+                logger.error(
+                    "Iteration %s failed during feedback/refine: %s",
+                    i + 1,
+                    exc,
+                )
+                iteration_failed = True
 
-            feedback: str = self._build_feedback(code, bandit_results_str, audit_llm)
-
-            logger.info(f"Iteration {i+1}: refining code")
-
-            code = refine_code(gen_llm, code, feedback)
+            if iteration_failed:
+                if code and code.strip():
+                    logger.info(
+                        "Stopping after iteration %s; returning last generated code.",
+                        i + 1,
+                    )
+                    break
+                logger.info(
+                    "No code to return; retrying iteration %s.",
+                    i + 1,
+                )
+                history.pop()
+                continue
 
         logger.info("CodeGuard run finished")
 

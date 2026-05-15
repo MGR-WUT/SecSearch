@@ -108,10 +108,21 @@ def ingest(payload: IngestRequest) -> dict[str, object]:
 def query_v2(payload: QueryRequest) -> QueryResponse:
     if not payload.question.strip():
         raise HTTPException(status_code=400, detail="Question must not be empty.")
-    return app.state.query_agent_v2.answer(payload.question, benchmark_strict=payload.benchmark_strict)
+    return app.state.query_agent_v2.answer(
+        payload.question,
+        benchmark_strict=payload.benchmark_strict,
+        benchmark_summary=payload.benchmark_summary,
+    )
 
 
 @app.post("/temporal/update")
 def temporal_update() -> dict[str, int]:
     return app.state.temporal_service.run_update_cycle()
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    # Default 8008 to avoid conflicting with CodeGuard on :8000.
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8008, reload=True)
 
