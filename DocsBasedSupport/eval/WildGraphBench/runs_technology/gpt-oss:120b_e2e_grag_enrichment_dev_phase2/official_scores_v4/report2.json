@@ -1,0 +1,34 @@
+{
+  "total_items": 113,
+  "single_fact": {
+    "num": 56,
+    "correct": 37,
+    "accuracy": 0.6607
+  },
+  "multi_fact": {
+    "num": 33,
+    "correct": 18,
+    "accuracy": 0.5455
+  },
+  "summary": {
+    "num": 24,
+    "correct": 0,
+    "correct_relaxed": 3,
+    "correct_partial_credit": 7,
+    "accuracy_binary": 0.0,
+    "accuracy_binary_relaxed": 0.125,
+    "accuracy_partial_credit": 0.2917,
+    "coverage_avg": 0.2891,
+    "statement_accuracy_avg": 0.1627,
+    "statement_f1_avg": 0.1788
+  },
+  "overall_accuracy": 0.4867,
+  "details": {
+    "scored_file": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/eval/WildGraphBench/runs_technology/gpt-oss:120b_e2e_grag_enrichment_dev_phase2/official_scores_v4/scored2.jsonl",
+    "derived_from": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/eval/WildGraphBench/runs_technology/gpt-oss:120b_e2e_grag_enrichment_dev_phase2/official_scores_v3/scored2.jsonl",
+    "judge_model": "gpt-5-mini",
+    "grading_method": "Type3 v3 scores + updated thresholds: relaxed@0.4 both ways; partial credit when max(coverage, accuracy)>=0.5",
+    "summary_relaxed_threshold": 0.4,
+    "summary_partial_credit_threshold": 0.5
+  }
+}

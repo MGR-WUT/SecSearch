@@ -1,0 +1,30 @@
+{
+  "total_items": 113,
+  "single_fact": {
+    "num": 56,
+    "correct": 37,
+    "accuracy": 0.6607
+  },
+  "multi_fact": {
+    "num": 33,
+    "correct": 18,
+    "accuracy": 0.5455
+  },
+  "summary": {
+    "num": 24,
+    "correct": 0,
+    "correct_relaxed": 0,
+    "accuracy_binary": 0.0,
+    "accuracy_binary_relaxed": 0.0,
+    "coverage_avg": 0.1108,
+    "statement_accuracy_avg": 0.1182,
+    "statement_f1_avg": 0.0833
+  },
+  "overall_accuracy": 0.4867,
+  "details": {
+    "scored_file": "eval/WildGraphBench/runs_technology/gpt-oss:120b_e2e_grag_enrichment_dev_phase2/official_scores_v2/scored2.jsonl",
+    "judge_model": "gpt-5-mini",
+    "max_concurrent": 10,
+    "grading_method": "Type1/2: binary exact; Type3: statement-level coverage/accuracy (statement-list reference, relaxed entailment); strict binary requires 100% both ways; relaxed binary requires >=0.5"
+  }
+}

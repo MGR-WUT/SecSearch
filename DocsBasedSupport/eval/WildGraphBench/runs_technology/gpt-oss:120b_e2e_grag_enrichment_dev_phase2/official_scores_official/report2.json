@@ -1,0 +1,38 @@
+{
+  "total_items": 113,
+  "single_fact": {
+    "num": 56,
+    "correct": 38,
+    "accuracy": 0.6786
+  },
+  "multi_fact": {
+    "num": 33,
+    "correct": 18,
+    "accuracy": 0.5455
+  },
+  "summary": {
+    "num": 24,
+    "correct": 0,
+    "correct_relaxed": null,
+    "correct_partial_credit": null,
+    "accuracy_binary": 0.0,
+    "accuracy_binary_relaxed": null,
+    "accuracy_partial_credit": null,
+    "recall_avg": 0.2147,
+    "precision_avg": 0.1459,
+    "f1_avg": 0.1486,
+    "coverage_avg": 0.2147,
+    "statement_accuracy_avg": 0.1459,
+    "statement_f1_avg": 0.1486
+  },
+  "overall_accuracy": 0.4956,
+  "details": {
+    "scored_file": "eval/WildGraphBench/runs_technology/gpt-oss:120b_e2e_grag_enrichment_dev_phase2/official_scores_official/scored2.jsonl",
+    "judge_model": "gpt-5-mini",
+    "max_concurrent": 10,
+    "summary_scoring": "strict",
+    "grading_method": "Type1/2: binary exact; Type3: paper Eq.2-3 stmt-to-stmt Match, strict judge, no paragraph fallback",
+    "summary_relaxed_threshold": null,
+    "summary_partial_credit_threshold": null
+  }
+}

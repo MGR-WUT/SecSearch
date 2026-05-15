@@ -111,8 +111,16 @@ Use this exact structure for each run:
 
 ## Interpretation caveat
 
-For summary questions, this evaluator is intentionally strict:
+For summary questions (Type-3), use **paper-aligned** scoring for Table 17 comparison:
 
-- It uses statement-level bidirectional checks.
-- `summary.accuracy_binary` is 1 only for near-perfect alignment.
-- `coverage_avg`, `statement_accuracy_avg`, and `statement_f1_avg` are often more informative than binary summary accuracy alone.
+```bash
+python eval/WildGraphBenchDataset/tools/eval.py \
+  --gold .../QA/technology/questions.jsonl \
+  --pred .../predictions_technology.jsonl \
+  --outdir .../official_scores \
+  --summary-scoring strict   # default; maps to Recall / Precision / F1
+```
+
+- `strict` (default): statement-to-statement Match per WildGraphBench Eq. (2)–(3); use for SOTA tables.
+- `lenient`: relaxed judge + paragraph fallback; **diagnostic only**, not comparable to published leaderboard numbers.
+- Report fields: `recall_avg` = `coverage_avg`, `precision_avg` = `statement_accuracy_avg`, `f1_avg` = `statement_f1_avg`.

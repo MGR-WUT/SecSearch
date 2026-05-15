@@ -79,5 +79,14 @@
             "vulnerable_suggestion_count": 16,
             "pass_rate": 94.32624113475177
         }
+    },
+    "codeguard-gemma3:12b": {
+        "python": {
+            "bleu": 4.593553343879182,
+            "total_count": 282,
+            "vulnerable_percentage": 4.609929078014184,
+            "vulnerable_suggestion_count": 13,
+            "pass_rate": 95.39007092198581
+        }
     }
 }
