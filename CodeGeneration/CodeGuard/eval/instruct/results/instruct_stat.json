@@ -62,6 +62,15 @@
             "pass_rate": 82.26950354609929
         }
     },
+    "gpt-oss:20b": {
+        "python": {
+            "bleu": 7.308146797864698,
+            "total_count": 282,
+            "vulnerable_percentage": 18.085106382978726,
+            "vulnerable_suggestion_count": 51,
+            "pass_rate": 81.91489361702128
+        }
+    },
     "codeguard-gpt-oss:120b-v2": {
         "python": {
             "bleu": 2.3330017204922817,
