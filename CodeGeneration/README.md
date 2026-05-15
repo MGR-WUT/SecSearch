@@ -12,7 +12,10 @@ The CodeGuard directory structure is as follows:
 CodeGuard/
 ├── api/
 │   └── main.py
-├── Eval/CyberSecEval4/
+├── eval/
+│   ├── instruct/results/
+│   ├── autocomplete/results/
+│   └── visualization/
 │   └── *.json
 ├── agents.py
 ├── config.yml
