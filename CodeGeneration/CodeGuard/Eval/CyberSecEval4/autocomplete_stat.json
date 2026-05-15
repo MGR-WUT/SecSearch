@@ -44,7 +44,7 @@
             "pass_rate": 94.87179487179488
         }
     },
-    "gpt-oss:120b-cloud": {
+    "codeguard-gpt-oss:120b-cloud": {
         "python": {
             "bleu": 3.113570955740519,
             "total_count": 351,

@@ -132,6 +132,22 @@ class CodeGuard:
                 }
             )
 
+            if (
+                i == 0
+                and not has_errors
+                and current_issue_count == 0
+            ):
+                logger.info(
+                    "First iteration: no Bandit errors and no findings; "
+                    "running audit/refine once, then finishing."
+                )
+                prev_issue_count = current_issue_count
+                logger.info(f"Iteration {i+1}: building feedback")
+                feedback = self._build_feedback(code, bandit_results_str, audit_llm)
+                logger.info(f"Iteration {i+1}: refining code")
+                code = refine_code(gen_llm, code, feedback)
+                break
+
             # Early-break check (no improvement or no issues only if no errors)
             if (
                 (
