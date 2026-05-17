@@ -1,0 +1,20 @@
+{
+  "benchmark": "WildGraphBench",
+  "mode": "api",
+  "api_base_url": "http://localhost:8000",
+  "domain": "technology",
+  "wildgraphbench_root": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/eval/WildGraphBenchDataset",
+  "skip_ingest": true,
+  "question_types_filter": null,
+  "merge_predictions": null,
+  "ingestion": {},
+  "qa": {
+    "questions_count": 113,
+    "avg_latency_seconds": 5.820518899694563,
+    "avg_evidence_edges": 6.486725663716814,
+    "answer_non_empty_rate": 1.0
+  },
+  "artifacts": {
+    "predictions_jsonl": "eval/WildGraphBench/runs_technology/gpt-oss:120b_e2e_dev/predictions_technology.jsonl"
+  }
+}

@@ -1,0 +1,54 @@
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Model} & \textbf{BLEU} $\uparrow$ & \textbf{Vulnerable \%} $\downarrow$ & \textbf{Pass Rate} $\uparrow$ \\
+\hline
+gemma3:4b & 6.80 & 21.63\% & 78.37\% \\
+gpt-oss:20b & \textbf{7.31} & 18.09\% & 81.91\% \\
+gpt-oss:120b & 6.08 & \textbf{17.73\%} & \textbf{82.27\%} \\
+\hline
+\textbf{codeguard-gemma3:4b} & 2.70 & 6.03\% & 93.97\% \\
+\textbf{codeguard-gpt-oss:20b} & \textbf{3.19} & \textbf{5.67\%} & \textbf{94.33\%} \\
+\textbf{codeguard-gpt-oss:120b} & 2.78 & 7.80\% & 92.20\% \\
+\hline
+\end{tabular}
+\caption{CyberSecEval4 Instruct Benchmark Results}
+\label{tab:instruct_benchmark}
+\end{table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Model} & \textbf{BLEU} $\uparrow$ & \textbf{Vulnerable \%} $\downarrow$ & \textbf{Pass Rate} $\uparrow$ \\
+\hline
+gemini-3-flash-preview & \textbf{20.44} & 43.59\% & 56.41\% \\
+gpt-5-mini & 14.86 & 37.61\% & 62.39\% \\
+gemma3:4b & 11.73 & \textbf{28.77\%} & \textbf{71.23\%} \\
+\hline
+\textbf{codeguard-gemma3:4b} & 3.62 & \textbf{5.13\%} & \textbf{94.87\%} \\
+\hline
+\end{tabular}
+\caption{CyberSecEval4 Autocomplete Benchmark Results}
+\label{tab:autocomplete_benchmark}
+\end{table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Model} & \textbf{BLEU} $\uparrow$ & \textbf{Vulnerable \%} $\downarrow$ & \textbf{Pass Rate} $\uparrow$ \\
+\hline
+gemma3:4b & 11.73 & \textbf{28.77\%} & \textbf{71.23\%} \\
+gpt-oss:20b & \textbf{14.90} & 37.04\% & 62.96\% \\
+gpt-oss:120b & 13.78 & 35.04\% & 64.96\% \\
+\hline
+\textbf{codeguard-gemma3:4b} & 3.62 & 5.13\% & 94.87\% \\
+\textbf{codeguard-gpt-oss:20b} & \textbf{3.72} & \textbf{3.99\%} & \textbf{96.01\%} \\
+\textbf{codeguard-gpt-oss:120b} & 3.11 & \textbf{3.99\%} & \textbf{96.01\%} \\
+\hline
+\end{tabular}
+\caption{CyberSecEval4 Autocomplete Benchmark Results (three-model comparison)}
+\label{tab:autocomplete_benchmark_three_models}
+\end{table}

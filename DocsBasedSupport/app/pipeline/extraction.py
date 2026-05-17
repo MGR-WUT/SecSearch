@@ -85,6 +85,7 @@ Typed properties by label:
 - ErrorCode: code, category, severity, typical_causes, recommended_action
 - Component: layer, runtime_environment, supported_protocols, owner_team
 - Policy/CVE/MitigationStep/Integration: include any known operational fields in properties
+- properties must be a flat map of strings/lists (no nested JSON objects)
 
 Return only JSON:
 {{

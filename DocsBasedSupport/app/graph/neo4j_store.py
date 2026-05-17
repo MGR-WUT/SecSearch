@@ -1,10 +1,38 @@
 from __future__ import annotations
 
+import json
+import logging
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 
 from neo4j import GraphDatabase
+
+logger = logging.getLogger(__name__)
+
+
+def sanitize_neo4j_properties(props: dict[str, Any], *, prefix: str = "") -> dict[str, Any]:
+    """Neo4j node properties must be primitives or arrays of primitives (no nested maps)."""
+    sanitized: dict[str, Any] = {}
+    for key, value in props.items():
+        if value is None:
+            continue
+        key_str = str(key)
+        full_key = f"{prefix}_{key_str}" if prefix else key_str
+        if isinstance(value, dict):
+            sanitized.update(sanitize_neo4j_properties(value, prefix=full_key))
+            continue
+        if isinstance(value, list):
+            if value and all(isinstance(item, (str, int, float, bool)) for item in value):
+                sanitized[full_key] = value
+            else:
+                sanitized[full_key] = json.dumps(value, ensure_ascii=True)
+            continue
+        if isinstance(value, (str, int, float, bool)):
+            sanitized[full_key] = value
+            continue
+        sanitized[full_key] = str(value)
+    return sanitized
 
 
 @dataclass
@@ -92,7 +120,7 @@ class Neo4jStore:
                 entity_id=entity.entity_id,
                 label=entity.label,
                 name=entity.name,
-                props=entity.properties,
+                props=sanitize_neo4j_properties(entity.properties),
                 source_id=source_id,
                 now=now,
             )
@@ -110,7 +138,7 @@ class Neo4jStore:
                 query,
                 source_id=relation.source_id,
                 target_id=relation.target_id,
-                props=relation.properties,
+                props=sanitize_neo4j_properties(relation.properties),
                 now=now,
             )
 
@@ -201,17 +229,30 @@ class Neo4jStore:
                 session.run(statement)
 
     def resolve_duplicate_entities(self) -> int:
-        query = """
+        find_query = """
         MATCH (e1:Entity), (e2:Entity)
-        WHERE e1.name = e2.name AND e1.label = e2.label AND id(e1) < id(e2)
-        WITH [e1, e2] AS nodes
-        CALL apoc.refactor.mergeNodes(nodes, {properties: 'combine', mergeRels: true})
+        WHERE e1.name = e2.name AND e1.label = e2.label AND elementId(e1) < elementId(e2)
+        RETURN elementId(e1) AS id1, elementId(e2) AS id2
+        LIMIT 500
+        """
+        merge_query = """
+        MATCH (e1:Entity) WHERE elementId(e1) = $id1
+        MATCH (e2:Entity) WHERE elementId(e2) = $id2
+        CALL apoc.refactor.mergeNodes([e1, e2], {properties: 'combine', mergeRels: true})
         YIELD node
         RETURN count(node) AS merged_count
         """
+        merged_total = 0
         with self.driver.session(database=self.database) as session:
-            record = session.run(query).single()
-            return int(record["merged_count"]) if record is not None else 0
+            pairs = [(record["id1"], record["id2"]) for record in session.run(find_query)]
+            for id1, id2 in pairs:
+                try:
+                    record = session.run(merge_query, id1=id1, id2=id2).single()
+                    if record is not None:
+                        merged_total += int(record["merged_count"])
+                except Exception as exc:  # noqa: BLE001
+                    logger.warning("Skipping duplicate merge for entities %s / %s: %s", id1, id2, exc)
+        return merged_total
 
     def query_chunk_vector_index(
         self, index_name: str, query_embedding: list[float], top_k: int

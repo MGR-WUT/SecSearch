@@ -26,6 +26,7 @@ WildGraphBench end-to-end:
   - `--neo4j-uri ... --neo4j-username ... --neo4j-password ... --llm-provider ... --llm-base-url ... --llm-chat-model ... --llm-extract-model ... --llm-embed-model ...`
 - Optional smoke test:
   - `PYTHONPATH=. python eval/wildgraphbench_run.py --mode api --api-base-url http://localhost:8000 --wildgraphbench-root /absolute/path/to/WildGraphBench --domain technology --max-reference-pages 25 --max-questions 20 --output-dir eval/WildGraphBench/smoke`
+- Long ingest runs (large reference pages / cloud models): increase `--request-timeout-seconds` (default `1800`).
 - Score against official benchmark evaluator:
   - `python tools/eval.py --gold /absolute/path/to/WildGraphBench/QA/technology/questions.jsonl --pred eval/WildGraphBench/predictions_technology.jsonl --outdir eval/WildGraphBench/official_scores_technology`
 

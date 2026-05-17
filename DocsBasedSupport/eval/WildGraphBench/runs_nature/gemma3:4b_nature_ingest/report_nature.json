@@ -1,0 +1,28 @@
+{
+  "benchmark": "WildGraphBench",
+  "mode": "api",
+  "api_base_url": "http://localhost:8000",
+  "domain": "nature",
+  "wildgraphbench_root": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/eval/WildGraphBenchDataset",
+  "skip_ingest": false,
+  "question_types_filter": null,
+  "merge_predictions": null,
+  "ingestion": {
+    "ingested_pages": 71,
+    "failed_pages": 0,
+    "entity_count_total": 144,
+    "relation_count_total": 89,
+    "indexed_chunks_total": 2507,
+    "ingest_time_seconds": 11982.175980499946,
+    "ingest_failures": []
+  },
+  "qa": {
+    "questions_count": 0,
+    "avg_latency_seconds": 0.0,
+    "avg_evidence_edges": 0.0,
+    "answer_non_empty_rate": 0.0
+  },
+  "artifacts": {
+    "predictions_jsonl": "eval/WildGraphBench/runs_nature/gemma3:4b_nature_ingest/predictions_nature.jsonl"
+  }
+}

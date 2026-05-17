@@ -689,8 +689,8 @@ def main() -> None:
     parser.add_argument(
         "--request-timeout-seconds",
         type=int,
-        default=120,
-        help="HTTP timeout in seconds for API mode requests.",
+        default=1800,
+        help="HTTP timeout in seconds for API mode requests (ingest can be slow per page).",
     )
     parser.add_argument(
         "--verbose-http",

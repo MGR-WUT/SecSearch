@@ -1,5 +1,9 @@
 *settings.yaml
 
+# Neo4j graph snapshots (large volume exports; see DocsBasedSupport/neo4j_snapshots/*/SNAPSHOT.md)
+DocsBasedSupport/neo4j_snapshots/**/*.tar.gz
+DocsBasedSupport/neo4j_snapshots/**/*.dump
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
