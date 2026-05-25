@@ -1,0 +1,38 @@
+{
+  "total_items": 113,
+  "single_fact": {
+    "num": 56,
+    "correct": 20,
+    "accuracy": 0.3571
+  },
+  "multi_fact": {
+    "num": 33,
+    "correct": 7,
+    "accuracy": 0.2121
+  },
+  "summary": {
+    "num": 24,
+    "correct": 0,
+    "correct_relaxed": null,
+    "correct_partial_credit": null,
+    "accuracy_binary": 0.0,
+    "accuracy_binary_relaxed": null,
+    "accuracy_partial_credit": null,
+    "recall_avg": 0.139,
+    "precision_avg": 0.1684,
+    "f1_avg": 0.1159,
+    "coverage_avg": 0.139,
+    "statement_accuracy_avg": 0.1684,
+    "statement_f1_avg": 0.1159
+  },
+  "overall_accuracy": 0.2389,
+  "details": {
+    "scored_file": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/eval/WildGraphBench/runs_technology/gemma3:4b_gemma4:e2b/official_scores/scored2.jsonl",
+    "judge_model": "gpt-5-mini",
+    "max_concurrent": 10,
+    "summary_scoring": "strict",
+    "grading_method": "Type1/2: binary exact; Type3: paper Eq.2-3 stmt-to-stmt Match, strict judge, no paragraph fallback",
+    "summary_relaxed_threshold": null,
+    "summary_partial_credit_threshold": null
+  }
+}
