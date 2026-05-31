@@ -1,0 +1,1665 @@
+{
+  "generated_at": "2026-05-31T09:03:11.586930+00:00",
+  "config": {
+    "pagerank_property": "pagerank",
+    "community_property": "community",
+    "top_overall": 30,
+    "top_per_label": 15,
+    "top_communities": 10,
+    "top_per_community": 10
+  },
+  "enriched_node_count": 1840,
+  "top_pagerank_overall": [
+    {
+      "entity_id": "attack:x-mitre-tactic--78b23412-0651-46d7-a540-170a1ce8bd5a",
+      "name": "Stealth",
+      "label": "Tactic",
+      "external_id": "TA0005",
+      "pagerank": 33.80591401573111
+    },
+    {
+      "entity_id": "attack:x-mitre-tactic--c17c5845-175e-4421-9713-829d0573dbc9",
+      "name": "Discovery",
+      "label": "Tactic",
+      "external_id": "TA0007",
+      "pagerank": 27.214847035851975
+    },
+    {
+      "entity_id": "attack:x-mitre-tactic--f72804c5-f15a-449e-a5da-2eecd181f813",
+      "name": "Command and Control",
+      "label": "Tactic",
+      "external_id": "TA0011",
+      "pagerank": 22.766388766787347
+    },
+    {
+      "entity_id": "attack:x-mitre-tactic--4ca45d45-df4d-4613-8980-bac22d278fa5",
+      "name": "Execution",
+      "label": "Tactic",
+      "external_id": "TA0002",
+      "pagerank": 19.475323546401885
+    },
+    {
+      "entity_id": "attack:x-mitre-tactic--5bc1d813-693e-4823-9961-abf9af4b0e92",
+      "name": "Persistence",
+      "label": "Tactic",
+      "external_id": "TA0003",
+      "pagerank": 13.519649559389027
+    },
+    {
+      "entity_id": "attack:x-mitre-tactic--d108ce10-2419-4cf9-a774-46161d6c6cfe",
+      "name": "Collection",
+      "label": "Tactic",
+      "external_id": "TA0009",
+      "pagerank": 12.188822311796386
+    },
+    {
+      "entity_id": "attack:x-mitre-tactic--2558fd61-8c75-4730-94c4-11926db2a263",
+      "name": "Credential Access",
+      "label": "Tactic",
+      "external_id": "TA0006",
+      "pagerank": 11.995647724886974
+    },
+    {
+      "entity_id": "attack:x-mitre-tactic--5e29b093-294e-49e9-a803-dab3d73b77dd",
+      "name": "Privilege Escalation",
+      "label": "Tactic",
+      "external_id": "TA0004",
+      "pagerank": 10.943374879181668
+    },
+    {
+      "entity_id": "attack:x-mitre-tactic--43c49635-f2fa-44f2-92b9-0ee980bbf4ef",
+      "name": "Defense Impairment",
+      "label": "Tactic",
+      "external_id": "TA0112",
+      "pagerank": 9.377690914169055
+    },
+    {
+      "entity_id": "attack:x-mitre-tactic--d679bca2-e57d-4935-8650-8031c87a4400",
+      "name": "Resource Development",
+      "label": "Tactic",
+      "external_id": "TA0042",
+      "pagerank": 8.367602474268939
+    },
+    {
+      "entity_id": "attack:x-mitre-tactic--5569339b-94c2-49ee-afb3-2222936582c8",
+      "name": "Impact",
+      "label": "Tactic",
+      "external_id": "TA0040",
+      "pagerank": 7.5381275966733305
+    },
+    {
+      "entity_id": "attack:x-mitre-tactic--daa4cbb1-b4f4-4723-a824-7f1efd6e0592",
+      "name": "Reconnaissance",
+      "label": "Tactic",
+      "external_id": "TA0043",
+      "pagerank": 6.237292575845852
+    },
+    {
+      "entity_id": "attack:attack-pattern--e6919abc-99f9-4c6c-95a5-14761e7b2add",
+      "name": "Ingress Tool Transfer",
+      "label": "Technique",
+      "external_id": "T1105",
+      "pagerank": 5.3969855650558705
+    },
+    {
+      "entity_id": "attack:x-mitre-tactic--9a4e74ab-5008-408c-84bf-a10dfbc53462",
+      "name": "Exfiltration",
+      "label": "Tactic",
+      "external_id": "TA0010",
+      "pagerank": 5.095883738294012
+    },
+    {
+      "entity_id": "attack:attack-pattern--b3d682b6-98f2-4fb0-aa3b-b4df007ca70a",
+      "name": "Obfuscated Files or Information",
+      "label": "Technique",
+      "external_id": "T1027",
+      "pagerank": 4.990809172130507
+    },
+    {
+      "entity_id": "attack:x-mitre-tactic--7141578b-e50b-4dcc-bfa4-08a8dd689e9e",
+      "name": "Lateral Movement",
+      "label": "Tactic",
+      "external_id": "TA0008",
+      "pagerank": 4.914070815727693
+    },
+    {
+      "entity_id": "attack:attack-pattern--7385dfaf-6886-4229-9ecd-6fd678040830",
+      "name": "Command and Scripting Interpreter",
+      "label": "Technique",
+      "external_id": "T1059",
+      "pagerank": 4.793251702971517
+    },
+    {
+      "entity_id": "attack:x-mitre-tactic--ffd5bcee-6e16-4dd2-8eca-7b3beedf33ca",
+      "name": "Initial Access",
+      "label": "Tactic",
+      "external_id": "TA0001",
+      "pagerank": 4.593721823688784
+    },
+    {
+      "entity_id": "attack:attack-pattern--df8b2a25-8bdf-4856-953c-a04372b1c161",
+      "name": "Web Protocols",
+      "label": "Technique",
+      "external_id": "T1071.001",
+      "pagerank": 4.275822805897973
+    },
+    {
+      "entity_id": "attack:attack-pattern--354a7f88-63fb-41b5-a801-ce3b377b36f1",
+      "name": "System Information Discovery",
+      "label": "Technique",
+      "external_id": "T1082",
+      "pagerank": 3.98383601682806
+    },
+    {
+      "entity_id": "attack:attack-pattern--d1fcf083-a721-4223-aedf-bf8960798d62",
+      "name": "Windows Command Shell",
+      "label": "Technique",
+      "external_id": "T1059.003",
+      "pagerank": 3.871735032992957
+    },
+    {
+      "entity_id": "attack:attack-pattern--7bc57495-ea59-4380-be31-a64af124ef18",
+      "name": "File and Directory Discovery",
+      "label": "Technique",
+      "external_id": "T1083",
+      "pagerank": 3.6190939740390617
+    },
+    {
+      "entity_id": "attack:attack-pattern--3ccef7ae-cb5e-48f6-8302-897105fbf55c",
+      "name": "Deobfuscate/Decode Files or Information",
+      "label": "Technique",
+      "external_id": "T1140",
+      "pagerank": 3.4288397600841076
+    },
+    {
+      "entity_id": "attack:attack-pattern--707399d6-ab3e-4963-9315-d9d3818cd6a0",
+      "name": "System Network Configuration Discovery",
+      "label": "Technique",
+      "external_id": "T1016",
+      "pagerank": 3.0875224797653855
+    },
+    {
+      "entity_id": "attack:attack-pattern--8f4a33ec-8b1f-4b80-a2f6-642b2e479580",
+      "name": "Process Discovery",
+      "label": "Technique",
+      "external_id": "T1057",
+      "pagerank": 2.8374481895936223
+    },
+    {
+      "entity_id": "attack:attack-pattern--355be19c-ffc9-46d5-8d50-d6a036c675b6",
+      "name": "Application Layer Protocol",
+      "label": "Technique",
+      "external_id": "T1071",
+      "pagerank": 2.7673881015370947
+    },
+    {
+      "entity_id": "attack:attack-pattern--d63a3fb8-9452-4e9d-a60a-54be68d5998c",
+      "name": "File Deletion",
+      "label": "Technique",
+      "external_id": "T1070.004",
+      "pagerank": 2.7252068394750815
+    },
+    {
+      "entity_id": "attack:attack-pattern--42e8de7b-37b2-4258-905a-6897815e58e0",
+      "name": "Masquerading",
+      "label": "Technique",
+      "external_id": "T1036",
+      "pagerank": 2.4815879544750357
+    },
+    {
+      "entity_id": "attack:attack-pattern--0d91b3c0-5e50-47c3-949a-2a796f04d144",
+      "name": "Encrypted/Encoded File",
+      "label": "Technique",
+      "external_id": "T1027.013",
+      "pagerank": 2.4136494689717476
+    },
+    {
+      "entity_id": "attack:attack-pattern--9efb1ea7-c37b-4595-9640-b7680cd84279",
+      "name": "Registry Run Keys / Startup Folder",
+      "label": "Technique",
+      "external_id": "T1547.001",
+      "pagerank": 2.353462124861662
+    }
+  ],
+  "top_pagerank_per_label": {
+    "ThreatActor": [
+      {
+        "entity_id": "attack:intrusion-set--efed95ba-d7e8-47ff-8c53-99c42426ee7c",
+        "name": "PROMETHIUM",
+        "external_id": "G0056",
+        "pagerank": 0.21375000000000002
+      },
+      {
+        "entity_id": "attack:intrusion-set--381fcf73-60f6-4ab2-9991-6af3cbc35192",
+        "name": "Sandworm Team",
+        "external_id": "G0034",
+        "pagerank": 0.1725434782608696
+      },
+      {
+        "entity_id": "attack:intrusion-set--c1aab4c9-4c34-4f4f-8541-d529e46a07f9",
+        "name": "APT5",
+        "external_id": "G1023",
+        "pagerank": 0.17125
+      },
+      {
+        "entity_id": "attack:intrusion-set--6713ab67-e25b-49cc-808d-2b36d4fbc35c",
+        "name": "Ke3chang",
+        "external_id": "G0004",
+        "pagerank": 0.17125
+      },
+      {
+        "entity_id": "attack:intrusion-set--4ca1929c-7d64-4aab-b849-badbfc0c760d",
+        "name": "OilRig",
+        "external_id": "G0049",
+        "pagerank": 0.16955965909090912
+      },
+      {
+        "entity_id": "attack:intrusion-set--174279b4-399f-4ddb-966e-5efedd1dd5f2",
+        "name": "Volt Typhoon",
+        "external_id": "G1017",
+        "pagerank": 0.1688214285714286
+      },
+      {
+        "entity_id": "attack:intrusion-set--9538b1a4-4120-4e2d-bf59-3b11fcab05a4",
+        "name": "TEMP.Veles",
+        "external_id": "G0088",
+        "pagerank": 0.1673355263157895
+      },
+      {
+        "entity_id": "attack:intrusion-set--e44e0985-bc65-4a8f-b578-211c858128e3",
+        "name": "Transparent Tribe",
+        "external_id": "G0134",
+        "pagerank": 0.16275000000000003
+      },
+      {
+        "entity_id": "attack:intrusion-set--899ce53f-13a0-479b-a0e4-67d46e241542",
+        "name": "APT29",
+        "external_id": "G0016",
+        "pagerank": 0.16064328743545614
+      },
+      {
+        "entity_id": "attack:intrusion-set--18854f55-ac7c-4634-bd9a-352dd07613b7",
+        "name": "APT41",
+        "external_id": "G0096",
+        "pagerank": 0.15809523809523812
+      },
+      {
+        "entity_id": "attack:intrusion-set--bef4c620-0787-42a8-a96d-b7eb6e85917c",
+        "name": "APT28",
+        "external_id": "G0007",
+        "pagerank": 0.15607142857142858
+      },
+      {
+        "entity_id": "attack:intrusion-set--14225573-63b5-4e50-ba9a-5fdcaf6a7b4c",
+        "name": "AppleJeus",
+        "external_id": "G1049",
+        "pagerank": 0.15531250000000002
+      },
+      {
+        "entity_id": "attack:intrusion-set--420ac20b-f2b9-42b8-aa1a-6d4b72895ca4",
+        "name": "Mustang Panda",
+        "external_id": "G0129",
+        "pagerank": 0.15510000000000002
+      },
+      {
+        "entity_id": "attack:intrusion-set--7113eaa5-ba79-4fb3-b68a-398ee9cd698e",
+        "name": "Leviathan",
+        "external_id": "G0065",
+        "pagerank": 0.15472222222222223
+      },
+      {
+        "entity_id": "attack:intrusion-set--461b8e25-8f4a-4ea2-a4a8-e39df7ce6630",
+        "name": "UNC3886",
+        "external_id": "G1048",
+        "pagerank": 0.15439655172413796
+      }
+    ],
+    "Technique": [
+      {
+        "entity_id": "attack:attack-pattern--e6919abc-99f9-4c6c-95a5-14761e7b2add",
+        "name": "Ingress Tool Transfer",
+        "external_id": "T1105",
+        "pagerank": 5.3969855650558705
+      },
+      {
+        "entity_id": "attack:attack-pattern--b3d682b6-98f2-4fb0-aa3b-b4df007ca70a",
+        "name": "Obfuscated Files or Information",
+        "external_id": "T1027",
+        "pagerank": 4.990809172130507
+      },
+      {
+        "entity_id": "attack:attack-pattern--7385dfaf-6886-4229-9ecd-6fd678040830",
+        "name": "Command and Scripting Interpreter",
+        "external_id": "T1059",
+        "pagerank": 4.793251702971517
+      },
+      {
+        "entity_id": "attack:attack-pattern--df8b2a25-8bdf-4856-953c-a04372b1c161",
+        "name": "Web Protocols",
+        "external_id": "T1071.001",
+        "pagerank": 4.275822805897973
+      },
+      {
+        "entity_id": "attack:attack-pattern--354a7f88-63fb-41b5-a801-ce3b377b36f1",
+        "name": "System Information Discovery",
+        "external_id": "T1082",
+        "pagerank": 3.98383601682806
+      },
+      {
+        "entity_id": "attack:attack-pattern--d1fcf083-a721-4223-aedf-bf8960798d62",
+        "name": "Windows Command Shell",
+        "external_id": "T1059.003",
+        "pagerank": 3.871735032992957
+      },
+      {
+        "entity_id": "attack:attack-pattern--7bc57495-ea59-4380-be31-a64af124ef18",
+        "name": "File and Directory Discovery",
+        "external_id": "T1083",
+        "pagerank": 3.6190939740390617
+      },
+      {
+        "entity_id": "attack:attack-pattern--3ccef7ae-cb5e-48f6-8302-897105fbf55c",
+        "name": "Deobfuscate/Decode Files or Information",
+        "external_id": "T1140",
+        "pagerank": 3.4288397600841076
+      },
+      {
+        "entity_id": "attack:attack-pattern--707399d6-ab3e-4963-9315-d9d3818cd6a0",
+        "name": "System Network Configuration Discovery",
+        "external_id": "T1016",
+        "pagerank": 3.0875224797653855
+      },
+      {
+        "entity_id": "attack:attack-pattern--8f4a33ec-8b1f-4b80-a2f6-642b2e479580",
+        "name": "Process Discovery",
+        "external_id": "T1057",
+        "pagerank": 2.8374481895936223
+      },
+      {
+        "entity_id": "attack:attack-pattern--355be19c-ffc9-46d5-8d50-d6a036c675b6",
+        "name": "Application Layer Protocol",
+        "external_id": "T1071",
+        "pagerank": 2.7673881015370947
+      },
+      {
+        "entity_id": "attack:attack-pattern--d63a3fb8-9452-4e9d-a60a-54be68d5998c",
+        "name": "File Deletion",
+        "external_id": "T1070.004",
+        "pagerank": 2.7252068394750815
+      },
+      {
+        "entity_id": "attack:attack-pattern--42e8de7b-37b2-4258-905a-6897815e58e0",
+        "name": "Masquerading",
+        "external_id": "T1036",
+        "pagerank": 2.4815879544750357
+      },
+      {
+        "entity_id": "attack:attack-pattern--0d91b3c0-5e50-47c3-949a-2a796f04d144",
+        "name": "Encrypted/Encoded File",
+        "external_id": "T1027.013",
+        "pagerank": 2.4136494689717476
+      },
+      {
+        "entity_id": "attack:attack-pattern--9efb1ea7-c37b-4595-9640-b7680cd84279",
+        "name": "Registry Run Keys / Startup Folder",
+        "external_id": "T1547.001",
+        "pagerank": 2.353462124861662
+      }
+    ],
+    "Tactic": [
+      {
+        "entity_id": "attack:x-mitre-tactic--78b23412-0651-46d7-a540-170a1ce8bd5a",
+        "name": "Stealth",
+        "external_id": "TA0005",
+        "pagerank": 33.80591401573111
+      },
+      {
+        "entity_id": "attack:x-mitre-tactic--c17c5845-175e-4421-9713-829d0573dbc9",
+        "name": "Discovery",
+        "external_id": "TA0007",
+        "pagerank": 27.214847035851975
+      },
+      {
+        "entity_id": "attack:x-mitre-tactic--f72804c5-f15a-449e-a5da-2eecd181f813",
+        "name": "Command and Control",
+        "external_id": "TA0011",
+        "pagerank": 22.766388766787347
+      },
+      {
+        "entity_id": "attack:x-mitre-tactic--4ca45d45-df4d-4613-8980-bac22d278fa5",
+        "name": "Execution",
+        "external_id": "TA0002",
+        "pagerank": 19.475323546401885
+      },
+      {
+        "entity_id": "attack:x-mitre-tactic--5bc1d813-693e-4823-9961-abf9af4b0e92",
+        "name": "Persistence",
+        "external_id": "TA0003",
+        "pagerank": 13.519649559389027
+      },
+      {
+        "entity_id": "attack:x-mitre-tactic--d108ce10-2419-4cf9-a774-46161d6c6cfe",
+        "name": "Collection",
+        "external_id": "TA0009",
+        "pagerank": 12.188822311796386
+      },
+      {
+        "entity_id": "attack:x-mitre-tactic--2558fd61-8c75-4730-94c4-11926db2a263",
+        "name": "Credential Access",
+        "external_id": "TA0006",
+        "pagerank": 11.995647724886974
+      },
+      {
+        "entity_id": "attack:x-mitre-tactic--5e29b093-294e-49e9-a803-dab3d73b77dd",
+        "name": "Privilege Escalation",
+        "external_id": "TA0004",
+        "pagerank": 10.943374879181668
+      },
+      {
+        "entity_id": "attack:x-mitre-tactic--43c49635-f2fa-44f2-92b9-0ee980bbf4ef",
+        "name": "Defense Impairment",
+        "external_id": "TA0112",
+        "pagerank": 9.377690914169055
+      },
+      {
+        "entity_id": "attack:x-mitre-tactic--d679bca2-e57d-4935-8650-8031c87a4400",
+        "name": "Resource Development",
+        "external_id": "TA0042",
+        "pagerank": 8.367602474268939
+      },
+      {
+        "entity_id": "attack:x-mitre-tactic--5569339b-94c2-49ee-afb3-2222936582c8",
+        "name": "Impact",
+        "external_id": "TA0040",
+        "pagerank": 7.5381275966733305
+      },
+      {
+        "entity_id": "attack:x-mitre-tactic--daa4cbb1-b4f4-4723-a824-7f1efd6e0592",
+        "name": "Reconnaissance",
+        "external_id": "TA0043",
+        "pagerank": 6.237292575845852
+      },
+      {
+        "entity_id": "attack:x-mitre-tactic--9a4e74ab-5008-408c-84bf-a10dfbc53462",
+        "name": "Exfiltration",
+        "external_id": "TA0010",
+        "pagerank": 5.095883738294012
+      },
+      {
+        "entity_id": "attack:x-mitre-tactic--7141578b-e50b-4dcc-bfa4-08a8dd689e9e",
+        "name": "Lateral Movement",
+        "external_id": "TA0008",
+        "pagerank": 4.914070815727693
+      },
+      {
+        "entity_id": "attack:x-mitre-tactic--ffd5bcee-6e16-4dd2-8eca-7b3beedf33ca",
+        "name": "Initial Access",
+        "external_id": "TA0001",
+        "pagerank": 4.593721823688784
+      }
+    ],
+    "Malware": [
+      {
+        "entity_id": "attack:malware--b42378e0-f147-496f-992a-26a49705395b",
+        "name": "PoisonIvy",
+        "external_id": "S0012",
+        "pagerank": 0.35406382615946985
+      },
+      {
+        "entity_id": "attack:malware--64fa0de0-6240-41f4-8638-f4ca7ed528fd",
+        "name": "PlugX",
+        "external_id": "S0013",
+        "pagerank": 0.28746902645012773
+      },
+      {
+        "entity_id": "attack:malware--a8d3d497-2da9-4797-8e0b-ed176be08654",
+        "name": "Wingbird",
+        "external_id": "S0176",
+        "pagerank": 0.2775
+      },
+      {
+        "entity_id": "attack:malware--8c050cea-86e1-4b63-bf21-7af4fa483349",
+        "name": "Micropsia",
+        "external_id": "S0339",
+        "pagerank": 0.2775
+      },
+      {
+        "entity_id": "attack:malware--a7881f21-e978-4fe4-af56-92c9416a2616",
+        "name": "Cobalt Strike",
+        "external_id": "S0154",
+        "pagerank": 0.2772067281118082
+      },
+      {
+        "entity_id": "attack:malware--20945359-3b39-4542-85ef-08ecb4e1c174",
+        "name": "StrongPity",
+        "external_id": "S0491",
+        "pagerank": 0.22772596153846159
+      },
+      {
+        "entity_id": "attack:malware--88c621a7-aef9-4ae0-94e3-1fc87123eb24",
+        "name": "gh0st RAT",
+        "external_id": "S0032",
+        "pagerank": 0.22299420345441245
+      },
+      {
+        "entity_id": "attack:malware--3cab1b76-2f40-4cd0-8d2c-7ed16eeb909c",
+        "name": "ELMER",
+        "external_id": "S0064",
+        "pagerank": 0.21375000000000002
+      },
+      {
+        "entity_id": "attack:malware--ec9e00dd-0313-4d5b-8105-c20aa47abffc",
+        "name": "ShadowPad",
+        "external_id": "S0596",
+        "pagerank": 0.20821917001638185
+      },
+      {
+        "entity_id": "attack:malware--d906e6f7-434c-44c0-b51a-ed50af8f7945",
+        "name": "njRAT",
+        "external_id": "S0385",
+        "pagerank": 0.20678591787564046
+      },
+      {
+        "entity_id": "attack:malware--02739f57-7585-4319-acd3-794ae8ff3a70",
+        "name": "Pikabot",
+        "external_id": "S1145",
+        "pagerank": 0.199474358974359
+      },
+      {
+        "entity_id": "attack:malware--d69c8146-ab35-4d50-8382-6fc80e641d43",
+        "name": "BLACKCOFFEE",
+        "external_id": "S0069",
+        "pagerank": 0.19564167414805675
+      },
+      {
+        "entity_id": "attack:malware--b4d80f8b-d2b9-4448-8844-4bef777ed676",
+        "name": "NanoCore",
+        "external_id": "S0336",
+        "pagerank": 0.1945044326241135
+      },
+      {
+        "entity_id": "attack:malware--5147ef15-1cae-4707-8ea1-bee8d98b7f1d",
+        "name": "IcedID",
+        "external_id": "S0483",
+        "pagerank": 0.18473250433776753
+      },
+      {
+        "entity_id": "attack:malware--2a70812b-f1ef-44db-8578-a496a227aef2",
+        "name": "NETWIRE",
+        "external_id": "S0198",
+        "pagerank": 0.18449204523672613
+      }
+    ],
+    "Tool": [
+      {
+        "entity_id": "attack:tool--afc079f3-c0ea-4096-b75d-3f05338b7f60",
+        "name": "Mimikatz",
+        "external_id": "S0002",
+        "pagerank": 0.45900932950851897
+      },
+      {
+        "entity_id": "attack:tool--ff6caf67-ea1f-4895-b80e-4bb0fc31c6db",
+        "name": "PsExec",
+        "external_id": "S0029",
+        "pagerank": 0.4184880406534873
+      },
+      {
+        "entity_id": "attack:tool--03342581-f790-4f03-ba41-e82e67392e23",
+        "name": "Net",
+        "external_id": "S0039",
+        "pagerank": 0.27236489407362546
+      },
+      {
+        "entity_id": "attack:tool--ed7d0cb1-87a6-43b4-9f46-ef1bc56d6c68",
+        "name": "Tor",
+        "external_id": "S0183",
+        "pagerank": 0.2218970117850454
+      },
+      {
+        "entity_id": "attack:tool--3433a9e8-1c47-4320-b9bf-ed449061d1c3",
+        "name": "Empire",
+        "external_id": "S0363",
+        "pagerank": 0.2170320867694282
+      },
+      {
+        "entity_id": "attack:tool--26c87906-d750-42c5-946c-d4162c73fc7b",
+        "name": "Impacket",
+        "external_id": "S0357",
+        "pagerank": 0.2110500370924714
+      },
+      {
+        "entity_id": "attack:tool--4664b683-f578-434f-919b-1c1aad2a1111",
+        "name": "netstat",
+        "external_id": "S0104",
+        "pagerank": 0.2087906630621464
+      },
+      {
+        "entity_id": "attack:tool--b77b563c-34bb-4fb8-86a3-3694338f7b47",
+        "name": "Ping",
+        "external_id": "S0097",
+        "pagerank": 0.20728337186328938
+      },
+      {
+        "entity_id": "attack:tool--294e2560-bd48-44b2-9da2-833b5588ad11",
+        "name": "ipconfig",
+        "external_id": "S0100",
+        "pagerank": 0.1981159521125246
+      },
+      {
+        "entity_id": "attack:tool--7fcbc4e8-1989-441f-9ac5-e7b6ff5806f1",
+        "name": "Systeminfo",
+        "external_id": "S0096",
+        "pagerank": 0.19800025497854734
+      },
+      {
+        "entity_id": "attack:tool--2e45723a-31da-4a7e-aaa6-e01998a6788f",
+        "name": "Tasklist",
+        "external_id": "S0057",
+        "pagerank": 0.19681039309503037
+      },
+      {
+        "entity_id": "attack:tool--b76b2d94-60e4-4107-a903-4a3a7622fb3b",
+        "name": "LaZagne",
+        "external_id": "S0349",
+        "pagerank": 0.1949086465220583
+      },
+      {
+        "entity_id": "attack:tool--0a68f1f1-da74-4d28-8d9a-696c082706cc",
+        "name": "certutil",
+        "external_id": "S0160",
+        "pagerank": 0.19203198957802045
+      },
+      {
+        "entity_id": "attack:tool--64764dc6-a032-495f-8250-1e4c06bdc163",
+        "name": "BITSAdmin",
+        "external_id": "S0190",
+        "pagerank": 0.18710196162613696
+      },
+      {
+        "entity_id": "attack:tool--f59508a6-3615-47c3-b493-6676e1a39a87",
+        "name": "AdFind",
+        "external_id": "S0552",
+        "pagerank": 0.18610952644551865
+      }
+    ],
+    "Mitigation": [
+      {
+        "entity_id": "attack:course-of-action--15437c6d-b998-4a36-be41-4ace3d54d266",
+        "name": "Vulnerability Scanning",
+        "external_id": "M1016",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:course-of-action--1dcaeb21-9348-42ea-950a-f842aaf1ae1f",
+        "name": "Limit Access to Resource Over Network",
+        "external_id": "M1035",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:course-of-action--20a2baeb-98c2-4901-bad7-dc62d0a03dea",
+        "name": "Remote Data Storage",
+        "external_id": "M1029",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:course-of-action--20f6a9df-37c4-4e20-9e47-025983b1b39d",
+        "name": "Filter Network Traffic",
+        "external_id": "M1037",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:course-of-action--21da4fd4-27ad-4e9c-b93d-0b9b14d02c96",
+        "name": "Restrict Web-Based Content",
+        "external_id": "M1021",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:course-of-action--23843cff-f7b9-4659-a7b7-713ef347f547",
+        "name": "Limit Software Installation",
+        "external_id": "M1033",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:course-of-action--25dc1ce8-eb55-4333-ae30-a7cb4f5894a1",
+        "name": "Application Developer Guidance",
+        "external_id": "M1013",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:course-of-action--2995bc22-2851-4345-ad19-4e7e295be264",
+        "name": "Limit Hardware Installation",
+        "external_id": "M1034",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:course-of-action--2a4f6c11-a4a7-4cb9-b0ef-6ae1bb3a718a",
+        "name": "User Training",
+        "external_id": "M1017",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:course-of-action--2c2ad92a-d710-41ab-a996-1db143bb4808",
+        "name": "User Account Control",
+        "external_id": "M1052",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:course-of-action--2f316f6c-ae42-44fe-adf8-150989e0f6d3",
+        "name": "Operating System Configuration",
+        "external_id": "M1028",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:course-of-action--3efe43d1-6f3f-4fcb-ab39-4a730971f70b",
+        "name": "Data Backup",
+        "external_id": "M1053",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:course-of-action--47e0e9fe-96ce-4f65-8bb1-8be1feacb5db",
+        "name": "Execution Prevention",
+        "external_id": "M1038",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:course-of-action--49c06d54-9002-491d-9147-8efb537fbd26",
+        "name": "Credential Access Protection",
+        "external_id": "M1043",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:course-of-action--12241367-a8b7-49b4-b86e-2236901ba50c",
+        "name": "Network Intrusion Prevention",
+        "external_id": "M1031",
+        "pagerank": 0.15000000000000002
+      }
+    ],
+    "CVE": [
+      {
+        "entity_id": "cve:CVE-2017-11774",
+        "name": "CVE-2017-11774",
+        "external_id": "CVE-2017-11774",
+        "pagerank": 0.505856537372226
+      },
+      {
+        "entity_id": "cve:CVE-2014-7169",
+        "name": "CVE-2014-7169",
+        "external_id": "CVE-2014-7169",
+        "pagerank": 0.4618890222905996
+      },
+      {
+        "entity_id": "cve:CVE-2016-6662",
+        "name": "CVE-2016-6662",
+        "external_id": "CVE-2016-6662",
+        "pagerank": 0.4618890222905996
+      },
+      {
+        "entity_id": "cve:CVE-2015-3113",
+        "name": "CVE-2015-3113",
+        "external_id": "CVE-2015-3113",
+        "pagerank": 0.33381335334061113
+      },
+      {
+        "entity_id": "cve:CVE-2024-1708",
+        "name": "CVE-2024-1708",
+        "external_id": "CVE-2024-1708",
+        "pagerank": 0.3303432072693451
+      },
+      {
+        "entity_id": "cve:CVE-2024-1709",
+        "name": "CVE-2024-1709",
+        "external_id": "CVE-2024-1709",
+        "pagerank": 0.3303432072693451
+      },
+      {
+        "entity_id": "cve:CVE-2017-0199",
+        "name": "CVE-2017-0199",
+        "external_id": "CVE-2017-0199",
+        "pagerank": 0.24305052547111103
+      },
+      {
+        "entity_id": "cve:CVE-2022-0185",
+        "name": "CVE-2022-0185",
+        "external_id": "CVE-2022-0185",
+        "pagerank": 0.23610282213701664
+      },
+      {
+        "entity_id": "cve:CVE-2023-1389",
+        "name": "CVE-2023-1389",
+        "external_id": "CVE-2023-1389",
+        "pagerank": 0.2294466115144501
+      },
+      {
+        "entity_id": "cve:CVE-2022-21894",
+        "name": "CVE-2022-21894",
+        "external_id": "CVE-2022-21894",
+        "pagerank": 0.22940054475258545
+      },
+      {
+        "entity_id": "cve:CVE-2017-0176",
+        "name": "CVE-2017-0176",
+        "external_id": "CVE-2017-0176",
+        "pagerank": 0.21940019464781957
+      },
+      {
+        "entity_id": "cve:CVE-2025-22457",
+        "name": "CVE-2025-22457",
+        "external_id": "CVE-2025-22457",
+        "pagerank": 0.2169375
+      },
+      {
+        "entity_id": "cve:CVE-2023-46747",
+        "name": "CVE-2023-46747",
+        "external_id": "CVE-2023-46747",
+        "pagerank": 0.21375000000000002
+      },
+      {
+        "entity_id": "cve:CVE-2019-3610",
+        "name": "CVE-2019-3610",
+        "external_id": "CVE-2019-3610",
+        "pagerank": 0.2072588988042253
+      },
+      {
+        "entity_id": "cve:CVE-2023-34362",
+        "name": "CVE-2023-34362",
+        "external_id": "CVE-2023-34362",
+        "pagerank": 0.20338189209495694
+      }
+    ],
+    "Campaign": [
+      {
+        "entity_id": "attack:campaign--b03d5112-e23a-4ac8-add0-be7502d24eff",
+        "name": "Operation Wocao",
+        "external_id": "C0014",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:campaign--add4d9de-1256-4166-83b8-57087288dced",
+        "name": "APT41 DUST",
+        "external_id": "C0040",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:campaign--8d2bc130-89fe-466e-a4f9-6bce6129c2b8",
+        "name": "FunnyDream",
+        "external_id": "C0007",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:campaign--a543ef15-91ea-4aa9-9c10-267d56e1ee82",
+        "name": "ArcaneDoor",
+        "external_id": "C0046",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:campaign--a6aba167-5ada-4812-9da1-912c0e73335d",
+        "name": "2025 Poland Wiper Attacks",
+        "external_id": "C0063",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:campaign--808d6b30-df4e-4341-8248-724da4bac650",
+        "name": "SolarWinds Compromise",
+        "external_id": "C0024",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:campaign--ab747e62-1bcb-479f-a26b-1cd39d413d81",
+        "name": "C0010",
+        "external_id": "C0010",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:campaign--93c23946-49af-41f4-ac03-40f9ffc7419b",
+        "name": "Operation CuckooBees",
+        "external_id": "C0012",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:campaign--7ab2f1a1-26af-4204-ad84-d640fde391da",
+        "name": "Juicy Mix",
+        "external_id": "C0044",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:campaign--f9cc545e-b0ef-4b92-8884-a3a4427609f6",
+        "name": "CostaRicto",
+        "external_id": "C0004",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:campaign--9cea8bec-07c5-422b-84b8-99d3128ce570",
+        "name": "Salesforce Data Exfiltration",
+        "external_id": "C0059",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:campaign--4553292d-12c6-4a93-934d-12160370d4e0",
+        "name": "Operation Honeybee",
+        "external_id": "C0006",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:campaign--aa73efef-1418-4dbe-b43c-87a498e97234",
+        "name": "2016 Ukraine Electric Power Attack",
+        "external_id": "C0025",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:campaign--590cd5b0-2421-4158-84a2-db13b5db02a3",
+        "name": "Anthropic AI-orchestrated Campaign",
+        "external_id": "C0062",
+        "pagerank": 0.15000000000000002
+      },
+      {
+        "entity_id": "attack:campaign--df74f7ad-b10d-431c-9f1d-a2bc18dadefa",
+        "name": "C0027",
+        "external_id": "C0027",
+        "pagerank": 0.15000000000000002
+      }
+    ]
+  },
+  "communities": {
+    "summaries": [
+      {
+        "community_id": 888,
+        "size": 456,
+        "label_distribution": {
+          "Tactic": 3,
+          "Technique": 182,
+          "CVE": 1,
+          "Malware": 173,
+          "Tool": 13,
+          "ThreatActor": 62,
+          "Mitigation": 12,
+          "Campaign": 10
+        },
+        "label_gini_impurity": 0.676246537396122,
+        "top_members": [
+          {
+            "entity_id": "attack:x-mitre-tactic--78b23412-0651-46d7-a540-170a1ce8bd5a",
+            "name": "Stealth",
+            "label": "Tactic",
+            "external_id": "TA0005",
+            "pagerank": 33.80591401573111
+          },
+          {
+            "entity_id": "attack:x-mitre-tactic--4ca45d45-df4d-4613-8980-bac22d278fa5",
+            "name": "Execution",
+            "label": "Tactic",
+            "external_id": "TA0002",
+            "pagerank": 19.475323546401885
+          },
+          {
+            "entity_id": "attack:attack-pattern--b3d682b6-98f2-4fb0-aa3b-b4df007ca70a",
+            "name": "Obfuscated Files or Information",
+            "label": "Technique",
+            "external_id": "T1027",
+            "pagerank": 4.990809172130507
+          },
+          {
+            "entity_id": "attack:attack-pattern--7385dfaf-6886-4229-9ecd-6fd678040830",
+            "name": "Command and Scripting Interpreter",
+            "label": "Technique",
+            "external_id": "T1059",
+            "pagerank": 4.793251702971517
+          },
+          {
+            "entity_id": "attack:x-mitre-tactic--ffd5bcee-6e16-4dd2-8eca-7b3beedf33ca",
+            "name": "Initial Access",
+            "label": "Tactic",
+            "external_id": "TA0001",
+            "pagerank": 4.593721823688784
+          },
+          {
+            "entity_id": "attack:attack-pattern--d1fcf083-a721-4223-aedf-bf8960798d62",
+            "name": "Windows Command Shell",
+            "label": "Technique",
+            "external_id": "T1059.003",
+            "pagerank": 3.871735032992957
+          },
+          {
+            "entity_id": "attack:attack-pattern--3ccef7ae-cb5e-48f6-8302-897105fbf55c",
+            "name": "Deobfuscate/Decode Files or Information",
+            "label": "Technique",
+            "external_id": "T1140",
+            "pagerank": 3.4288397600841076
+          },
+          {
+            "entity_id": "attack:attack-pattern--d63a3fb8-9452-4e9d-a60a-54be68d5998c",
+            "name": "File Deletion",
+            "label": "Technique",
+            "external_id": "T1070.004",
+            "pagerank": 2.7252068394750815
+          },
+          {
+            "entity_id": "attack:attack-pattern--42e8de7b-37b2-4258-905a-6897815e58e0",
+            "name": "Masquerading",
+            "label": "Technique",
+            "external_id": "T1036",
+            "pagerank": 2.4815879544750357
+          },
+          {
+            "entity_id": "attack:attack-pattern--0d91b3c0-5e50-47c3-949a-2a796f04d144",
+            "name": "Encrypted/Encoded File",
+            "label": "Technique",
+            "external_id": "T1027.013",
+            "pagerank": 2.4136494689717476
+          }
+        ]
+      },
+      {
+        "community_id": 881,
+        "size": 315,
+        "label_distribution": {
+          "Tactic": 4,
+          "Technique": 154,
+          "CVE": 2,
+          "Malware": 94,
+          "Tool": 16,
+          "ThreatActor": 25,
+          "Mitigation": 4,
+          "Campaign": 16
+        },
+        "label_gini_impurity": 0.6601158982111363,
+        "top_members": [
+          {
+            "entity_id": "attack:x-mitre-tactic--d108ce10-2419-4cf9-a774-46161d6c6cfe",
+            "name": "Collection",
+            "label": "Tactic",
+            "external_id": "TA0009",
+            "pagerank": 12.188822311796386
+          },
+          {
+            "entity_id": "attack:x-mitre-tactic--d679bca2-e57d-4935-8650-8031c87a4400",
+            "name": "Resource Development",
+            "label": "Tactic",
+            "external_id": "TA0042",
+            "pagerank": 8.367602474268939
+          },
+          {
+            "entity_id": "attack:x-mitre-tactic--daa4cbb1-b4f4-4723-a824-7f1efd6e0592",
+            "name": "Reconnaissance",
+            "label": "Tactic",
+            "external_id": "TA0043",
+            "pagerank": 6.237292575845852
+          },
+          {
+            "entity_id": "attack:x-mitre-tactic--9a4e74ab-5008-408c-84bf-a10dfbc53462",
+            "name": "Exfiltration",
+            "label": "Tactic",
+            "external_id": "TA0010",
+            "pagerank": 5.095883738294012
+          },
+          {
+            "entity_id": "attack:attack-pattern--3c4a2599-71ee-4405-ba1e-0e28414b4bc5",
+            "name": "Data from Local System",
+            "label": "Technique",
+            "external_id": "T1005",
+            "pagerank": 1.9384041259078932
+          },
+          {
+            "entity_id": "attack:attack-pattern--0259baeb-9f63-4c69-bf10-eb038c390688",
+            "name": "Screen Capture",
+            "label": "Technique",
+            "external_id": "T1113",
+            "pagerank": 1.619008650122839
+          },
+          {
+            "entity_id": "attack:attack-pattern--92d7da27-2d91-488e-a00c-059dc162766d",
+            "name": "Exfiltration Over C2 Channel",
+            "label": "Technique",
+            "external_id": "T1041",
+            "pagerank": 1.5237807590864245
+          },
+          {
+            "entity_id": "attack:attack-pattern--1c34f7aa-9341-4a48-bfab-af22e51aca6c",
+            "name": "Local Data Staging",
+            "label": "Technique",
+            "external_id": "T1074.001",
+            "pagerank": 1.2050300683471078
+          },
+          {
+            "entity_id": "attack:attack-pattern--53ac20cd-aca3-406e-9aa0-9fc7fdc60a5a",
+            "name": "Archive Collected Data",
+            "label": "Technique",
+            "external_id": "T1560",
+            "pagerank": 1.189122022952761
+          },
+          {
+            "entity_id": "attack:attack-pattern--0458aab9-ad42-4eac-9e22-706a95bafee2",
+            "name": "Acquire Infrastructure",
+            "label": "Technique",
+            "external_id": "T1583",
+            "pagerank": 0.9771723694770872
+          }
+        ]
+      },
+      {
+        "community_id": 886,
+        "size": 271,
+        "label_distribution": {
+          "Tactic": 2,
+          "Technique": 168,
+          "Tool": 14,
+          "ThreatActor": 44,
+          "Malware": 22,
+          "Mitigation": 7,
+          "Campaign": 14
+        },
+        "label_gini_impurity": 0.576680600754347,
+        "top_members": [
+          {
+            "entity_id": "attack:x-mitre-tactic--5bc1d813-693e-4823-9961-abf9af4b0e92",
+            "name": "Persistence",
+            "label": "Tactic",
+            "external_id": "TA0003",
+            "pagerank": 13.519649559389027
+          },
+          {
+            "entity_id": "attack:x-mitre-tactic--2558fd61-8c75-4730-94c4-11926db2a263",
+            "name": "Credential Access",
+            "label": "Tactic",
+            "external_id": "TA0006",
+            "pagerank": 11.995647724886974
+          },
+          {
+            "entity_id": "attack:attack-pattern--9efb1ea7-c37b-4595-9640-b7680cd84279",
+            "name": "Registry Run Keys / Startup Folder",
+            "label": "Technique",
+            "external_id": "T1547.001",
+            "pagerank": 2.353462124861662
+          },
+          {
+            "entity_id": "attack:attack-pattern--0a3ead4e-6d47-4ccb-854c-a6a4f9d96b22",
+            "name": "OS Credential Dumping",
+            "label": "Technique",
+            "external_id": "T1003",
+            "pagerank": 1.7675897513979517
+          },
+          {
+            "entity_id": "attack:attack-pattern--1ecb2399-e8ba-4f6b-8ba7-5c27d49405cf",
+            "name": "Boot or Logon Autostart Execution",
+            "label": "Technique",
+            "external_id": "T1547",
+            "pagerank": 1.6188553947342632
+          },
+          {
+            "entity_id": "attack:attack-pattern--005a06c6-14bf-4118-afa0-ebcd8aebb0c9",
+            "name": "Scheduled Task",
+            "label": "Technique",
+            "external_id": "T1053.005",
+            "pagerank": 1.5496982904745602
+          },
+          {
+            "entity_id": "attack:attack-pattern--57340c81-c025-4189-8fa0-fc7ede51bae4",
+            "name": "Modify Registry",
+            "label": "Technique",
+            "external_id": "T1112",
+            "pagerank": 1.493374368933699
+          },
+          {
+            "entity_id": "attack:attack-pattern--2959d63f-73fd-46a1-abd2-109d7dcede32",
+            "name": "Windows Service",
+            "label": "Technique",
+            "external_id": "T1543.003",
+            "pagerank": 1.4687732245753016
+          },
+          {
+            "entity_id": "attack:attack-pattern--09a60ea3-a8d1-4ae5-976e-5783248b72a4",
+            "name": "Keylogging",
+            "label": "Technique",
+            "external_id": "T1056.001",
+            "pagerank": 1.3983928870455553
+          },
+          {
+            "entity_id": "attack:attack-pattern--3fc9b85a-2862-4363-a64d-d692e3ffbee0",
+            "name": "Credentials from Password Stores",
+            "label": "Technique",
+            "external_id": "T1555",
+            "pagerank": 1.164176884641834
+          }
+        ]
+      },
+      {
+        "community_id": 82,
+        "size": 271,
+        "label_distribution": {
+          "Tactic": 1,
+          "Technique": 43,
+          "Tool": 24,
+          "Malware": 179,
+          "CVE": 1,
+          "ThreatActor": 18,
+          "Campaign": 5
+        },
+        "label_gini_impurity": 0.5259187647227026,
+        "top_members": [
+          {
+            "entity_id": "attack:x-mitre-tactic--c17c5845-175e-4421-9713-829d0573dbc9",
+            "name": "Discovery",
+            "label": "Tactic",
+            "external_id": "TA0007",
+            "pagerank": 27.214847035851975
+          },
+          {
+            "entity_id": "attack:attack-pattern--354a7f88-63fb-41b5-a801-ce3b377b36f1",
+            "name": "System Information Discovery",
+            "label": "Technique",
+            "external_id": "T1082",
+            "pagerank": 3.98383601682806
+          },
+          {
+            "entity_id": "attack:attack-pattern--7bc57495-ea59-4380-be31-a64af124ef18",
+            "name": "File and Directory Discovery",
+            "label": "Technique",
+            "external_id": "T1083",
+            "pagerank": 3.6190939740390617
+          },
+          {
+            "entity_id": "attack:attack-pattern--707399d6-ab3e-4963-9315-d9d3818cd6a0",
+            "name": "System Network Configuration Discovery",
+            "label": "Technique",
+            "external_id": "T1016",
+            "pagerank": 3.0875224797653855
+          },
+          {
+            "entity_id": "attack:attack-pattern--8f4a33ec-8b1f-4b80-a2f6-642b2e479580",
+            "name": "Process Discovery",
+            "label": "Technique",
+            "external_id": "T1057",
+            "pagerank": 2.8374481895936223
+          },
+          {
+            "entity_id": "attack:attack-pattern--03d7999c-1f4c-42cc-8373-e7690d318104",
+            "name": "System Owner/User Discovery",
+            "label": "Technique",
+            "external_id": "T1033",
+            "pagerank": 1.9734923309631691
+          },
+          {
+            "entity_id": "attack:attack-pattern--cba37adb-d6fb-4610-b069-dd04c0643384",
+            "name": "Security Software Discovery",
+            "label": "Technique",
+            "external_id": "T1518.001",
+            "pagerank": 1.1846772016123241
+          },
+          {
+            "entity_id": "attack:attack-pattern--e358d692-23c0-4a31-9eb6-ecc13a8d7735",
+            "name": "Remote System Discovery",
+            "label": "Technique",
+            "external_id": "T1018",
+            "pagerank": 1.0323494439749794
+          },
+          {
+            "entity_id": "attack:attack-pattern--e3b6daca-e963-4a69-aee6-ed4fd653ad58",
+            "name": "Software Discovery",
+            "label": "Technique",
+            "external_id": "T1518",
+            "pagerank": 1.0196626877368493
+          },
+          {
+            "entity_id": "attack:attack-pattern--c32f7008-9fea-41f7-8366-5eb9b74bd896",
+            "name": "Query Registry",
+            "label": "Technique",
+            "external_id": "T1012",
+            "pagerank": 0.9475144629862837
+          }
+        ]
+      },
+      {
+        "community_id": 874,
+        "size": 207,
+        "label_distribution": {
+          "Tactic": 3,
+          "Technique": 77,
+          "Tool": 15,
+          "Malware": 84,
+          "CVE": 2,
+          "ThreatActor": 8,
+          "Mitigation": 16,
+          "Campaign": 2
+        },
+        "label_gini_impurity": 0.6838432635534084,
+        "top_members": [
+          {
+            "entity_id": "attack:x-mitre-tactic--5e29b093-294e-49e9-a803-dab3d73b77dd",
+            "name": "Privilege Escalation",
+            "label": "Tactic",
+            "external_id": "TA0004",
+            "pagerank": 10.943374879181668
+          },
+          {
+            "entity_id": "attack:x-mitre-tactic--43c49635-f2fa-44f2-92b9-0ee980bbf4ef",
+            "name": "Defense Impairment",
+            "label": "Tactic",
+            "external_id": "TA0112",
+            "pagerank": 9.377690914169055
+          },
+          {
+            "entity_id": "attack:x-mitre-tactic--7141578b-e50b-4dcc-bfa4-08a8dd689e9e",
+            "name": "Lateral Movement",
+            "label": "Tactic",
+            "external_id": "TA0008",
+            "pagerank": 4.914070815727693
+          },
+          {
+            "entity_id": "attack:attack-pattern--bbde9781-60aa-4b8a-a911-895b0c1b3872",
+            "name": "Disable or Modify Tools",
+            "label": "Technique",
+            "external_id": "T1685",
+            "pagerank": 1.686265053627962
+          },
+          {
+            "entity_id": "attack:attack-pattern--54a649ff-439a-41a4-9856-8d144a2551ba",
+            "name": "Remote Services",
+            "label": "Technique",
+            "external_id": "T1021",
+            "pagerank": 1.1810809119831258
+          },
+          {
+            "entity_id": "attack:attack-pattern--b83e166d-13d7-4b52-8677-dff90c548fd7",
+            "name": "Subvert Trust Controls",
+            "label": "Technique",
+            "external_id": "T1553",
+            "pagerank": 0.9268874495088073
+          },
+          {
+            "entity_id": "attack:attack-pattern--67720091-eee3-4d2d-ae16-8264567f6f5b",
+            "name": "Abuse Elevation Control Mechanism",
+            "label": "Technique",
+            "external_id": "T1548",
+            "pagerank": 0.8192966170668633
+          },
+          {
+            "entity_id": "attack:attack-pattern--32901740-b42c-4fdd-bc02-345b5dc57082",
+            "name": "Code Signing",
+            "label": "Technique",
+            "external_id": "T1553.002",
+            "pagerank": 0.8157370152295842
+          },
+          {
+            "entity_id": "attack:attack-pattern--bf90d72c-c00b-45e3-b3aa-68560560d4c5",
+            "name": "Lateral Tool Transfer",
+            "label": "Technique",
+            "external_id": "T1570",
+            "pagerank": 0.6913227380195849
+          },
+          {
+            "entity_id": "attack:attack-pattern--120d5519-3098-4e1c-9191-2aa61232f073",
+            "name": "Bypass User Account Control",
+            "label": "Technique",
+            "external_id": "T1548.002",
+            "pagerank": 0.6563191508440063
+          }
+        ]
+      },
+      {
+        "community_id": 93,
+        "size": 200,
+        "label_distribution": {
+          "Tactic": 1,
+          "Technique": 37,
+          "Malware": 133,
+          "Tool": 8,
+          "CVE": 1,
+          "Mitigation": 2,
+          "ThreatActor": 10,
+          "Campaign": 8
+        },
+        "label_gini_impurity": 0.5177,
+        "top_members": [
+          {
+            "entity_id": "attack:x-mitre-tactic--f72804c5-f15a-449e-a5da-2eecd181f813",
+            "name": "Command and Control",
+            "label": "Tactic",
+            "external_id": "TA0011",
+            "pagerank": 22.766388766787347
+          },
+          {
+            "entity_id": "attack:attack-pattern--e6919abc-99f9-4c6c-95a5-14761e7b2add",
+            "name": "Ingress Tool Transfer",
+            "label": "Technique",
+            "external_id": "T1105",
+            "pagerank": 5.3969855650558705
+          },
+          {
+            "entity_id": "attack:attack-pattern--df8b2a25-8bdf-4856-953c-a04372b1c161",
+            "name": "Web Protocols",
+            "label": "Technique",
+            "external_id": "T1071.001",
+            "pagerank": 4.275822805897973
+          },
+          {
+            "entity_id": "attack:attack-pattern--355be19c-ffc9-46d5-8d50-d6a036c675b6",
+            "name": "Application Layer Protocol",
+            "label": "Technique",
+            "external_id": "T1071",
+            "pagerank": 2.7673881015370947
+          },
+          {
+            "entity_id": "attack:attack-pattern--24bfaeba-cb0d-4525-b3dc-507c77ecec41",
+            "name": "Symmetric Cryptography",
+            "label": "Technique",
+            "external_id": "T1573.001",
+            "pagerank": 2.0199231019088457
+          },
+          {
+            "entity_id": "attack:attack-pattern--b8902400-e6c5-4ba2-95aa-2d35b442b118",
+            "name": "Encrypted Channel",
+            "label": "Technique",
+            "external_id": "T1573",
+            "pagerank": 1.6283788414194633
+          },
+          {
+            "entity_id": "attack:attack-pattern--731f4f55-b6d0-41d1-a7a9-072a66389aea",
+            "name": "Proxy",
+            "label": "Technique",
+            "external_id": "T1090",
+            "pagerank": 1.5339781790765818
+          },
+          {
+            "entity_id": "attack:attack-pattern--04fd5427-79c7-44ea-ae13-11b24778ff1c",
+            "name": "Standard Encoding",
+            "label": "Technique",
+            "external_id": "T1132.001",
+            "pagerank": 1.3032503083288722
+          },
+          {
+            "entity_id": "attack:attack-pattern--c21d5a77-d422-4a69-acd7-2c53c1faa34b",
+            "name": "Non-Application Layer Protocol",
+            "label": "Technique",
+            "external_id": "T1095",
+            "pagerank": 1.219844493255994
+          },
+          {
+            "entity_id": "attack:attack-pattern--bf176076-b789-408e-8cba-7275e81c0ada",
+            "name": "Asymmetric Cryptography",
+            "label": "Technique",
+            "external_id": "T1573.002",
+            "pagerank": 1.0933323755680338
+          }
+        ]
+      },
+      {
+        "community_id": 1088,
+        "size": 92,
+        "label_distribution": {
+          "Tactic": 1,
+          "Technique": 35,
+          "CVE": 2,
+          "ThreatActor": 6,
+          "Tool": 5,
+          "Malware": 40,
+          "Mitigation": 2,
+          "Campaign": 1
+        },
+        "label_gini_impurity": 0.6578449905482041,
+        "top_members": [
+          {
+            "entity_id": "attack:x-mitre-tactic--5569339b-94c2-49ee-afb3-2222936582c8",
+            "name": "Impact",
+            "label": "Tactic",
+            "external_id": "TA0040",
+            "pagerank": 7.5381275966733305
+          },
+          {
+            "entity_id": "attack:attack-pattern--b80d107d-fa0d-4b60-9684-b0433e8bdba0",
+            "name": "Data Encrypted for Impact",
+            "label": "Technique",
+            "external_id": "T1486",
+            "pagerank": 0.9980055181559073
+          },
+          {
+            "entity_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+            "name": "Exploit Public-Facing Application",
+            "label": "Technique",
+            "external_id": "T1190",
+            "pagerank": 0.8558429210921646
+          },
+          {
+            "entity_id": "attack:attack-pattern--f5d8eed6-48a9-4cdf-a3d7-d1ffa99c3d2a",
+            "name": "Inhibit System Recovery",
+            "label": "Technique",
+            "external_id": "T1490",
+            "pagerank": 0.6626156027195296
+          },
+          {
+            "entity_id": "attack:attack-pattern--d45a3d09-b3cf-48f4-9f0f-f521ee5cb05c",
+            "name": "Data Destruction",
+            "label": "Technique",
+            "external_id": "T1485",
+            "pagerank": 0.636928334133513
+          },
+          {
+            "entity_id": "attack:attack-pattern--20fb2507-d71c-455d-9b6d-6104461cf26b",
+            "name": "Service Stop",
+            "label": "Technique",
+            "external_id": "T1489",
+            "pagerank": 0.6274600846296032
+          },
+          {
+            "entity_id": "attack:attack-pattern--fb640c43-aa6b-431e-a961-a279010424ac",
+            "name": "Disk Content Wipe",
+            "label": "Technique",
+            "external_id": "T1561.001",
+            "pagerank": 0.5912800851639017
+          },
+          {
+            "entity_id": "attack:attack-pattern--1988cc35-ced8-4dad-b2d1-7628488fa967",
+            "name": "Disk Wipe",
+            "label": "Technique",
+            "external_id": "T1561",
+            "pagerank": 0.5745855609753017
+          },
+          {
+            "entity_id": "cve:CVE-2014-7169",
+            "name": "CVE-2014-7169",
+            "label": "CVE",
+            "external_id": "CVE-2014-7169",
+            "pagerank": 0.4618890222905996
+          },
+          {
+            "entity_id": "cve:CVE-2016-6662",
+            "name": "CVE-2016-6662",
+            "label": "CVE",
+            "external_id": "CVE-2016-6662",
+            "pagerank": 0.4618890222905996
+          }
+        ]
+      },
+      {
+        "community_id": 878,
+        "size": 4,
+        "label_distribution": {
+          "CVE": 2,
+          "Technique": 1,
+          "Malware": 1
+        },
+        "label_gini_impurity": 0.625,
+        "top_members": [
+          {
+            "entity_id": "cve:CVE-2022-0185",
+            "name": "CVE-2022-0185",
+            "label": "CVE",
+            "external_id": "CVE-2022-0185",
+            "pagerank": 0.23610282213701664
+          },
+          {
+            "entity_id": "attack:attack-pattern--4a5b7ade-8bb5-4853-84ed-23f262002665",
+            "name": "Escape to Host",
+            "label": "Technique",
+            "external_id": "T1611",
+            "pagerank": 0.20259487561650968
+          },
+          {
+            "entity_id": "cve:CVE-2014-6352",
+            "name": "CVE-2014-6352",
+            "label": "CVE",
+            "external_id": "CVE-2014-6352",
+            "pagerank": 0.17640351715154148
+          },
+          {
+            "entity_id": "attack:malware--f5352566-1a64-49ac-8f7f-97e1d1a03300",
+            "name": "AutoIt backdoor",
+            "label": "Malware",
+            "external_id": "S0129",
+            "pagerank": 0.15531480677377335
+          }
+        ]
+      },
+      {
+        "community_id": 887,
+        "size": 3,
+        "label_distribution": {
+          "CVE": 1,
+          "Mitigation": 1,
+          "ThreatActor": 1
+        },
+        "label_gini_impurity": 0.6666666666666667,
+        "top_members": [
+          {
+            "entity_id": "cve:CVE-2024-1708",
+            "name": "CVE-2024-1708",
+            "label": "CVE",
+            "external_id": "CVE-2024-1708",
+            "pagerank": 0.3303432072693451
+          },
+          {
+            "entity_id": "attack:course-of-action--2995bc22-2851-4345-ad19-4e7e295be264",
+            "name": "Limit Hardware Installation",
+            "label": "Mitigation",
+            "external_id": "M1034",
+            "pagerank": 0.15000000000000002
+          },
+          {
+            "entity_id": "attack:intrusion-set--d69e568e-9ac8-4c08-b32c-d93b43ba9172",
+            "name": "Thrip",
+            "label": "ThreatActor",
+            "external_id": "G0076",
+            "pagerank": 0.15000000000000002
+          }
+        ]
+      },
+      {
+        "community_id": 249,
+        "size": 1,
+        "label_distribution": {
+          "CVE": 1
+        },
+        "label_gini_impurity": 0.0,
+        "top_members": [
+          {
+            "entity_id": "cve:CVE-2021-32648",
+            "name": "CVE-2021-32648",
+            "label": "CVE",
+            "external_id": "CVE-2021-32648",
+            "pagerank": 0.15446098394768137
+          }
+        ]
+      }
+    ],
+    "total_assigned_nodes": 1840,
+    "total_communities": 30
+  }
+}

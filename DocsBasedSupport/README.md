@@ -164,6 +164,50 @@ For reproducible experiment tracking (run folders, logs, parameter card template
 
 - `eval/README.md` ("Reproducible experiment logging")
 
+## MITRE ATT&CK experiment (security-specialised graph analytics)
+
+WildGraphBench measures GraphoDynamo on general IT corpora. To measure *security-specialised* analytical capability, the
+repository also ships a self-contained experiment that loads the official
+**MITRE ATT&CK Enterprise** STIX 2.1 bundle into the same Neo4j and exercises
+the existing PageRank + Louvain pipeline against it.
+
+Key points:
+
+- **Deterministic loader** (`app/pipeline/attack_loader.py`): no LLM
+  round-trip on ATT&CK; the bundle is canonical structured data, so any
+  recovered signal is attributable to the graph-analytics layer rather than
+  to extraction.
+- **Schema**: nodes get the shared `:Entity` label plus domain labels
+  `ThreatActor / Technique / Tactic / Malware / Tool / Mitigation / CVE /
+  Campaign` and a `:AttackEntity` marker for scoped queries. Edges are
+  `USES / MITIGATES / SUBTECHNIQUE_OF / ATTRIBUTED_TO / TARGETS / EXPLOITS /
+  IN_TACTIC`.
+- **Quantitative evaluation**: held-out link prediction on
+  `(ThreatActor)-[:USES]->(Technique)` edges, comparing four ranking
+  strategies (random, popularity-only PageRank, neighbour co-use, and
+  neighbour × PageRank) to test whether the graph maps actor↔technique
+  relationships well enough to recover hidden edges.
+- **Qualitative evaluation**: top-PageRank entities per label and Louvain
+  community summaries (size, label distribution, label-purity / Gini, top
+  members) for the thesis's analytical-navigation narrative.
+
+End-to-end run (after `docker compose up -d` and `pip install -r requirements.txt`):
+
+```bash
+PYTHONPATH=. python eval/AttackGraph/load_attack.py --enrich --reset
+PYTHONPATH=. python eval/AttackGraph/eval_link_prediction.py
+PYTHONPATH=. python eval/AttackGraph/community_report.py
+```
+
+Outputs land in `eval/AttackGraph/reports/`:
+
+- `load_summary.json` - graph size + entity / relationship counts.
+- `link_prediction.json` - Precision@K / Recall@K / Hits@K / MRR per strategy.
+- `community_report.json` - PageRank leaderboards and community summaries.
+
+See `eval/AttackGraph/README.md` for the full methodology, schema, and the
+explicit list of claims this experiment supports (and the ones it does not).
+
 ## GraphRAG v2 notes
 
 - v2 uses `neo4j-graphrag-python` retriever flow with chunk embeddings stored on `Chunk.embedding`.

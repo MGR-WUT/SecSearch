@@ -1,0 +1,2583 @@
+{
+  "generated_at": "2026-05-31T09:41:13.915642+00:00",
+  "config": {
+    "top_actors": 5,
+    "max_paths_per_pair": 10,
+    "max_hops": 3,
+    "pagerank_property": "pagerank"
+  },
+  "aggregate": {
+    "num_cves": 33,
+    "num_cves_with_actor_link": 26,
+    "coverage_fraction": 0.7879,
+    "actors_per_cve": {
+      "mean": 10.576,
+      "median": 2,
+      "max": 67
+    },
+    "evidence_paths_per_cve": {
+      "mean": 14.545,
+      "median": 3,
+      "max": 107
+    }
+  },
+  "per_cve": [
+    {
+      "cve_id": "CVE-2014-6352",
+      "cve_entity_id": "cve:CVE-2014-6352",
+      "actor_link_count": 2,
+      "total_evidence_paths": 2,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--17862c7d-9e60-48a0-b48e-da4dc4c3f6b0",
+          "actor_name": "Patchwork",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Malware",
+              "mid_id": "attack:malware--f5352566-1a64-49ac-8f7f-97e1d1a03300",
+              "mid_name": "AutoIt backdoor",
+              "mid_external_id": "S0129"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15
+        },
+        {
+          "actor_id": "attack:intrusion-set--fbd29c89-18ba-4c2d-b792-51c0adee049f",
+          "actor_name": "APT33",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Malware",
+              "mid_id": "attack:malware--f5352566-1a64-49ac-8f7f-97e1d1a03300",
+              "mid_name": "AutoIt backdoor",
+              "mid_external_id": "S0129"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2014-7169",
+      "cve_entity_id": "cve:CVE-2014-7169",
+      "actor_link_count": 67,
+      "total_evidence_paths": 107,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--18854f55-ac7c-4634-bd9a-352dd07613b7",
+          "actor_name": "APT41",
+          "actor_pagerank": 0.16154118404118406,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Tool",
+              "hop2_id": "attack:tool--3433a9e8-1c47-4320-b9bf-ed449061d1c3",
+              "hop2_name": "Empire",
+              "hop2_external_id": "S0363"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190",
+              "hop2_label": "Tool",
+              "hop2_id": "attack:tool--9a2640c2-9f43-46fe-b13f-bde881e55555",
+              "hop2_name": "sqlmap",
+              "hop2_external_id": "S0225"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--cfc75b0d-e579-40ae-ad07-a1ce00d49a6c",
+              "hop2_name": "ZxShell",
+              "hop2_external_id": "S0412"
+            },
+            {
+              "path_kind": "campaign_uses_software",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190",
+              "hop2_label": "Campaign",
+              "hop2_id": "attack:campaign--93c23946-49af-41f4-ac03-40f9ffc7419b",
+              "hop2_name": "Operation CuckooBees",
+              "hop2_external_id": "C0012"
+            },
+            {
+              "path_kind": "campaign_uses_software",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190",
+              "hop2_label": "Campaign",
+              "hop2_id": "attack:campaign--ba6dfa37-f401-4140-88b0-8938f2895e61",
+              "hop2_name": "C0017",
+              "hop2_external_id": "C0017"
+            }
+          ],
+          "path_count": 6,
+          "score": 6.969247
+        },
+        {
+          "actor_id": "attack:intrusion-set--381fcf73-60f6-4ab2-9991-6af3cbc35192",
+          "actor_name": "Sandworm Team",
+          "actor_pagerank": 0.1725434782608696,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Tool",
+              "hop2_id": "attack:tool--4b57c098-f043-4da2-83ef-7588a6d426bc",
+              "hop2_name": "PoshC2",
+              "hop2_external_id": "S0378"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--5719af9d-6b16-46f9-9b28-fb019541ddbb",
+              "hop2_name": "NotPetya",
+              "hop2_external_id": "S0368"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--2eaa5319-5e1e-4dd7-bbc4-566fced3964a",
+              "hop2_name": "Bad Rabbit",
+              "hop2_external_id": "S0606"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Tool",
+              "hop2_id": "attack:tool--3433a9e8-1c47-4320-b9bf-ed449061d1c3",
+              "hop2_name": "Empire",
+              "hop2_external_id": "S0363"
+            }
+          ],
+          "path_count": 5,
+          "score": 5.862717
+        },
+        {
+          "actor_id": "attack:intrusion-set--fb366179-766c-4a4a-afa1-52bff1fd601c",
+          "actor_name": "Threat Group-3390",
+          "actor_pagerank": 0.15283333333333335,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210"
+            },
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--cfc75b0d-e579-40ae-ad07-a1ce00d49a6c",
+              "hop2_name": "ZxShell",
+              "hop2_external_id": "S0412"
+            },
+            {
+              "path_kind": "campaign_uses_software",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190",
+              "hop2_label": "Campaign",
+              "hop2_id": "attack:campaign--1a0576df-df21-4775-843e-844d8a58a94b",
+              "hop2_name": "SharePoint ToolShell Exploitation",
+              "hop2_external_id": "C0058"
+            }
+          ],
+          "path_count": 4,
+          "score": 4.611333
+        },
+        {
+          "actor_id": "attack:intrusion-set--dd2d9ca6-505b-4860-a604-233685b802c7",
+          "actor_name": "Wizard Spider",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--00806466-754d-44ea-ad6f-0caf59cb8556",
+              "hop2_name": "TrickBot",
+              "hop2_external_id": "S0266"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Tool",
+              "hop2_id": "attack:tool--3433a9e8-1c47-4320-b9bf-ed449061d1c3",
+              "hop2_name": "Empire",
+              "hop2_external_id": "S0363"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--32066e94-3112-48ca-b9eb-ba2b59d2f023",
+              "hop2_name": "Emotet",
+              "hop2_external_id": "S0367"
+            }
+          ],
+          "path_count": 4,
+          "score": 4.6
+        },
+        {
+          "actor_id": "attack:intrusion-set--899ce53f-13a0-479b-a0e4-67d46e241542",
+          "actor_name": "APT29",
+          "actor_pagerank": 0.16814328743545615,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--e33e4603-afab-402d-b2a1-248d435b5fe0",
+              "hop2_name": "SoreFang",
+              "hop2_external_id": "S0516"
+            },
+            {
+              "path_kind": "campaign_uses_software",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190",
+              "hop2_label": "Campaign",
+              "hop2_id": "attack:campaign--808d6b30-df4e-4341-8248-724da4bac650",
+              "hop2_name": "SolarWinds Compromise",
+              "hop2_external_id": "C0024"
+            }
+          ],
+          "path_count": 3,
+          "score": 3.50443
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2015-3113",
+      "cve_entity_id": "cve:CVE-2015-3113",
+      "actor_link_count": 19,
+      "total_evidence_paths": 21,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--129f2f77-1ab2-4c35-bd5e-21260cee92af",
+          "actor_name": "EXOTIC LILY",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--82caa33e-d11a-433a-94ea-9b5a5fbef81d",
+              "mid_name": "Virtualization/Sandbox Evasion",
+              "mid_external_id": "T1497",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--04378e79-4387-468a-a8f7-f974b8254e44",
+              "hop2_name": "Bumblebee",
+              "hop2_external_id": "S1039"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--82caa33e-d11a-433a-94ea-9b5a5fbef81d",
+              "mid_name": "Virtualization/Sandbox Evasion",
+              "mid_external_id": "T1497",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--99fdf3b4-96ef-4ab9-b191-fc683441cad0",
+              "hop2_name": "Bazar",
+              "hop2_external_id": "S0534"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.3
+        },
+        {
+          "actor_id": "attack:intrusion-set--a5cfbc79-316c-42f2-915d-6e8fef4085f8",
+          "actor_name": "TA578",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--82caa33e-d11a-433a-94ea-9b5a5fbef81d",
+              "mid_name": "Virtualization/Sandbox Evasion",
+              "mid_external_id": "T1497",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--04378e79-4387-468a-a8f7-f974b8254e44",
+              "hop2_name": "Bumblebee",
+              "hop2_external_id": "S1039"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--82caa33e-d11a-433a-94ea-9b5a5fbef81d",
+              "mid_name": "Virtualization/Sandbox Evasion",
+              "mid_external_id": "T1497",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--5147ef15-1cae-4707-8ea1-bee8d98b7f1d",
+              "hop2_name": "IcedID",
+              "hop2_external_id": "S0483"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.3
+        },
+        {
+          "actor_id": "attack:intrusion-set--899ce53f-13a0-479b-a0e4-67d46e241542",
+          "actor_name": "APT29",
+          "actor_pagerank": 0.16814328743545615,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--82caa33e-d11a-433a-94ea-9b5a5fbef81d",
+              "mid_name": "Virtualization/Sandbox Evasion",
+              "mid_external_id": "T1497",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--e6ef745b-077f-42e1-a37d-29eecff9c754",
+              "hop2_name": "CozyCar",
+              "hop2_external_id": "S0046"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.168143
+        },
+        {
+          "actor_id": "attack:intrusion-set--c4d50cdf-87ce-407d-86d8-862883485842",
+          "actor_name": "APT-C-36",
+          "actor_pagerank": 0.15637500000000001,
+          "evidence_paths": [
+            {
+              "path_kind": "campaign_uses_software",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--82caa33e-d11a-433a-94ea-9b5a5fbef81d",
+              "mid_name": "Virtualization/Sandbox Evasion",
+              "mid_external_id": "T1497",
+              "hop2_label": "Campaign",
+              "hop2_id": "attack:campaign--4c840263-bbda-440d-a22b-674679ddebf1",
+              "hop2_name": "Operation Spalax",
+              "hop2_external_id": "C0005"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.156375
+        },
+        {
+          "actor_id": "attack:intrusion-set--bef4c620-0787-42a8-a96d-b7eb6e85917c",
+          "actor_name": "APT28",
+          "actor_pagerank": 0.15579545454545457,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--82caa33e-d11a-433a-94ea-9b5a5fbef81d",
+              "mid_name": "Virtualization/Sandbox Evasion",
+              "mid_external_id": "T1497",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--ccd61dfc-b03f-4689-8c18-7c97eab08472",
+              "hop2_name": "CHOPSTICK",
+              "hop2_external_id": "S0023"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.155795
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2015-5119",
+      "cve_entity_id": "cve:CVE-2015-5119",
+      "actor_link_count": 11,
+      "total_evidence_paths": 11,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--c1aab4c9-4c34-4f4f-8541-d529e46a07f9",
+          "actor_name": "APT5",
+          "actor_pagerank": 0.17125,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Malware",
+              "mid_id": "attack:malware--88c621a7-aef9-4ae0-94e3-1fc87123eb24",
+              "mid_name": "gh0st RAT",
+              "mid_external_id": "S0032"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.17125
+        },
+        {
+          "actor_id": "attack:intrusion-set--18854f55-ac7c-4634-bd9a-352dd07613b7",
+          "actor_name": "APT41",
+          "actor_pagerank": 0.16154118404118406,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Malware",
+              "mid_id": "attack:malware--88c621a7-aef9-4ae0-94e3-1fc87123eb24",
+              "mid_name": "gh0st RAT",
+              "mid_external_id": "S0032"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.161541
+        },
+        {
+          "actor_id": "attack:intrusion-set--7113eaa5-ba79-4fb3-b68a-398ee9cd698e",
+          "actor_name": "Leviathan",
+          "actor_pagerank": 0.15472222222222223,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Malware",
+              "mid_id": "attack:malware--88c621a7-aef9-4ae0-94e3-1fc87123eb24",
+              "mid_name": "gh0st RAT",
+              "mid_external_id": "S0032"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.154722
+        },
+        {
+          "actor_id": "attack:intrusion-set--fb366179-766c-4a4a-afa1-52bff1fd601c",
+          "actor_name": "Threat Group-3390",
+          "actor_pagerank": 0.15283333333333335,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Malware",
+              "mid_id": "attack:malware--88c621a7-aef9-4ae0-94e3-1fc87123eb24",
+              "mid_name": "gh0st RAT",
+              "mid_external_id": "S0032"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.152833
+        },
+        {
+          "actor_id": "attack:intrusion-set--39d6890e-7f23-4474-b8ef-e7b0343c5fc8",
+          "actor_name": "Andariel",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Malware",
+              "mid_id": "attack:malware--88c621a7-aef9-4ae0-94e3-1fc87123eb24",
+              "mid_name": "gh0st RAT",
+              "mid_external_id": "S0032"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2016-6662",
+      "cve_entity_id": "cve:CVE-2016-6662",
+      "actor_link_count": 67,
+      "total_evidence_paths": 107,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--18854f55-ac7c-4634-bd9a-352dd07613b7",
+          "actor_name": "APT41",
+          "actor_pagerank": 0.16154118404118406,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Tool",
+              "hop2_id": "attack:tool--3433a9e8-1c47-4320-b9bf-ed449061d1c3",
+              "hop2_name": "Empire",
+              "hop2_external_id": "S0363"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190",
+              "hop2_label": "Tool",
+              "hop2_id": "attack:tool--9a2640c2-9f43-46fe-b13f-bde881e55555",
+              "hop2_name": "sqlmap",
+              "hop2_external_id": "S0225"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--cfc75b0d-e579-40ae-ad07-a1ce00d49a6c",
+              "hop2_name": "ZxShell",
+              "hop2_external_id": "S0412"
+            },
+            {
+              "path_kind": "campaign_uses_software",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190",
+              "hop2_label": "Campaign",
+              "hop2_id": "attack:campaign--93c23946-49af-41f4-ac03-40f9ffc7419b",
+              "hop2_name": "Operation CuckooBees",
+              "hop2_external_id": "C0012"
+            },
+            {
+              "path_kind": "campaign_uses_software",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190",
+              "hop2_label": "Campaign",
+              "hop2_id": "attack:campaign--ba6dfa37-f401-4140-88b0-8938f2895e61",
+              "hop2_name": "C0017",
+              "hop2_external_id": "C0017"
+            }
+          ],
+          "path_count": 6,
+          "score": 6.969247
+        },
+        {
+          "actor_id": "attack:intrusion-set--381fcf73-60f6-4ab2-9991-6af3cbc35192",
+          "actor_name": "Sandworm Team",
+          "actor_pagerank": 0.1725434782608696,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Tool",
+              "hop2_id": "attack:tool--4b57c098-f043-4da2-83ef-7588a6d426bc",
+              "hop2_name": "PoshC2",
+              "hop2_external_id": "S0378"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--5719af9d-6b16-46f9-9b28-fb019541ddbb",
+              "hop2_name": "NotPetya",
+              "hop2_external_id": "S0368"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--2eaa5319-5e1e-4dd7-bbc4-566fced3964a",
+              "hop2_name": "Bad Rabbit",
+              "hop2_external_id": "S0606"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Tool",
+              "hop2_id": "attack:tool--3433a9e8-1c47-4320-b9bf-ed449061d1c3",
+              "hop2_name": "Empire",
+              "hop2_external_id": "S0363"
+            }
+          ],
+          "path_count": 5,
+          "score": 5.862717
+        },
+        {
+          "actor_id": "attack:intrusion-set--fb366179-766c-4a4a-afa1-52bff1fd601c",
+          "actor_name": "Threat Group-3390",
+          "actor_pagerank": 0.15283333333333335,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210"
+            },
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--cfc75b0d-e579-40ae-ad07-a1ce00d49a6c",
+              "hop2_name": "ZxShell",
+              "hop2_external_id": "S0412"
+            },
+            {
+              "path_kind": "campaign_uses_software",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190",
+              "hop2_label": "Campaign",
+              "hop2_id": "attack:campaign--1a0576df-df21-4775-843e-844d8a58a94b",
+              "hop2_name": "SharePoint ToolShell Exploitation",
+              "hop2_external_id": "C0058"
+            }
+          ],
+          "path_count": 4,
+          "score": 4.611333
+        },
+        {
+          "actor_id": "attack:intrusion-set--dd2d9ca6-505b-4860-a604-233685b802c7",
+          "actor_name": "Wizard Spider",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--00806466-754d-44ea-ad6f-0caf59cb8556",
+              "hop2_name": "TrickBot",
+              "hop2_external_id": "S0266"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Tool",
+              "hop2_id": "attack:tool--3433a9e8-1c47-4320-b9bf-ed449061d1c3",
+              "hop2_name": "Empire",
+              "hop2_external_id": "S0363"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--32066e94-3112-48ca-b9eb-ba2b59d2f023",
+              "hop2_name": "Emotet",
+              "hop2_external_id": "S0367"
+            }
+          ],
+          "path_count": 4,
+          "score": 4.6
+        },
+        {
+          "actor_id": "attack:intrusion-set--899ce53f-13a0-479b-a0e4-67d46e241542",
+          "actor_name": "APT29",
+          "actor_pagerank": 0.16814328743545615,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--e33e4603-afab-402d-b2a1-248d435b5fe0",
+              "hop2_name": "SoreFang",
+              "hop2_external_id": "S0516"
+            },
+            {
+              "path_kind": "campaign_uses_software",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--3f886f2a-874f-4333-b794-aa6075009b1c",
+              "mid_name": "Exploit Public-Facing Application",
+              "mid_external_id": "T1190",
+              "hop2_label": "Campaign",
+              "hop2_id": "attack:campaign--808d6b30-df4e-4341-8248-724da4bac650",
+              "hop2_name": "SolarWinds Compromise",
+              "hop2_external_id": "C0024"
+            }
+          ],
+          "path_count": 3,
+          "score": 3.50443
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2017-0176",
+      "cve_entity_id": "cve:CVE-2017-0176",
+      "actor_link_count": 31,
+      "total_evidence_paths": 40,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--381fcf73-60f6-4ab2-9991-6af3cbc35192",
+          "actor_name": "Sandworm Team",
+          "actor_pagerank": 0.1725434782608696,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Tool",
+              "hop2_id": "attack:tool--4b57c098-f043-4da2-83ef-7588a6d426bc",
+              "hop2_name": "PoshC2",
+              "hop2_external_id": "S0378"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--5719af9d-6b16-46f9-9b28-fb019541ddbb",
+              "hop2_name": "NotPetya",
+              "hop2_external_id": "S0368"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--2eaa5319-5e1e-4dd7-bbc4-566fced3964a",
+              "hop2_name": "Bad Rabbit",
+              "hop2_external_id": "S0606"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Tool",
+              "hop2_id": "attack:tool--3433a9e8-1c47-4320-b9bf-ed449061d1c3",
+              "hop2_name": "Empire",
+              "hop2_external_id": "S0363"
+            }
+          ],
+          "path_count": 4,
+          "score": 4.690174
+        },
+        {
+          "actor_id": "attack:intrusion-set--dd2d9ca6-505b-4860-a604-233685b802c7",
+          "actor_name": "Wizard Spider",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--00806466-754d-44ea-ad6f-0caf59cb8556",
+              "hop2_name": "TrickBot",
+              "hop2_external_id": "S0266"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Tool",
+              "hop2_id": "attack:tool--3433a9e8-1c47-4320-b9bf-ed449061d1c3",
+              "hop2_name": "Empire",
+              "hop2_external_id": "S0363"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--32066e94-3112-48ca-b9eb-ba2b59d2f023",
+              "hop2_name": "Emotet",
+              "hop2_external_id": "S0367"
+            }
+          ],
+          "path_count": 4,
+          "score": 4.6
+        },
+        {
+          "actor_id": "attack:intrusion-set--f29b7c5e-2439-42ad-a86f-9f8984fafae3",
+          "actor_name": "HEXANE",
+          "actor_pagerank": 0.15375000000000003,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Tool",
+              "hop2_id": "attack:tool--4b57c098-f043-4da2-83ef-7588a6d426bc",
+              "hop2_name": "PoshC2",
+              "hop2_external_id": "S0378"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Tool",
+              "hop2_id": "attack:tool--3433a9e8-1c47-4320-b9bf-ed449061d1c3",
+              "hop2_name": "Empire",
+              "hop2_external_id": "S0363"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.3075
+        },
+        {
+          "actor_id": "attack:intrusion-set--269e8108-68c6-4f99-b911-14b2e765dec2",
+          "actor_name": "MuddyWater",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Tool",
+              "hop2_id": "attack:tool--3433a9e8-1c47-4320-b9bf-ed449061d1c3",
+              "hop2_name": "Empire",
+              "hop2_external_id": "S0363"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.3
+        },
+        {
+          "actor_id": "attack:intrusion-set--fbd29c89-18ba-4c2d-b792-51c0adee049f",
+          "actor_name": "APT33",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Tool",
+              "hop2_id": "attack:tool--4b57c098-f043-4da2-83ef-7588a6d426bc",
+              "hop2_name": "PoshC2",
+              "hop2_external_id": "S0378"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--9db0cf3a-a3c9-4012-8268-123b9db6fd82",
+              "mid_name": "Exploitation of Remote Services",
+              "mid_external_id": "T1210",
+              "hop2_label": "Tool",
+              "hop2_id": "attack:tool--3433a9e8-1c47-4320-b9bf-ed449061d1c3",
+              "hop2_name": "Empire",
+              "hop2_external_id": "S0363"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.3
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2017-0199",
+      "cve_entity_id": "cve:CVE-2017-0199",
+      "actor_link_count": 23,
+      "total_evidence_paths": 32,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--269e8108-68c6-4f99-b911-14b2e765dec2",
+          "actor_name": "MuddyWater",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--840a987a-99bd-4a80-a5c9-0cb2baa6cade",
+              "mid_name": "Mshta",
+              "mid_external_id": "T1218.005"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--840a987a-99bd-4a80-a5c9-0cb2baa6cade",
+              "mid_name": "Mshta",
+              "mid_external_id": "T1218.005",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--e8545794-b98c-492b-a5b3-4b5a02682e37",
+              "hop2_name": "POWERSTATS",
+              "hop2_external_id": "S0223"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--840a987a-99bd-4a80-a5c9-0cb2baa6cade",
+              "mid_name": "Mshta",
+              "mid_external_id": "T1218.005",
+              "hop2_label": "Tool",
+              "hop2_id": "attack:tool--c8655260-9f4b-44e3-85e1-6538a5f6e4f4",
+              "hop2_name": "Koadic",
+              "hop2_external_id": "S0250"
+            }
+          ],
+          "path_count": 3,
+          "score": 3.45
+        },
+        {
+          "actor_id": "attack:intrusion-set--899ce53f-13a0-479b-a0e4-67d46e241542",
+          "actor_name": "APT29",
+          "actor_pagerank": 0.16814328743545615,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--840a987a-99bd-4a80-a5c9-0cb2baa6cade",
+              "mid_name": "Mshta",
+              "mid_external_id": "T1218.005"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--840a987a-99bd-4a80-a5c9-0cb2baa6cade",
+              "mid_name": "Mshta",
+              "mid_external_id": "T1218.005",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--979adb5a-dc30-48f0-9e3d-9a26d866928c",
+              "hop2_name": "Sibot",
+              "hop2_external_id": "S0589"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.336287
+        },
+        {
+          "actor_id": "attack:intrusion-set--2e290bfe-93b5-48ce-97d6-edcd6d32b7cf",
+          "actor_name": "Gamaredon Group",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--840a987a-99bd-4a80-a5c9-0cb2baa6cade",
+              "mid_name": "Mshta",
+              "mid_external_id": "T1218.005"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--840a987a-99bd-4a80-a5c9-0cb2baa6cade",
+              "mid_name": "Mshta",
+              "mid_external_id": "T1218.005",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--5f9f7648-04ba-4a9f-bb4c-2a13e74572bd",
+              "hop2_name": "Pteranodon",
+              "hop2_external_id": "S0147"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.3
+        },
+        {
+          "actor_id": "attack:intrusion-set--0ec2f388-bf0f-4b5c-97b1-fc736d26c25f",
+          "actor_name": "Kimsuky",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--840a987a-99bd-4a80-a5c9-0cb2baa6cade",
+              "mid_name": "Mshta",
+              "mid_external_id": "T1218.005"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--840a987a-99bd-4a80-a5c9-0cb2baa6cade",
+              "mid_name": "Mshta",
+              "mid_external_id": "T1218.005",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--d1b7830a-fced-4be3-a99c-f495af9d9e1b",
+              "hop2_name": "BabyShark",
+              "hop2_external_id": "S0414"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.3
+        },
+        {
+          "actor_id": "attack:intrusion-set--467271fd-47c0-4e90-a3f9-d84f5cf790d0",
+          "actor_name": "TA2541",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--840a987a-99bd-4a80-a5c9-0cb2baa6cade",
+              "mid_name": "Mshta",
+              "mid_external_id": "T1218.005"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--840a987a-99bd-4a80-a5c9-0cb2baa6cade",
+              "mid_name": "Mshta",
+              "mid_external_id": "T1218.005",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--bdb27a1d-1844-42f1-a0c0-826027ae0326",
+              "hop2_name": "Revenge RAT",
+              "hop2_external_id": "S0379"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.3
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2017-11774",
+      "cve_entity_id": "cve:CVE-2017-11774",
+      "actor_link_count": 19,
+      "total_evidence_paths": 31,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--899ce53f-13a0-479b-a0e4-67d46e241542",
+          "actor_name": "APT29",
+          "actor_pagerank": 0.16814328743545615,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--853c4192-4311-43e1-bfbb-b11b14911852",
+              "mid_name": "Execution Guardrails",
+              "mid_external_id": "T1480",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--96eca9b9-b37f-42f1-96dc-a2c441403194",
+              "hop2_name": "VaporRage",
+              "hop2_external_id": "S0636"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--853c4192-4311-43e1-bfbb-b11b14911852",
+              "mid_name": "Execution Guardrails",
+              "mid_external_id": "T1480",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--2f8229dc-da94-41c6-89ba-b5b6c32f6b7d",
+              "hop2_name": "EnvyScout",
+              "hop2_external_id": "S0634"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--853c4192-4311-43e1-bfbb-b11b14911852",
+              "mid_name": "Execution Guardrails",
+              "mid_external_id": "T1480",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--bf48e7f8-752c-4ce8-bf8f-748edacd8fa6",
+              "hop2_name": "SUNSPOT",
+              "hop2_external_id": "S0562"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--853c4192-4311-43e1-bfbb-b11b14911852",
+              "mid_name": "Execution Guardrails",
+              "mid_external_id": "T1480",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--c26f1c05-b861-4970-94dc-2f7f921a3074",
+              "hop2_name": "BoomBox",
+              "hop2_external_id": "S0635"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--853c4192-4311-43e1-bfbb-b11b14911852",
+              "mid_name": "Execution Guardrails",
+              "mid_external_id": "T1480",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--b4783be3-35d9-4a56-ac8d-1f3e1c9d9a84",
+              "hop2_name": "NativeZone",
+              "hop2_external_id": "S0637"
+            }
+          ],
+          "path_count": 5,
+          "score": 5.840716
+        },
+        {
+          "actor_id": "attack:intrusion-set--8cf6e33b-b6ef-4a1f-a77c-0ecdde93161f",
+          "actor_name": "MirrorFace",
+          "actor_pagerank": 0.1535416666666667,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--853c4192-4311-43e1-bfbb-b11b14911852",
+              "mid_name": "Execution Guardrails",
+              "mid_external_id": "T1480",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--7908f855-5b5b-4d6a-acbc-af6b45ec27ad",
+              "hop2_name": "LODEINFO",
+              "hop2_external_id": "S9020"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--853c4192-4311-43e1-bfbb-b11b14911852",
+              "mid_name": "Execution Guardrails",
+              "mid_external_id": "T1480",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--251f1715-fc97-4487-b939-5c8823ef7a39",
+              "hop2_name": "ROAMINGHOUSE",
+              "hop2_external_id": "S9026"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--853c4192-4311-43e1-bfbb-b11b14911852",
+              "mid_name": "Execution Guardrails",
+              "mid_external_id": "T1480",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--9edc41d1-a13d-4acf-b400-d47fb2f6809d",
+              "hop2_name": "HiddenFace",
+              "hop2_external_id": "S9023"
+            }
+          ],
+          "path_count": 3,
+          "score": 3.460625
+        },
+        {
+          "actor_id": "attack:intrusion-set--02b16bd6-ae88-417a-8a3f-02c5e166175a",
+          "actor_name": "BlackByte",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--853c4192-4311-43e1-bfbb-b11b14911852",
+              "mid_name": "Execution Guardrails",
+              "mid_external_id": "T1480"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--853c4192-4311-43e1-bfbb-b11b14911852",
+              "mid_name": "Execution Guardrails",
+              "mid_external_id": "T1480",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--6207dd22-bf18-4c96-aada-c573a9bbf5ec",
+              "hop2_name": "Exbyte",
+              "hop2_external_id": "S1179"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--853c4192-4311-43e1-bfbb-b11b14911852",
+              "mid_name": "Execution Guardrails",
+              "mid_external_id": "T1480",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--9454bb5d-3bdb-40f9-a878-b5fb446ded3d",
+              "hop2_name": "BlackByte Ransomware",
+              "hop2_external_id": "S1180"
+            }
+          ],
+          "path_count": 3,
+          "score": 3.45
+        },
+        {
+          "actor_id": "attack:intrusion-set--c4d50cdf-87ce-407d-86d8-862883485842",
+          "actor_name": "APT-C-36",
+          "actor_pagerank": 0.15637500000000001,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--853c4192-4311-43e1-bfbb-b11b14911852",
+              "mid_name": "Execution Guardrails",
+              "mid_external_id": "T1480"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--853c4192-4311-43e1-bfbb-b11b14911852",
+              "mid_name": "Execution Guardrails",
+              "mid_external_id": "T1480",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--6f22487c-dbbf-4a5b-85ca-a8c85e8f2f80",
+              "hop2_name": "PureCrypter",
+              "hop2_external_id": "S9019"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.31275
+        },
+        {
+          "actor_id": "attack:intrusion-set--420ac20b-f2b9-42b8-aa1a-6d4b72895ca4",
+          "actor_name": "Mustang Panda",
+          "actor_pagerank": 0.15510000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--853c4192-4311-43e1-bfbb-b11b14911852",
+              "mid_name": "Execution Guardrails",
+              "mid_external_id": "T1480",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--2683fde8-1dc4-415c-94bd-9bb95cc5b7ff",
+              "hop2_name": "TONESHELL",
+              "hop2_external_id": "S1239"
+            },
+            {
+              "path_kind": "campaign_uses_software",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--853c4192-4311-43e1-bfbb-b11b14911852",
+              "mid_name": "Execution Guardrails",
+              "mid_external_id": "T1480",
+              "hop2_label": "Campaign",
+              "hop2_id": "attack:campaign--276671b5-5425-48db-ad65-c8c2564a969b",
+              "hop2_name": "RedDelta Modified PlugX Infection Chain Operations",
+              "hop2_external_id": "C0047"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.3102
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2017-11882",
+      "cve_entity_id": "cve:CVE-2017-11882",
+      "actor_link_count": 1,
+      "total_evidence_paths": 3,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--4ca1929c-7d64-4aab-b849-badbfc0c760d",
+          "actor_name": "OilRig",
+          "actor_pagerank": 0.16955965909090912,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Malware",
+              "mid_id": "attack:malware--d5268dfb-ae2b-4e0e-ac07-02a460613d8a",
+              "mid_name": "BONDUPDATER",
+              "mid_external_id": "S0360"
+            },
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Malware",
+              "mid_id": "attack:malware--09b2cd76-c674-47cc-9f57-d2f2ad150a46",
+              "mid_name": "POWRUNER",
+              "mid_external_id": "S0184"
+            },
+            {
+              "path_kind": "actor_direct_exploit",
+              "mid_label": "ThreatActor",
+              "mid_id": "attack:intrusion-set--4ca1929c-7d64-4aab-b849-badbfc0c760d",
+              "mid_name": "OilRig",
+              "mid_external_id": "G0049"
+            }
+          ],
+          "path_count": 3,
+          "score": 3.508679
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2017-8625",
+      "cve_entity_id": "cve:CVE-2017-8625",
+      "actor_link_count": 5,
+      "total_evidence_paths": 5,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--4ca1929c-7d64-4aab-b849-badbfc0c760d",
+          "actor_name": "OilRig",
+          "actor_pagerank": 0.16955965909090912,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--a6937325-9321-4e2e-bb2b-3ed2d40b2a9d",
+              "mid_name": "Compiled HTML File",
+              "mid_external_id": "T1218.001"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.16956
+        },
+        {
+          "actor_id": "attack:intrusion-set--18854f55-ac7c-4634-bd9a-352dd07613b7",
+          "actor_name": "APT41",
+          "actor_pagerank": 0.16154118404118406,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--a6937325-9321-4e2e-bb2b-3ed2d40b2a9d",
+              "mid_name": "Compiled HTML File",
+              "mid_external_id": "T1218.001"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.161541
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "actor_name": "APT38",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--a6937325-9321-4e2e-bb2b-3ed2d40b2a9d",
+              "mid_name": "Compiled HTML File",
+              "mid_external_id": "T1218.001"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15
+        },
+        {
+          "actor_id": "attack:intrusion-set--d13c8a7f-740b-4efa-a232-de7d6bb05321",
+          "actor_name": "Silence",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--a6937325-9321-4e2e-bb2b-3ed2d40b2a9d",
+              "mid_name": "Compiled HTML File",
+              "mid_external_id": "T1218.001"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15
+        },
+        {
+          "actor_id": "attack:intrusion-set--8a831aaa-f3e0-47a3-bed8-a9ced744dd12",
+          "actor_name": "Dark Caracal",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--a6937325-9321-4e2e-bb2b-3ed2d40b2a9d",
+              "mid_name": "Compiled HTML File",
+              "mid_external_id": "T1218.001"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2017-8759",
+      "cve_entity_id": "cve:CVE-2017-8759",
+      "actor_link_count": 4,
+      "total_evidence_paths": 4,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--dc6fe6ee-04c2-49be-ba3d-f38d2463c02a",
+          "actor_name": "Cobalt Group",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--6e3bd510-6b33-41a4-af80-2d80f3ee0071",
+              "mid_name": "Odbcconf",
+              "mid_external_id": "T1218.008"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15
+        },
+        {
+          "actor_id": "attack:intrusion-set--8a831aaa-f3e0-47a3-bed8-a9ced744dd12",
+          "actor_name": "Dark Caracal",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Malware",
+              "mid_id": "attack:malware--a5528622-3a8a-4633-86ce-8cdaf8423858",
+              "mid_name": "FinFisher",
+              "mid_external_id": "S0182"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15
+        },
+        {
+          "actor_id": "attack:intrusion-set--129f2f77-1ab2-4c35-bd5e-21260cee92af",
+          "actor_name": "EXOTIC LILY",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--6e3bd510-6b33-41a4-af80-2d80f3ee0071",
+              "mid_name": "Odbcconf",
+              "mid_external_id": "T1218.008",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--04378e79-4387-468a-a8f7-f974b8254e44",
+              "hop2_name": "Bumblebee",
+              "hop2_external_id": "S1039"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15
+        },
+        {
+          "actor_id": "attack:intrusion-set--a5cfbc79-316c-42f2-915d-6e8fef4085f8",
+          "actor_name": "TA578",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--6e3bd510-6b33-41a4-af80-2d80f3ee0071",
+              "mid_name": "Odbcconf",
+              "mid_external_id": "T1218.008",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--04378e79-4387-468a-a8f7-f974b8254e44",
+              "hop2_name": "Bumblebee",
+              "hop2_external_id": "S1039"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2019-3610",
+      "cve_entity_id": "cve:CVE-2019-3610",
+      "actor_link_count": 11,
+      "total_evidence_paths": 11,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--461b8e25-8f4a-4ea2-a4a8-e39df7ce6630",
+          "actor_name": "UNC3886",
+          "actor_pagerank": 0.15439655172413796,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--315f51f0-6b03-4c1e-bfb2-84740afb8e21",
+              "mid_name": "Password Managers",
+              "mid_external_id": "T1555.005"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.154397
+        },
+        {
+          "actor_id": "attack:intrusion-set--44d37b89-a739-4810-9111-0d2617a8939b",
+          "actor_name": "Scattered Spider",
+          "actor_pagerank": 0.15425000000000003,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--315f51f0-6b03-4c1e-bfb2-84740afb8e21",
+              "mid_name": "Password Managers",
+              "mid_external_id": "T1555.005"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15425
+        },
+        {
+          "actor_id": "attack:intrusion-set--fb366179-766c-4a4a-afa1-52bff1fd601c",
+          "actor_name": "Threat Group-3390",
+          "actor_pagerank": 0.15283333333333335,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--315f51f0-6b03-4c1e-bfb2-84740afb8e21",
+              "mid_name": "Password Managers",
+              "mid_external_id": "T1555.005"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.152833
+        },
+        {
+          "actor_id": "attack:intrusion-set--d8bc9788-4f7d-41a9-9e9d-ee1ea18a8cf7",
+          "actor_name": "LAPSUS$",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--315f51f0-6b03-4c1e-bfb2-84740afb8e21",
+              "mid_name": "Password Managers",
+              "mid_external_id": "T1555.005"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15
+        },
+        {
+          "actor_id": "attack:intrusion-set--7b404cd0-3ae9-41d4-90c0-023793d35d97",
+          "actor_name": "Storm-0501",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--315f51f0-6b03-4c1e-bfb2-84740afb8e21",
+              "mid_name": "Password Managers",
+              "mid_external_id": "T1555.005"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2021-30724",
+      "cve_entity_id": "cve:CVE-2021-30724",
+      "actor_link_count": 0,
+      "total_evidence_paths": 0,
+      "top_actors": []
+    },
+    {
+      "cve_id": "CVE-2021-32648",
+      "cve_entity_id": "cve:CVE-2021-32648",
+      "actor_link_count": 1,
+      "total_evidence_paths": 1,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--a7f57cc1-4540-4429-823f-f4e56b8473c9",
+          "actor_name": "Ember Bear",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Malware",
+              "mid_id": "attack:malware--49fee0b0-390e-4bde-97f8-97ed46bd19b7",
+              "mid_name": "WhisperGate",
+              "mid_external_id": "S0689"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2022-0185",
+      "cve_entity_id": "cve:CVE-2022-0185",
+      "actor_link_count": 1,
+      "total_evidence_paths": 3,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--35d1b3be-49d4-42f1-aaa6-ef159c880bca",
+          "actor_name": "TeamTNT",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--4a5b7ade-8bb5-4853-84ed-23f262002665",
+              "mid_name": "Escape to Host",
+              "mid_external_id": "T1611"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--4a5b7ade-8bb5-4853-84ed-23f262002665",
+              "mid_name": "Escape to Host",
+              "mid_external_id": "T1611",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--40a1b8ec-7295-416c-a6b1-68181d86f120",
+              "hop2_name": "Hildegard",
+              "hop2_external_id": "S0601"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--4a5b7ade-8bb5-4853-84ed-23f262002665",
+              "mid_name": "Escape to Host",
+              "mid_external_id": "T1611",
+              "hop2_label": "Tool",
+              "hop2_id": "attack:tool--79dd477a-8226-4b3d-ad15-28623675f221",
+              "hop2_name": "Peirates",
+              "hop2_external_id": "S0683"
+            }
+          ],
+          "path_count": 3,
+          "score": 3.45
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2022-21894",
+      "cve_entity_id": "cve:CVE-2022-21894",
+      "actor_link_count": 7,
+      "total_evidence_paths": 8,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--18854f55-ac7c-4634-bd9a-352dd07613b7",
+          "actor_name": "APT41",
+          "actor_pagerank": 0.16154118404118406,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--1b7b1806-7746-41a1-a35d-e48dae25ddba",
+              "mid_name": "Bootkit",
+              "mid_external_id": "T1542.003"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--1b7b1806-7746-41a1-a35d-e48dae25ddba",
+              "mid_name": "Bootkit",
+              "mid_external_id": "T1542.003",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--cba78a1c-186f-4112-9e6a-be1839f030f7",
+              "hop2_name": "ROCKBOOT",
+              "hop2_external_id": "S0112"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.323082
+        },
+        {
+          "actor_id": "attack:intrusion-set--c93fccb1-e8e8-42cf-ae33-2ad1d183913a",
+          "actor_name": "Lazarus Group",
+          "actor_pagerank": 0.16066101694915258,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--1b7b1806-7746-41a1-a35d-e48dae25ddba",
+              "mid_name": "Bootkit",
+              "mid_external_id": "T1542.003"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.160661
+        },
+        {
+          "actor_id": "attack:intrusion-set--bef4c620-0787-42a8-a96d-b7eb6e85917c",
+          "actor_name": "APT28",
+          "actor_pagerank": 0.15579545454545457,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--1b7b1806-7746-41a1-a35d-e48dae25ddba",
+              "mid_name": "Bootkit",
+              "mid_external_id": "T1542.003"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.155795
+        },
+        {
+          "actor_id": "attack:intrusion-set--8a831aaa-f3e0-47a3-bed8-a9ced744dd12",
+          "actor_name": "Dark Caracal",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--1b7b1806-7746-41a1-a35d-e48dae25ddba",
+              "mid_name": "Bootkit",
+              "mid_external_id": "T1542.003",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--a5528622-3a8a-4633-86ce-8cdaf8423858",
+              "hop2_name": "FinFisher",
+              "hop2_external_id": "S0182"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15
+        },
+        {
+          "actor_id": "attack:intrusion-set--dd2d9ca6-505b-4860-a604-233685b802c7",
+          "actor_name": "Wizard Spider",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--1b7b1806-7746-41a1-a35d-e48dae25ddba",
+              "mid_name": "Bootkit",
+              "mid_external_id": "T1542.003",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--00806466-754d-44ea-ad6f-0caf59cb8556",
+              "hop2_name": "TrickBot",
+              "hop2_external_id": "S0266"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2022-38028",
+      "cve_entity_id": "cve:CVE-2022-38028",
+      "actor_link_count": 1,
+      "total_evidence_paths": 1,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--bef4c620-0787-42a8-a96d-b7eb6e85917c",
+          "actor_name": "APT28",
+          "actor_pagerank": 0.15579545454545457,
+          "evidence_paths": [
+            {
+              "path_kind": "campaign_attribution",
+              "mid_label": "Campaign",
+              "mid_id": "attack:campaign--a010610e-22cb-437e-bfde-b78861bdca7a",
+              "mid_name": "APT28 Nearest Neighbor Campaign",
+              "mid_external_id": "C0051"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.155795
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2022-42475",
+      "cve_entity_id": "cve:CVE-2022-42475",
+      "actor_link_count": 0,
+      "total_evidence_paths": 0,
+      "top_actors": []
+    },
+    {
+      "cve_id": "CVE-2023-1389",
+      "cve_entity_id": "cve:CVE-2023-1389",
+      "actor_link_count": 0,
+      "total_evidence_paths": 0,
+      "top_actors": []
+    },
+    {
+      "cve_id": "CVE-2023-34362",
+      "cve_entity_id": "cve:CVE-2023-34362",
+      "actor_link_count": 6,
+      "total_evidence_paths": 6,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--381fcf73-60f6-4ab2-9991-6af3cbc35192",
+          "actor_name": "Sandworm Team",
+          "actor_pagerank": 0.1725434782608696,
+          "evidence_paths": [
+            {
+              "path_kind": "campaign_uses_software",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--d349c66e-18e1-4d8b-a2d7-65af7cbd2ba0",
+              "mid_name": "Masquerade Account Name",
+              "mid_external_id": "T1036.010",
+              "hop2_label": "Campaign",
+              "hop2_id": "attack:campaign--aa73efef-1418-4dbe-b43c-87a498e97234",
+              "hop2_name": "2016 Ukraine Electric Power Attack",
+              "hop2_external_id": "C0025"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.172543
+        },
+        {
+          "actor_id": "attack:intrusion-set--1c63d4ec-0a75-4daa-b1df-0d11af3d3cc1",
+          "actor_name": "Dragonfly",
+          "actor_pagerank": 0.15196153846153848,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--d349c66e-18e1-4d8b-a2d7-65af7cbd2ba0",
+              "mid_name": "Masquerade Account Name",
+              "mid_external_id": "T1036.010"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.151962
+        },
+        {
+          "actor_id": "attack:intrusion-set--0bbdf25b-30ff-4894-a1cd-49260d0dd2d9",
+          "actor_name": "APT3",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--d349c66e-18e1-4d8b-a2d7-65af7cbd2ba0",
+              "mid_name": "Masquerade Account Name",
+              "mid_external_id": "T1036.010"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15
+        },
+        {
+          "actor_id": "attack:intrusion-set--f9d6633a-55e6-4adc-9263-6ae080421a13",
+          "actor_name": "Magic Hound",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--d349c66e-18e1-4d8b-a2d7-65af7cbd2ba0",
+              "mid_name": "Masquerade Account Name",
+              "mid_external_id": "T1036.010"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15
+        },
+        {
+          "actor_id": "attack:intrusion-set--319fd652-edde-46b2-9987-3519493989f5",
+          "actor_name": "Storm-1811",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--d349c66e-18e1-4d8b-a2d7-65af7cbd2ba0",
+              "mid_name": "Masquerade Account Name",
+              "mid_external_id": "T1036.010"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2023-46747",
+      "cve_entity_id": "cve:CVE-2023-46747",
+      "actor_link_count": 0,
+      "total_evidence_paths": 0,
+      "top_actors": []
+    },
+    {
+      "cve_id": "CVE-2023-48022",
+      "cve_entity_id": "cve:CVE-2023-48022",
+      "actor_link_count": 0,
+      "total_evidence_paths": 0,
+      "top_actors": []
+    },
+    {
+      "cve_id": "CVE-2024-1708",
+      "cve_entity_id": "cve:CVE-2024-1708",
+      "actor_link_count": 30,
+      "total_evidence_paths": 37,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--44d37b89-a739-4810-9111-0d2617a8939b",
+          "actor_name": "Scattered Spider",
+          "actor_pagerank": 0.15425000000000003,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--d4287702-e2f7-4946-bdfa-2c7f5aaa5032",
+              "mid_name": "Remote Desktop Software",
+              "mid_external_id": "T1219.002"
+            },
+            {
+              "path_kind": "campaign_uses_software",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--d4287702-e2f7-4946-bdfa-2c7f5aaa5032",
+              "mid_name": "Remote Desktop Software",
+              "mid_external_id": "T1219.002",
+              "hop2_label": "Campaign",
+              "hop2_id": "attack:campaign--df74f7ad-b10d-431c-9f1d-a2bc18dadefa",
+              "hop2_name": "C0027",
+              "hop2_external_id": "C0027"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.3085
+        },
+        {
+          "actor_id": "attack:intrusion-set--c416b28c-103b-4df1-909e-78089a7e0e5f",
+          "actor_name": "RTM",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--d4287702-e2f7-4946-bdfa-2c7f5aaa5032",
+              "mid_name": "Remote Desktop Software",
+              "mid_external_id": "T1219.002"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--4061e78c-1284-44b4-9116-73e4ac3912f7",
+              "mid_name": "Remote Access Tools",
+              "mid_external_id": "T1219",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--92ec0cbd-2c30-44a2-b270-73f4ec949841",
+              "hop2_name": "RTM",
+              "hop2_external_id": "S0148"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.3
+        },
+        {
+          "actor_id": "attack:intrusion-set--46599a4a-77ee-4697-9474-2683b6464859",
+          "actor_name": "Contagious Interview",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--d4287702-e2f7-4946-bdfa-2c7f5aaa5032",
+              "mid_name": "Remote Desktop Software",
+              "mid_external_id": "T1219.002"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--4061e78c-1284-44b4-9116-73e4ac3912f7",
+              "mid_name": "Remote Access Tools",
+              "mid_external_id": "T1219",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--1dac60f2-7d53-4a3e-95d1-cb2e875d5491",
+              "hop2_name": "InvisibleFerret",
+              "hop2_external_id": "S1245"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.3
+        },
+        {
+          "actor_id": "attack:intrusion-set--55033a4d-3ffe-46b2-99b4-2c1541e9ce1c",
+          "actor_name": "Carbanak",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--4061e78c-1284-44b4-9116-73e4ac3912f7",
+              "mid_name": "Remote Access Tools",
+              "mid_external_id": "T1219"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--4061e78c-1284-44b4-9116-73e4ac3912f7",
+              "mid_name": "Remote Access Tools",
+              "mid_external_id": "T1219",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--72f54d66-675d-4587-9bd3-4ed09f9522e4",
+              "hop2_name": "Carbanak",
+              "hop2_external_id": "S0030"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.3
+        },
+        {
+          "actor_id": "attack:intrusion-set--3753cc21-2dae-4dfb-8481-d004e74502cc",
+          "actor_name": "FIN7",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--4061e78c-1284-44b4-9116-73e4ac3912f7",
+              "mid_name": "Remote Access Tools",
+              "mid_external_id": "T1219"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--4061e78c-1284-44b4-9116-73e4ac3912f7",
+              "mid_name": "Remote Access Tools",
+              "mid_external_id": "T1219",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--72f54d66-675d-4587-9bd3-4ed09f9522e4",
+              "hop2_name": "Carbanak",
+              "hop2_external_id": "S0030"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.3
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2024-1709",
+      "cve_entity_id": "cve:CVE-2024-1709",
+      "actor_link_count": 30,
+      "total_evidence_paths": 37,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--44d37b89-a739-4810-9111-0d2617a8939b",
+          "actor_name": "Scattered Spider",
+          "actor_pagerank": 0.15425000000000003,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--d4287702-e2f7-4946-bdfa-2c7f5aaa5032",
+              "mid_name": "Remote Desktop Software",
+              "mid_external_id": "T1219.002"
+            },
+            {
+              "path_kind": "campaign_uses_software",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--d4287702-e2f7-4946-bdfa-2c7f5aaa5032",
+              "mid_name": "Remote Desktop Software",
+              "mid_external_id": "T1219.002",
+              "hop2_label": "Campaign",
+              "hop2_id": "attack:campaign--df74f7ad-b10d-431c-9f1d-a2bc18dadefa",
+              "hop2_name": "C0027",
+              "hop2_external_id": "C0027"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.3085
+        },
+        {
+          "actor_id": "attack:intrusion-set--c416b28c-103b-4df1-909e-78089a7e0e5f",
+          "actor_name": "RTM",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--d4287702-e2f7-4946-bdfa-2c7f5aaa5032",
+              "mid_name": "Remote Desktop Software",
+              "mid_external_id": "T1219.002"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--4061e78c-1284-44b4-9116-73e4ac3912f7",
+              "mid_name": "Remote Access Tools",
+              "mid_external_id": "T1219",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--92ec0cbd-2c30-44a2-b270-73f4ec949841",
+              "hop2_name": "RTM",
+              "hop2_external_id": "S0148"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.3
+        },
+        {
+          "actor_id": "attack:intrusion-set--46599a4a-77ee-4697-9474-2683b6464859",
+          "actor_name": "Contagious Interview",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--d4287702-e2f7-4946-bdfa-2c7f5aaa5032",
+              "mid_name": "Remote Desktop Software",
+              "mid_external_id": "T1219.002"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--4061e78c-1284-44b4-9116-73e4ac3912f7",
+              "mid_name": "Remote Access Tools",
+              "mid_external_id": "T1219",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--1dac60f2-7d53-4a3e-95d1-cb2e875d5491",
+              "hop2_name": "InvisibleFerret",
+              "hop2_external_id": "S1245"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.3
+        },
+        {
+          "actor_id": "attack:intrusion-set--55033a4d-3ffe-46b2-99b4-2c1541e9ce1c",
+          "actor_name": "Carbanak",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--4061e78c-1284-44b4-9116-73e4ac3912f7",
+              "mid_name": "Remote Access Tools",
+              "mid_external_id": "T1219"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--4061e78c-1284-44b4-9116-73e4ac3912f7",
+              "mid_name": "Remote Access Tools",
+              "mid_external_id": "T1219",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--72f54d66-675d-4587-9bd3-4ed09f9522e4",
+              "hop2_name": "Carbanak",
+              "hop2_external_id": "S0030"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.3
+        },
+        {
+          "actor_id": "attack:intrusion-set--3753cc21-2dae-4dfb-8481-d004e74502cc",
+          "actor_name": "FIN7",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--4061e78c-1284-44b4-9116-73e4ac3912f7",
+              "mid_name": "Remote Access Tools",
+              "mid_external_id": "T1219"
+            },
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--4061e78c-1284-44b4-9116-73e4ac3912f7",
+              "mid_name": "Remote Access Tools",
+              "mid_external_id": "T1219",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--72f54d66-675d-4587-9bd3-4ed09f9522e4",
+              "hop2_name": "Carbanak",
+              "hop2_external_id": "S0030"
+            }
+          ],
+          "path_count": 2,
+          "score": 2.3
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2024-20399",
+      "cve_entity_id": "cve:CVE-2024-20399",
+      "actor_link_count": 1,
+      "total_evidence_paths": 1,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--e1fc262c-dad2-4b82-abda-5f08dd134971",
+          "actor_name": "Velvet Ant",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "actor_direct_exploit",
+              "mid_label": "ThreatActor",
+              "mid_id": "attack:intrusion-set--e1fc262c-dad2-4b82-abda-5f08dd134971",
+              "mid_name": "Velvet Ant",
+              "mid_external_id": "G1047"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2024-3400",
+      "cve_entity_id": "cve:CVE-2024-3400",
+      "actor_link_count": 0,
+      "total_evidence_paths": 0,
+      "top_actors": []
+    },
+    {
+      "cve_id": "CVE-2024-39717",
+      "cve_entity_id": "cve:CVE-2024-39717",
+      "actor_link_count": 1,
+      "total_evidence_paths": 1,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--174279b4-399f-4ddb-966e-5efedd1dd5f2",
+          "actor_name": "Volt Typhoon",
+          "actor_pagerank": 0.16766233766233768,
+          "evidence_paths": [
+            {
+              "path_kind": "campaign_attribution",
+              "mid_label": "Campaign",
+              "mid_id": "attack:campaign--af0ec65a-caa9-40ef-b1c7-21b71fbf3a10",
+              "mid_name": "Versa Director Zero Day Exploitation",
+              "mid_external_id": "C0039"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.167662
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2024-55591",
+      "cve_entity_id": "cve:CVE-2024-55591",
+      "actor_link_count": 3,
+      "total_evidence_paths": 3,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--381fcf73-60f6-4ab2-9991-6af3cbc35192",
+          "actor_name": "Sandworm Team",
+          "actor_pagerank": 0.1725434782608696,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_indirect",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--a29aa77c-a88d-4f19-bab9-7751941b2e2d",
+              "mid_name": "Network Device Firewall",
+              "mid_external_id": "T1686.002",
+              "hop2_label": "Malware",
+              "hop2_id": "attack:malware--b350b47f-88fe-4921-8538-6d9c59bac84e",
+              "hop2_name": "Cyclops Blink",
+              "hop2_external_id": "S0687"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.172543
+        },
+        {
+          "actor_id": "attack:intrusion-set--1c63d4ec-0a75-4daa-b1df-0d11af3d3cc1",
+          "actor_name": "Dragonfly",
+          "actor_pagerank": 0.15196153846153848,
+          "evidence_paths": [
+            {
+              "path_kind": "campaign_uses_software",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--a29aa77c-a88d-4f19-bab9-7751941b2e2d",
+              "mid_name": "Network Device Firewall",
+              "mid_external_id": "T1686.002",
+              "hop2_label": "Campaign",
+              "hop2_id": "attack:campaign--a6aba167-5ada-4812-9da1-912c0e73335d",
+              "hop2_name": "2025 Poland Wiper Attacks",
+              "hop2_external_id": "C0063"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.151962
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "actor_name": "APT38",
+          "actor_pagerank": 0.15000000000000002,
+          "evidence_paths": [
+            {
+              "path_kind": "uses_direct",
+              "mid_label": "Technique",
+              "mid_id": "attack:attack-pattern--a29aa77c-a88d-4f19-bab9-7751941b2e2d",
+              "mid_name": "Network Device Firewall",
+              "mid_external_id": "T1686.002"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.15
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2025-22457",
+      "cve_entity_id": "cve:CVE-2025-22457",
+      "actor_link_count": 0,
+      "total_evidence_paths": 0,
+      "top_actors": []
+    },
+    {
+      "cve_id": "CVE-2025-49704",
+      "cve_entity_id": "cve:CVE-2025-49704",
+      "actor_link_count": 2,
+      "total_evidence_paths": 2,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--4283ae19-69c7-4347-a35e-b56f08eb660b",
+          "actor_name": "ZIRCONIUM",
+          "actor_pagerank": 0.16877083333333337,
+          "evidence_paths": [
+            {
+              "path_kind": "campaign_attribution",
+              "mid_label": "Campaign",
+              "mid_id": "attack:campaign--1a0576df-df21-4775-843e-844d8a58a94b",
+              "mid_name": "SharePoint ToolShell Exploitation",
+              "mid_external_id": "C0058"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.168771
+        },
+        {
+          "actor_id": "attack:intrusion-set--fb366179-766c-4a4a-afa1-52bff1fd601c",
+          "actor_name": "Threat Group-3390",
+          "actor_pagerank": 0.15283333333333335,
+          "evidence_paths": [
+            {
+              "path_kind": "campaign_attribution",
+              "mid_label": "Campaign",
+              "mid_id": "attack:campaign--1a0576df-df21-4775-843e-844d8a58a94b",
+              "mid_name": "SharePoint ToolShell Exploitation",
+              "mid_external_id": "C0058"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.152833
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2025-49706",
+      "cve_entity_id": "cve:CVE-2025-49706",
+      "actor_link_count": 2,
+      "total_evidence_paths": 2,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--4283ae19-69c7-4347-a35e-b56f08eb660b",
+          "actor_name": "ZIRCONIUM",
+          "actor_pagerank": 0.16877083333333337,
+          "evidence_paths": [
+            {
+              "path_kind": "campaign_attribution",
+              "mid_label": "Campaign",
+              "mid_id": "attack:campaign--1a0576df-df21-4775-843e-844d8a58a94b",
+              "mid_name": "SharePoint ToolShell Exploitation",
+              "mid_external_id": "C0058"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.168771
+        },
+        {
+          "actor_id": "attack:intrusion-set--fb366179-766c-4a4a-afa1-52bff1fd601c",
+          "actor_name": "Threat Group-3390",
+          "actor_pagerank": 0.15283333333333335,
+          "evidence_paths": [
+            {
+              "path_kind": "campaign_attribution",
+              "mid_label": "Campaign",
+              "mid_id": "attack:campaign--1a0576df-df21-4775-843e-844d8a58a94b",
+              "mid_name": "SharePoint ToolShell Exploitation",
+              "mid_external_id": "C0058"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.152833
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2025-53770",
+      "cve_entity_id": "cve:CVE-2025-53770",
+      "actor_link_count": 2,
+      "total_evidence_paths": 2,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--4283ae19-69c7-4347-a35e-b56f08eb660b",
+          "actor_name": "ZIRCONIUM",
+          "actor_pagerank": 0.16877083333333337,
+          "evidence_paths": [
+            {
+              "path_kind": "campaign_attribution",
+              "mid_label": "Campaign",
+              "mid_id": "attack:campaign--1a0576df-df21-4775-843e-844d8a58a94b",
+              "mid_name": "SharePoint ToolShell Exploitation",
+              "mid_external_id": "C0058"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.168771
+        },
+        {
+          "actor_id": "attack:intrusion-set--fb366179-766c-4a4a-afa1-52bff1fd601c",
+          "actor_name": "Threat Group-3390",
+          "actor_pagerank": 0.15283333333333335,
+          "evidence_paths": [
+            {
+              "path_kind": "campaign_attribution",
+              "mid_label": "Campaign",
+              "mid_id": "attack:campaign--1a0576df-df21-4775-843e-844d8a58a94b",
+              "mid_name": "SharePoint ToolShell Exploitation",
+              "mid_external_id": "C0058"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.152833
+        }
+      ]
+    },
+    {
+      "cve_id": "CVE-2025-53771",
+      "cve_entity_id": "cve:CVE-2025-53771",
+      "actor_link_count": 2,
+      "total_evidence_paths": 2,
+      "top_actors": [
+        {
+          "actor_id": "attack:intrusion-set--4283ae19-69c7-4347-a35e-b56f08eb660b",
+          "actor_name": "ZIRCONIUM",
+          "actor_pagerank": 0.16877083333333337,
+          "evidence_paths": [
+            {
+              "path_kind": "campaign_attribution",
+              "mid_label": "Campaign",
+              "mid_id": "attack:campaign--1a0576df-df21-4775-843e-844d8a58a94b",
+              "mid_name": "SharePoint ToolShell Exploitation",
+              "mid_external_id": "C0058"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.168771
+        },
+        {
+          "actor_id": "attack:intrusion-set--fb366179-766c-4a4a-afa1-52bff1fd601c",
+          "actor_name": "Threat Group-3390",
+          "actor_pagerank": 0.15283333333333335,
+          "evidence_paths": [
+            {
+              "path_kind": "campaign_attribution",
+              "mid_label": "Campaign",
+              "mid_id": "attack:campaign--1a0576df-df21-4775-843e-844d8a58a94b",
+              "mid_name": "SharePoint ToolShell Exploitation",
+              "mid_external_id": "C0058"
+            }
+          ],
+          "path_count": 1,
+          "score": 1.152833
+        }
+      ]
+    }
+  ]
+}

@@ -4,6 +4,9 @@
 DocsBasedSupport/neo4j_snapshots/**/*.tar.gz
 DocsBasedSupport/neo4j_snapshots/**/*.dump
 
+# MITRE ATT&CK ontology bundles (downloaded on demand by eval/AttackGraph/load_attack.py)
+DocsBasedSupport/data/ontologies/mitre_attack/*.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

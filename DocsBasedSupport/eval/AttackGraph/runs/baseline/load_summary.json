@@ -1,0 +1,52 @@
+{
+  "bundle_path": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/data/ontologies/mitre_attack/enterprise-attack.json",
+  "source_id": "mitre-attack:enterprise",
+  "load_stats": {
+    "entities_by_label": {
+      "Mitigation": 44,
+      "Malware": 726,
+      "CVE": 33,
+      "Tool": 95,
+      "Tactic": 15,
+      "Technique": 697,
+      "ThreatActor": 174,
+      "Campaign": 56
+    },
+    "relations_by_type": {
+      "EXPLOITS": 37,
+      "IN_TACTIC": 872,
+      "USES": 18220,
+      "MITIGATES": 1448,
+      "SUBTECHNIQUE_OF": 475,
+      "ATTRIBUTED_TO": 26
+    },
+    "total_entities": 1840,
+    "total_relations": 21078,
+    "skipped_objects": 2564,
+    "skipped_relationships": 856,
+    "cve_nodes": 33,
+    "revoked_objects_skipped": 446
+  },
+  "post_load_counts": {
+    "labels": {
+      "CVE": 33,
+      "Mitigation": 44,
+      "Tool": 95,
+      "Campaign": 56,
+      "Malware": 726,
+      "ThreatActor": 174,
+      "Technique": 697,
+      "Tactic": 15
+    },
+    "relations": {
+      "USES": 18220,
+      "MITIGATES": 1448,
+      "SUBTECHNIQUE_OF": 475,
+      "ATTRIBUTED_TO": 26,
+      "TARGETS": 0,
+      "EXPLOITS": 37,
+      "IN_TACTIC": 872
+    }
+  },
+  "enriched": true
+}
