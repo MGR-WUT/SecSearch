@@ -2,7 +2,7 @@
 
 Usage:
 
-    PYTHONPATH=. python eval/AttackGraph/load_attack.py \\
+    PYTHONPATH=. python eval/AttackGraph/loaders/load_attack.py \\
         --bundle-path data/ontologies/mitre_attack/enterprise-attack.json \\
         --enrich --reset
 
@@ -23,9 +23,9 @@ import sys
 import urllib.request
 from pathlib import Path
 
-# Allow `python eval/AttackGraph/load_attack.py` from the project root without
+# Allow `python eval/AttackGraph/loaders/load_attack.py` from the project root without
 # requiring PYTHONPATH=. — convenient when invoking via cron/CI.
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -37,7 +37,7 @@ from app.pipeline.attack_loader import (  # noqa: E402
     STIX_TYPE_TO_LABEL,
     AttackLoader,
 )
-from eval.AttackGraph._run_utils import (  # noqa: E402
+from eval.AttackGraph.lib._run_utils import (  # noqa: E402
     append_run_card,
     resolve_report_path,
     resolve_run_dir,

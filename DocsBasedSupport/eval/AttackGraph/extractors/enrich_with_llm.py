@@ -6,17 +6,17 @@ Typical workflow:
   RUN_DIR_ENRICHED=eval/AttackGraph/runs/2026-05-31_enriched_gemma3-4b
 
   # 1. baseline path report (in the baseline run folder)
-  PYTHONPATH=. python eval/AttackGraph/eval_cve_apt.py --run-dir $RUN_DIR --variant baseline
+  PYTHONPATH=. python eval/AttackGraph/evals/eval_cve_apt.py --run-dir $RUN_DIR --variant baseline
 
   # 2. ask the LLM to extract any CVEs mentioned in entity descriptions
-  PYTHONPATH=. python eval/AttackGraph/enrich_with_llm.py \\
+  PYTHONPATH=. python eval/AttackGraph/extractors/enrich_with_llm.py \\
       --labels ThreatActor Malware Tool Campaign --run-dir $RUN_DIR_ENRICHED
 
   # 3. recompute PageRank / Louvain over the now-enriched graph
-  PYTHONPATH=. python eval/AttackGraph/load_attack.py --enrich --run-dir $RUN_DIR_ENRICHED
+  PYTHONPATH=. python eval/AttackGraph/loaders/load_attack.py --enrich --run-dir $RUN_DIR_ENRICHED
 
   # 4. enriched path report -- compare with step 1 in the thesis text
-  PYTHONPATH=. python eval/AttackGraph/eval_cve_apt.py --run-dir $RUN_DIR_ENRICHED --variant enriched
+  PYTHONPATH=. python eval/AttackGraph/evals/eval_cve_apt.py --run-dir $RUN_DIR_ENRICHED --variant enriched
 
 The LLM model is taken from settings.yaml (``llm_extract_model`` by default).
 Use ``--model`` to override on the CLI without touching the YAML.
@@ -31,7 +31,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -39,7 +39,7 @@ from app.core.config import get_settings  # noqa: E402
 from app.core.llm_factory import build_chat_llm  # noqa: E402
 from app.graph.neo4j_store import Neo4jStore  # noqa: E402
 from app.pipeline.attack_enrichment import AttackDescriptionEnricher  # noqa: E402
-from eval.AttackGraph._run_utils import (  # noqa: E402
+from eval.AttackGraph.lib._run_utils import (  # noqa: E402
     append_run_card,
     resolve_report_path,
     resolve_run_dir,

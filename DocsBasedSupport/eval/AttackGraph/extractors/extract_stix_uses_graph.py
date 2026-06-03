@@ -6,12 +6,12 @@ edges; results are written as ``USES_EXTRACTED`` so deterministic STIX stays int
 
 Usage::
 
-    PYTHONPATH=. python eval/AttackGraph/load_attack.py --enrich --reset
-    PYTHONPATH=. python eval/AttackGraph/extract_stix_uses_graph.py \\
+    PYTHONPATH=. python eval/AttackGraph/loaders/load_attack.py --enrich --reset
+    PYTHONPATH=. python eval/AttackGraph/extractors/extract_stix_uses_graph.py \\
         --model gemma3:4b --reset --run-dir eval/AttackGraph/runs/stix-llm-gemma3-4b
-    PYTHONPATH=. python eval/AttackGraph/eval_stix_extraction_quality.py \\
+    PYTHONPATH=. python eval/AttackGraph/evals/eval_stix_extraction_quality.py \\
         --graph-variant llm-extracted:gemma3-4b --run-dir ...
-    PYTHONPATH=. python eval/AttackGraph/eval_link_prediction.py \\
+    PYTHONPATH=. python eval/AttackGraph/evals/eval_link_prediction.py \\
         --graph-variant llm-extracted:gemma3-4b --run-dir ...
 """
 
@@ -24,7 +24,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -33,10 +33,10 @@ from app.core.llm_factory import build_chat_llm  # noqa: E402
 from app.graph.neo4j_store import Neo4jStore  # noqa: E402
 from app.pipeline.attack_uses_extractor import AttackUsesExtractor  # noqa: E402
 from app.pipeline.attack_graph_variants import build_llm_extracted_variant  # noqa: E402
-from eval.AttackGraph._run_utils import append_run_card, resolve_report_path, resolve_run_dir  # noqa: E402
-from eval.AttackGraph.load_attack import DEFAULT_BUNDLE_PATH, DEFAULT_BUNDLE_URL, _ensure_bundle  # noqa: E402
-from eval.AttackGraph.stix_actor_reports import build_actor_reports, reports_to_corpus_payload  # noqa: E402
-from eval.AttackGraph.stix_document_structure import (  # noqa: E402
+from eval.AttackGraph.lib._run_utils import append_run_card, resolve_report_path, resolve_run_dir  # noqa: E402
+from eval.AttackGraph.loaders.load_attack import DEFAULT_BUNDLE_PATH, DEFAULT_BUNDLE_URL, _ensure_bundle  # noqa: E402
+from eval.AttackGraph.lib.stix_actor_reports import build_actor_reports, reports_to_corpus_payload  # noqa: E402
+from eval.AttackGraph.lib.stix_document_structure import (  # noqa: E402
     apply_structure_profile,
     corpus_structure_summary,
     structure_profiles,
@@ -167,9 +167,9 @@ def main(argv: list[str] | None = None) -> int:
             ],
             "edges_written": written,
             "next_commands": [
-                f"PYTHONPATH=. python eval/AttackGraph/eval_stix_extraction_quality.py "
+                f"PYTHONPATH=. python eval/AttackGraph/evals/eval_stix_extraction_quality.py "
                 f'--graph-variant "{summary.graph_variant}" --run-dir {run_dir}',
-                f"PYTHONPATH=. python eval/AttackGraph/eval_link_prediction.py "
+                f"PYTHONPATH=. python eval/AttackGraph/evals/eval_link_prediction.py "
                 f'--graph-variant "{summary.graph_variant}" --run-dir {run_dir}',
             ],
         }

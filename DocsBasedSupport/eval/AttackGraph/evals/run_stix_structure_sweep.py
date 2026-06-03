@@ -6,7 +6,7 @@ Each profile writes a separate ``graph_variant`` so clean STIX and other models 
 Usage::
 
     cd DocsBasedSupport
-    PYTHONPATH=. python eval/AttackGraph/run_stix_structure_sweep.py \\
+    PYTHONPATH=. python eval/AttackGraph/evals/run_stix_structure_sweep.py \\
         --model gpt-oss:20b-cloud --profiles mild,moderate,severe
 """
 
@@ -17,7 +17,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_PROFILES = ("mild", "moderate", "severe")
 
 
@@ -49,7 +49,7 @@ def main(argv: list[str] | None = None) -> int:
         run_dir.mkdir(parents=True, exist_ok=True)
         extract_cmd = [
             py,
-            "eval/AttackGraph/extract_stix_uses_graph.py",
+            "eval/AttackGraph/extractors/extract_stix_uses_graph.py",
             "--model",
             args.model,
             "--structure-profile",
@@ -74,7 +74,7 @@ def main(argv: list[str] | None = None) -> int:
         _run(
             [
                 py,
-                "eval/AttackGraph/eval_stix_extraction_quality.py",
+                "eval/AttackGraph/evals/eval_stix_extraction_quality.py",
                 "--graph-variant",
                 variant,
                 "--run-dir",
@@ -85,7 +85,7 @@ def main(argv: list[str] | None = None) -> int:
         _run(
             [
                 py,
-                "eval/AttackGraph/eval_link_prediction.py",
+                "eval/AttackGraph/evals/eval_link_prediction.py",
                 "--graph-variant",
                 variant,
                 "--run-dir",
@@ -96,7 +96,7 @@ def main(argv: list[str] | None = None) -> int:
 
     summarize = [
         py,
-        "eval/AttackGraph/summarize_structure_sweep.py",
+        "eval/AttackGraph/evals/summarize_structure_sweep.py",
         "--model",
         args.model,
         "--profiles",

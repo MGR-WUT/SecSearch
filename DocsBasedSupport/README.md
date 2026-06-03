@@ -194,9 +194,9 @@ Key points:
 End-to-end run (after `docker compose up -d` and `pip install -r requirements.txt`):
 
 ```bash
-PYTHONPATH=. python eval/AttackGraph/load_attack.py --enrich --reset
-PYTHONPATH=. python eval/AttackGraph/eval_link_prediction.py
-PYTHONPATH=. python eval/AttackGraph/community_report.py
+PYTHONPATH=. python eval/AttackGraph/loaders/load_attack.py --enrich --reset
+PYTHONPATH=. python eval/AttackGraph/evals/eval_link_prediction.py
+PYTHONPATH=. python eval/AttackGraph/evals/community_report.py
 ```
 
 Outputs land in `eval/AttackGraph/reports/`:

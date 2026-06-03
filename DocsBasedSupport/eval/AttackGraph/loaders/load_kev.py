@@ -2,7 +2,7 @@
 
 Usage::
 
-    PYTHONPATH=. python eval/AttackGraph/load_kev.py --run-dir eval/AttackGraph/runs/kev-load
+    PYTHONPATH=. python eval/AttackGraph/loaders/load_kev.py --run-dir eval/AttackGraph/runs/kev-load
 """
 
 from __future__ import annotations
@@ -16,14 +16,14 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from app.core.config import get_settings  # noqa: E402
 from app.graph.neo4j_store import GraphEntity, Neo4jStore  # noqa: E402
-from eval.AttackGraph._run_utils import append_run_card, resolve_report_path, resolve_run_dir  # noqa: E402
-from eval.AttackGraph.graph_constants import DEFAULT_KEV_URL, KEV_SOURCE_ID, KEV_SOURCE_URI  # noqa: E402
+from eval.AttackGraph.lib._run_utils import append_run_card, resolve_report_path, resolve_run_dir  # noqa: E402
+from eval.AttackGraph.lib.graph_constants import DEFAULT_KEV_URL, KEV_SOURCE_ID, KEV_SOURCE_URI  # noqa: E402
 
 DEFAULT_REPORT_FILENAME = "kev_load_summary.json"
 

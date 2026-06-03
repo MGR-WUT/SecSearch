@@ -22,7 +22,7 @@ We compare four ranking strategies against the held-out edges:
 
 The experiment is reproducible via a seeded random split and writes a single
 report JSON. It assumes the ATT&CK bundle has already been loaded via
-``eval/AttackGraph/load_attack.py``.
+``eval/AttackGraph/loaders/load_attack.py``.
 """
 
 from __future__ import annotations
@@ -37,18 +37,18 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from app.core.config import get_settings  # noqa: E402
 from app.graph.neo4j_store import Neo4jStore  # noqa: E402
-from eval.AttackGraph._run_utils import (  # noqa: E402
+from eval.AttackGraph.lib._run_utils import (  # noqa: E402
     append_run_card,
     resolve_report_path,
     resolve_run_dir,
 )
-from eval.AttackGraph.graph_constants import (  # noqa: E402
+from eval.AttackGraph.lib.graph_constants import (  # noqa: E402
     GRAPH_VARIANT_STIX,
     USES_EXTRACTED_REL,
     actor_technique_uses_rel,

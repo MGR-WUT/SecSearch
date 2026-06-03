@@ -22,13 +22,13 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from app.core.config import get_settings  # noqa: E402
 from app.graph.neo4j_store import Neo4jStore  # noqa: E402
-from eval.AttackGraph._run_utils import (  # noqa: E402
+from eval.AttackGraph.lib._run_utils import (  # noqa: E402
     append_run_card,
     resolve_report_path,
     resolve_run_dir,
@@ -245,7 +245,7 @@ def main(argv: list[str] | None = None) -> int:
         if enriched_count == 0:
             raise SystemExit(
                 "No AttackEntity nodes have both pagerank and community properties. "
-                "Re-run eval/AttackGraph/load_attack.py --enrich first."
+                "Re-run eval/AttackGraph/loaders/load_attack.py --enrich first."
             )
 
         report = {

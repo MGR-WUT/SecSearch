@@ -12,11 +12,11 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from eval.AttackGraph._run_utils import append_run_card, resolve_report_path, resolve_run_dir  # noqa: E402
+from eval.AttackGraph.lib._run_utils import append_run_card, resolve_report_path, resolve_run_dir  # noqa: E402
 
 DEFAULT_REPORT_FILENAME = "cve_scaling_report.json"
 DEFAULT_SAMPLE_CSV = "cve_attribution_sample.csv"
