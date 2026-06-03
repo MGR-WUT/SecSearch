@@ -1,0 +1,26 @@
+{
+  "generated_at": "2026-06-03T13:53:27.664493+00:00",
+  "config": {
+    "model": "gemma3:4b",
+    "graph_variant": "llm-extracted:gemma3-4b",
+    "bundle_path": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/data/ontologies/mitre_attack/enterprise-attack.json",
+    "limit": 2,
+    "reset": true,
+    "prior_edges_deleted": 14
+  },
+  "summary": {
+    "model": "llm:gemma3:4b",
+    "graph_variant": "llm-extracted:gemma3-4b",
+    "processed_actors": 2,
+    "parse_failures": 0,
+    "total_extracted_raw": 69,
+    "total_canonicalized": 58,
+    "total_dropped_unquoted": 8,
+    "total_dropped_unmatched": 0
+  },
+  "edges_written": 58,
+  "next_commands": [
+    "PYTHONPATH=. python eval/AttackGraph/eval_stix_extraction_quality.py --graph-variant \"llm-extracted:gemma3-4b\" --run-dir eval/AttackGraph/runs/stix-llm-gemma3-4b-smoke2",
+    "PYTHONPATH=. python eval/AttackGraph/eval_link_prediction.py --graph-variant \"llm-extracted:gemma3-4b\" --run-dir eval/AttackGraph/runs/stix-llm-gemma3-4b-smoke2"
+  ]
+}

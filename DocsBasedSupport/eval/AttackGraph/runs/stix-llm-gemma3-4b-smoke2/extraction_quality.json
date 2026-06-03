@@ -1,0 +1,32 @@
+{
+  "generated_at": "2026-06-03T13:55:00.327709+00:00",
+  "config": {
+    "graph_variant": "llm-extracted:gemma3-4b",
+    "corpus_path": "eval/AttackGraph/runs/stix-llm-gemma3-4b-smoke2/stix_actor_corpus.json"
+  },
+  "counts": {
+    "predicted_uses_edges": 58,
+    "predicted_actors": 2,
+    "predicted_techniques": 56,
+    "gold_pairs_corpus": 89,
+    "gold_pairs_stix_restricted": 89
+  },
+  "actor_technique_pairs_vs_corpus_gold": {
+    "precision": 1.0,
+    "recall": 0.6517,
+    "f1": 0.7891,
+    "support": 89,
+    "true_positives": 58,
+    "false_positives": 0,
+    "false_negatives": 31
+  },
+  "actor_technique_pairs_vs_stix_gold": {
+    "precision": 1.0,
+    "recall": 0.6517,
+    "f1": 0.7891,
+    "support": 89,
+    "true_positives": 58,
+    "false_positives": 0,
+    "false_negatives": 31
+  }
+}

@@ -1,0 +1,217 @@
+{
+  "generated_at": "2026-06-03T13:55:01.863119+00:00",
+  "config": {
+    "seed": 20260529,
+    "hold_out_fraction": 0.2,
+    "top_ks": [
+      5,
+      10,
+      20,
+      50
+    ],
+    "max_actors": null,
+    "graph_variant": "llm-extracted:gemma3-4b",
+    "num_held_out_edges": 11,
+    "num_total_edges": 58,
+    "num_evaluated_actors": 2,
+    "num_candidates": 697
+  },
+  "aggregated": {
+    "random": {
+      "hits@10": 0.0,
+      "hits@20": 0.0,
+      "hits@5": 0.0,
+      "hits@50": 0.5,
+      "mrr": 0.020866454689984104,
+      "precision@10": 0.0,
+      "precision@20": 0.0,
+      "precision@5": 0.0,
+      "precision@50": 0.01,
+      "recall@10": 0.0,
+      "recall@20": 0.0,
+      "recall@5": 0.0,
+      "recall@50": 0.07142857142857142
+    },
+    "popularity": {
+      "hits@10": 0.5,
+      "hits@20": 1.0,
+      "hits@5": 0.0,
+      "hits@50": 1.0,
+      "mrr": 0.11274509803921567,
+      "precision@10": 0.05,
+      "precision@20": 0.05,
+      "precision@5": 0.0,
+      "precision@50": 0.04,
+      "recall@10": 0.125,
+      "recall@20": 0.19642857142857142,
+      "recall@5": 0.0,
+      "recall@50": 0.3392857142857143
+    },
+    "neighbour": {
+      "hits@10": 0.0,
+      "hits@20": 1.0,
+      "hits@5": 0.0,
+      "hits@50": 1.0,
+      "mrr": 0.075,
+      "precision@10": 0.0,
+      "precision@20": 0.05,
+      "precision@5": 0.0,
+      "precision@50": 0.03,
+      "recall@10": 0.0,
+      "recall@20": 0.19642857142857142,
+      "recall@5": 0.0,
+      "recall@50": 0.26785714285714285
+    },
+    "neighbour_pagerank": {
+      "hits@10": 0.5,
+      "hits@20": 0.5,
+      "hits@5": 0.5,
+      "hits@50": 1.0,
+      "mrr": 0.140625,
+      "precision@10": 0.05,
+      "precision@20": 0.025,
+      "precision@5": 0.1,
+      "precision@50": 0.02,
+      "recall@10": 0.125,
+      "recall@20": 0.125,
+      "recall@5": 0.125,
+      "recall@50": 0.19642857142857142
+    }
+  },
+  "per_actor": [
+    {
+      "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+      "actor_name": "APT38",
+      "held_out_count": 7,
+      "metrics": {
+        "random": {
+          "hits@5": 0.0,
+          "precision@5": 0.0,
+          "recall@5": 0.0,
+          "hits@10": 0.0,
+          "precision@10": 0.0,
+          "recall@10": 0.0,
+          "hits@20": 0.0,
+          "precision@20": 0.0,
+          "recall@20": 0.0,
+          "hits@50": 1.0,
+          "precision@50": 0.02,
+          "recall@50": 0.14285714285714285,
+          "mrr": 0.02702702702702703
+        },
+        "popularity": {
+          "hits@5": 0.0,
+          "precision@5": 0.0,
+          "recall@5": 0.0,
+          "hits@10": 0.0,
+          "precision@10": 0.0,
+          "recall@10": 0.0,
+          "hits@20": 1.0,
+          "precision@20": 0.05,
+          "recall@20": 0.14285714285714285,
+          "hits@50": 1.0,
+          "precision@50": 0.06,
+          "recall@50": 0.42857142857142855,
+          "mrr": 0.058823529411764705
+        },
+        "neighbour": {
+          "hits@5": 0.0,
+          "precision@5": 0.0,
+          "recall@5": 0.0,
+          "hits@10": 0.0,
+          "precision@10": 0.0,
+          "recall@10": 0.0,
+          "hits@20": 1.0,
+          "precision@20": 0.05,
+          "recall@20": 0.14285714285714285,
+          "hits@50": 1.0,
+          "precision@50": 0.04,
+          "recall@50": 0.2857142857142857,
+          "mrr": 0.06666666666666667
+        },
+        "neighbour_pagerank": {
+          "hits@5": 0.0,
+          "precision@5": 0.0,
+          "recall@5": 0.0,
+          "hits@10": 0.0,
+          "precision@10": 0.0,
+          "recall@10": 0.0,
+          "hits@20": 0.0,
+          "precision@20": 0.0,
+          "recall@20": 0.0,
+          "hits@50": 1.0,
+          "precision@50": 0.02,
+          "recall@50": 0.14285714285714285,
+          "mrr": 0.03125
+        }
+      }
+    },
+    {
+      "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+      "actor_name": "Indrik Spider",
+      "held_out_count": 4,
+      "metrics": {
+        "random": {
+          "hits@5": 0.0,
+          "precision@5": 0.0,
+          "recall@5": 0.0,
+          "hits@10": 0.0,
+          "precision@10": 0.0,
+          "recall@10": 0.0,
+          "hits@20": 0.0,
+          "precision@20": 0.0,
+          "recall@20": 0.0,
+          "hits@50": 0.0,
+          "precision@50": 0.0,
+          "recall@50": 0.0,
+          "mrr": 0.014705882352941176
+        },
+        "popularity": {
+          "hits@5": 0.0,
+          "precision@5": 0.0,
+          "recall@5": 0.0,
+          "hits@10": 1.0,
+          "precision@10": 0.1,
+          "recall@10": 0.25,
+          "hits@20": 1.0,
+          "precision@20": 0.05,
+          "recall@20": 0.25,
+          "hits@50": 1.0,
+          "precision@50": 0.02,
+          "recall@50": 0.25,
+          "mrr": 0.16666666666666666
+        },
+        "neighbour": {
+          "hits@5": 0.0,
+          "precision@5": 0.0,
+          "recall@5": 0.0,
+          "hits@10": 0.0,
+          "precision@10": 0.0,
+          "recall@10": 0.0,
+          "hits@20": 1.0,
+          "precision@20": 0.05,
+          "recall@20": 0.25,
+          "hits@50": 1.0,
+          "precision@50": 0.02,
+          "recall@50": 0.25,
+          "mrr": 0.08333333333333333
+        },
+        "neighbour_pagerank": {
+          "hits@5": 1.0,
+          "precision@5": 0.2,
+          "recall@5": 0.25,
+          "hits@10": 1.0,
+          "precision@10": 0.1,
+          "recall@10": 0.25,
+          "hits@20": 1.0,
+          "precision@20": 0.05,
+          "recall@20": 0.25,
+          "hits@50": 1.0,
+          "precision@50": 0.02,
+          "recall@50": 0.25,
+          "mrr": 0.25
+        }
+      }
+    }
+  ]
+}

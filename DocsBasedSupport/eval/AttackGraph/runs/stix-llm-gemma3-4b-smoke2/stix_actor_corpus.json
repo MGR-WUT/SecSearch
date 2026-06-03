@@ -1,0 +1,379 @@
+{
+  "documents": [
+    {
+      "actor_entity_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+      "actor_name": "APT38",
+      "actor_external_id": "G0082",
+      "text_chars": 13931,
+      "gold_uses_count": 56,
+      "gold_pairs": [
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--b80d107d-fa0d-4b60-9684-b0433e8bdba0"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--43e7dc91-05b2-474c-b9ac-2ed4fe101f4d"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--03d7999c-1f4c-42cc-8373-e7690d318104"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--57340c81-c025-4189-8fa0-fc7ede51bae4"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--7e150503-88e7-4861-866b-ff1ac82c4475"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--d63a3fb8-9452-4e9d-a60a-54be68d5998c"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--e51137a5-1cdc-499e-911a-abaedaa5ac86"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--09a60ea3-a8d1-4ae5-976e-5783248b72a4"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--cba37adb-d6fb-4610-b069-dd04c0643384"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--2959d63f-73fd-46a1-abd2-109d7dcede32"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--120d5519-3098-4e1c-9191-2aa61232f073"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--d742a578-d70e-4d0e-96a6-02a9c30204e6"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--7bc57495-ea59-4380-be31-a64af124ef18"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--d1fcf083-a721-4223-aedf-bf8960798d62"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--3ccef7ae-cb5e-48f6-8302-897105fbf55c"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--dfd7cc1d-e1d8-4394-a198-97c4cab8aa67"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--ff73aa03-0090-4464-83ac-f89e233c02bc"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--ef67e13e-5598-4adc-bdb2-998225874fa9"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--df8b2a25-8bdf-4856-953c-a04372b1c161"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--e6919abc-99f9-4c6c-95a5-14761e7b2add"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--bbde9781-60aa-4b8a-a911-895b0c1b3872"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--deb98323-e13f-4b0c-8d94-175379069062"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--5e4a2073-9643-44cb-a0b5-e7f4048446c7"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--75b9a4d2-d4e2-4ca1-9aab-1badd9e05fd0"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--840a987a-99bd-4a80-a5c9-0cb2baa6cade"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--47f2d673-ca62-47e9-929b-1b0be9657611"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--eec096b8-c207-43df-b6c1-11523861e452"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--d45a3d09-b3cf-48f4-9f0f-f521ee5cb05c"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--a93494bb-4b80-4ea1-8695-3236a49916fd"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--3489cfc5-640f-4bb3-a103-9137b97de79f"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--7e7c2fba-7cca-486c-9582-4c1bb2851961"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--354a7f88-63fb-41b5-a801-ce3b377b36f1"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--d0613359-5781-4fd2-b5be-c269270be1f6"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--a29aa77c-a88d-4f19-bab9-7751941b2e2d"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--0af0ca99-357d-4ba1-805f-674fdfb7bef9"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--bd5b58a4-a52d-4a29-bc0d-3f1d3968eb6b"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--b831f51c-d22f-4724-bbab-60d056bd1150"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--005a06c6-14bf-4118-afa0-ebcd8aebb0c9"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--a2fdce72-04b2-409a-ac10-cc1695f4fce0"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--5d0d3609-d06d-49e1-b9c9-b544e0c618cb"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--30973a08-aed9-4edf-8604-9084ce1b5c4f"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--045d0922-2310-4e60-b5e4-3302302cb3c5"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--32ad5c86-2bcf-47d8-8fdc-d7f3d79a7490"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--40f5caa0-4cb7-4117-89fc-d421bb493df3"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--391d824f-0ef1-47a0-b0ee-c59a75e27670"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--a6937325-9321-4e2e-bb2b-3ed2d40b2a9d"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--232b7f21-adf9-4b42-b936-b9d6f7df856e"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--1cfcb312-b8d7-47a4-b560-4b16cc677292"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--3c4a2599-71ee-4405-ba1e-0e28414b4bc5"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--970a3432-3237-47ad-bcca-7d8cbb217736"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--2acf44aa-542f-4366-b4eb-55ef5747759c"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--2e34237d-8574-43f6-aace-ae2915de8597"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--365be77f-fc0e-42ee-bac8-4faf806d9336"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--f1951e8a-500e-4a26-8803-76d95c4554b4"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--49fca0d2-685d-41eb-8bd4-05451cc3a742"
+        },
+        {
+          "actor_id": "attack:intrusion-set--00f67a77-86a4-4adf-be26-1a54fc713340",
+          "technique_id": "attack:attack-pattern--8f4a33ec-8b1f-4b80-a2f6-642b2e479580"
+        }
+      ]
+    },
+    {
+      "actor_entity_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+      "actor_name": "Indrik Spider",
+      "actor_external_id": "G0119",
+      "text_chars": 9194,
+      "gold_uses_count": 33,
+      "gold_pairs": [
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--65f2d882-3f41-4d48-8a06-29af77ec9f90"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--212306d8-efa4-44c9-8c2d-ed3d2e224aa0"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--e01be9c5-e763-4caf-aeb7-000b416aef67"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--57340c81-c025-4189-8fa0-fc7ede51bae4"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--1c4e5d32-1fe9-4116-9d9d-59e3925bd6a2"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--322bad5a-1c49-4d23-ab79-76d641794afa"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--0458aab9-ad42-4eac-9e22-706a95bafee2"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--bbde9781-60aa-4b8a-a911-895b0c1b3872"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--1c34f7aa-9341-4a48-bfab-af22e51aca6c"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--eb062747-2193-45de-8fa2-e62549c37ddf"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--315f51f0-6b03-4c1e-bfb2-84740afb8e21"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--9d48cab2-7929-4812-ad22-f536665f0109"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--970a3432-3237-47ad-bcca-7d8cbb217736"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--c3d4bdd9-2cfe-4a80-9d0c-07a29ecdce8f"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--837f9164-50af-4ac0-8219-379d8a74cefc"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--bf1b6176-597c-4600-bfcd-ac989670f96b"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--d1fcf083-a721-4223-aedf-bf8960798d62"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--5d2be8b9-d24c-4e98-83bf-2f5f79477163"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--01a5a209-b94c-450b-b7f9-946497d91055"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--b17a1a56-e99c-403c-8948-561df0cffe81"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--b80d107d-fa0d-4b60-9684-b0433e8bdba0"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--75b9a4d2-d4e2-4ca1-9aab-1badd9e05fd0"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--635cbe30-392d-4e27-978e-66774357c762"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--e358d692-23c0-4a31-9eb6-ecc13a8d7735"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--0f4a0c76-ab2d-4cb0-85d3-3f0efb8cba0d"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--65013dd2-bc61-43e3-afb5-a14c4fa7437a"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--e6919abc-99f9-4c6c-95a5-14761e7b2add"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--20fb2507-d71c-455d-9b6d-6104461cf26b"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--c32f7008-9fea-41f7-8366-5eb9b74bd896"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--f2877f7f-9a4c-4251-879f-1224e3006bee"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--232b7f21-adf9-4b42-b936-b9d6f7df856e"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--2db31dcd-54da-405d-acef-b9129b816ed6"
+        },
+        {
+          "actor_id": "attack:intrusion-set--01e28736-2ffc-455b-9880-ed4d1407ae07",
+          "technique_id": "attack:attack-pattern--e196b5c5-8118-4a1c-ab8a-936586ce3db5"
+        }
+      ]
+    }
+  ],
+  "total_gold_pairs": 89
+}

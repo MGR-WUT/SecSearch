@@ -1,0 +1,26 @@
+{
+  "generated_at": "2026-06-03T14:29:25.119981+00:00",
+  "config": {
+    "model": "gpt-oss:20b-cloud",
+    "graph_variant": "llm-extracted:gpt-oss-20b-cloud",
+    "bundle_path": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/data/ontologies/mitre_attack/enterprise-attack.json",
+    "limit": null,
+    "reset": true,
+    "prior_edges_deleted": 0
+  },
+  "summary": {
+    "model": "llm:gpt-oss:20b-cloud",
+    "graph_variant": "llm-extracted:gpt-oss-20b-cloud",
+    "processed_actors": 170,
+    "parse_failures": 12,
+    "total_extracted_raw": 2745,
+    "total_canonicalized": 2693,
+    "total_dropped_unquoted": 40,
+    "total_dropped_unmatched": 12
+  },
+  "edges_written": 2693,
+  "next_commands": [
+    "PYTHONPATH=. python eval/AttackGraph/eval_stix_extraction_quality.py --graph-variant \"llm-extracted:gpt-oss-20b-cloud\" --run-dir eval/AttackGraph/runs/stix-llm-gpt-oss-20b-cloud",
+    "PYTHONPATH=. python eval/AttackGraph/eval_link_prediction.py --graph-variant \"llm-extracted:gpt-oss-20b-cloud\" --run-dir eval/AttackGraph/runs/stix-llm-gpt-oss-20b-cloud"
+  ]
+}

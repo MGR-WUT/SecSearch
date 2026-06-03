@@ -1,3 +1,4 @@
+import os
 from functools import lru_cache
 from pathlib import Path
 
@@ -95,9 +96,26 @@ def _load_yaml_settings() -> dict[str, object]:
     return loaded
 
 
+_ENV_OVERRIDABLE = (
+    "neo4j_uri",
+    "neo4j_username",
+    "neo4j_password",
+    "neo4j_database",
+)
+
+
+def _load_settings_kwargs() -> dict[str, object]:
+    """YAML defaults with optional env override (for parallel Neo4j instances)."""
+    data = _load_yaml_settings()
+    for key in _ENV_OVERRIDABLE:
+        if os.environ.get(key.upper()):
+            data.pop(key, None)
+    return data
+
+
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
-    settings = Settings(**_load_yaml_settings())
+    settings = Settings(**_load_settings_kwargs())
     settings.validate_required()
     settings.validate_local_only()
     return settings

@@ -272,6 +272,7 @@ class AttackLoader:
                     "stix_type": "vulnerability",
                     "external_id": cve_id,
                     "domain": "mitre-attack-enterprise",
+                    "cve_source": "mitre-attack",
                 },
             ),
             source_id=self.source_id,

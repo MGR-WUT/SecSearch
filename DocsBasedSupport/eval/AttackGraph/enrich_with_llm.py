@@ -47,6 +47,7 @@ from eval.AttackGraph._run_utils import (  # noqa: E402
 
 DEFAULT_REPORT_FILENAME = "llm_enrichment.json"
 DEFAULT_LABELS = ("ThreatActor", "Malware", "Tool", "Campaign")
+DEFAULT_KEV_LABELS = ("CVE",)
 
 
 def _build_arg_parser() -> argparse.ArgumentParser:
@@ -79,6 +80,16 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         help="Source id used when creating new CVE nodes.",
     )
     parser.add_argument(
+        "--cve-source",
+        default=None,
+        help="When enriching CVE nodes, filter by cve_source property (mitre-attack or cisa-kev).",
+    )
+    parser.add_argument(
+        "--ingestion-model",
+        default=None,
+        help="Tag recorded in the enrichment report for the ingestion LLM variant.",
+    )
+    parser.add_argument(
         "--run-dir",
         type=Path,
         default=None,
@@ -98,26 +109,38 @@ def _build_arg_parser() -> argparse.ArgumentParser:
 
 
 def _fetch_entities(
-    store: Neo4jStore, labels: list[str], limit: int | None, force: bool
+    store: Neo4jStore,
+    labels: list[str],
+    limit: int | None,
+    force: bool,
+    *,
+    cve_source: str | None = None,
 ) -> list[dict[str, object]]:
     label_clause = " OR ".join(f"n:`{lbl}`" for lbl in labels)
     where_extra = "" if force else "AND n.llm_enriched_at IS NULL"
+    cve_filter = "AND n.cve_source = $cve_source" if cve_source else ""
     limit_clause = f"LIMIT {int(limit)}" if limit else ""
     query = f"""
     MATCH (n:AttackEntity)
     WHERE ({label_clause})
       AND n.description IS NOT NULL AND trim(n.description) <> ''
       {where_extra}
+      {cve_filter}
     RETURN n.entity_id AS entity_id,
            n.name AS name,
            [lbl IN labels(n) WHERE lbl <> 'Entity' AND lbl <> 'AttackEntity'][0] AS primary_label,
            n.external_id AS external_id,
            n.description AS description,
+           n.vendor_project AS vendor_project,
+           n.product AS product,
            n.llm_enriched_at AS llm_enriched_at
     ORDER BY n.entity_id
     {limit_clause}
     """
-    return store.run_read(query)
+    params: dict[str, object] = {}
+    if cve_source:
+        params["cve_source"] = cve_source
+    return store.run_read(query, **params)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -141,7 +164,13 @@ def main(argv: list[str] | None = None) -> int:
         database=settings.neo4j_database,
     )
     try:
-        entities = _fetch_entities(store, args.labels, args.limit, args.force)
+        entities = _fetch_entities(
+            store,
+            args.labels,
+            args.limit,
+            args.force,
+            cve_source=args.cve_source,
+        )
         logging.info(
             "Fetched %d AttackEntity nodes to enrich (labels=%s, force=%s, limit=%s).",
             len(entities),
@@ -166,6 +195,7 @@ def main(argv: list[str] | None = None) -> int:
             provider_tag=f"{settings.llm_provider}",
         )
         summary = enricher.enrich(entities, force=args.force)
+        ingestion_model = args.ingestion_model or model_name
         report = {
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "config": {
@@ -173,8 +203,10 @@ def main(argv: list[str] | None = None) -> int:
                 "limit": args.limit,
                 "force": bool(args.force),
                 "model": model_name,
+                "ingestion_model": ingestion_model,
                 "provider": settings.llm_provider,
                 "source_id": args.source_id,
+                "cve_source": args.cve_source,
             },
             "summary": summary.as_dict(),
             "per_entity": [
@@ -183,10 +215,13 @@ def main(argv: list[str] | None = None) -> int:
                     "new_cve_nodes": r.new_cve_nodes,
                     "new_exploits_edges": r.new_exploits_edges,
                     "new_attribution_edges": r.new_attribution_edges,
+                    "new_actor_exploit_edges": r.new_actor_exploit_edges,
+                    "new_malware_exploit_edges": r.new_malware_exploit_edges,
                     "extracted_count": r.extracted_count,
                     "extracted_actor_count": r.extracted_actor_count,
                     "dropped_unquoted": r.dropped_unquoted,
                     "dropped_unmatched_actors": r.dropped_unmatched_actors,
+                    "dropped_unmatched_malware": r.dropped_unmatched_malware,
                     "parse_failed": r.parse_failed,
                 }
                 for r in summary.per_entity
@@ -210,8 +245,13 @@ def main(argv: list[str] | None = None) -> int:
                 "new_cve_nodes": summary.new_cve_nodes,
                 "new_exploits_edges": summary.new_exploits_edges,
                 "new_attribution_edges": summary.new_attribution_edges,
+                "new_actor_exploit_edges": summary.new_actor_exploit_edges,
+                "new_malware_exploit_edges": summary.new_malware_exploit_edges,
+                "ingestion_model": ingestion_model,
+                "cve_source": args.cve_source,
                 "dropped_unquoted": summary.dropped_unquoted,
                 "dropped_unmatched_actors": summary.dropped_unmatched_actors,
+                "dropped_unmatched_malware": summary.dropped_unmatched_malware,
                 "parse_failures": summary.parse_failures,
             },
             output_files=[report_path],

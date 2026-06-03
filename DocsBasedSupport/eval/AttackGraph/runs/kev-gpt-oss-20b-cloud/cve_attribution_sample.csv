@@ -1,0 +1,2 @@
+cve_id,actor_link_count,total_evidence_paths,top_actor_name,top_actor_paths,manual_correct,notes
+CVE-2022-39197,30,33,APT41,3,,

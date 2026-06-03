@@ -1,0 +1,32 @@
+{
+  "generated_at": "2026-06-03T15:08:14.509849+00:00",
+  "config": {
+    "graph_variant": "llm-extracted:gpt-oss-20b-cloud:struct-mild",
+    "corpus_path": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/eval/AttackGraph/runs/stix-llm-gpt-oss-20b-cloud-struct-mild/stix_actor_corpus.json"
+  },
+  "counts": {
+    "predicted_uses_edges": 3228,
+    "predicted_actors": 159,
+    "predicted_techniques": 444,
+    "gold_pairs_corpus": 4546,
+    "gold_pairs_stix_restricted": 4546
+  },
+  "actor_technique_pairs_vs_corpus_gold": {
+    "precision": 0.9975,
+    "recall": 0.7083,
+    "f1": 0.8284,
+    "support": 4546,
+    "true_positives": 3220,
+    "false_positives": 8,
+    "false_negatives": 1326
+  },
+  "actor_technique_pairs_vs_stix_gold": {
+    "precision": 0.9975,
+    "recall": 0.7083,
+    "f1": 0.8284,
+    "support": 4546,
+    "true_positives": 3220,
+    "false_positives": 8,
+    "false_negatives": 1326
+  }
+}

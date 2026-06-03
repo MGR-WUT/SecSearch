@@ -97,6 +97,19 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
+        "--cve-source",
+        default=None,
+        help=(
+            "Evaluate only CVE nodes with this cve_source (cisa-kev, mitre-attack). "
+            "Omit to include all CVE nodes."
+        ),
+    )
+    parser.add_argument(
+        "--ingestion-model",
+        default=None,
+        help="Optional label for the LLM ingestion variant (recorded in report config).",
+    )
+    parser.add_argument(
         "--report-path",
         type=Path,
         default=None,
@@ -110,13 +123,17 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _fetch_cves(store: Neo4jStore) -> list[dict[str, object]]:
+def _fetch_cves(store: Neo4jStore, cve_source: str | None) -> list[dict[str, object]]:
+    source_clause = "WHERE c.cve_source = $cve_source" if cve_source else ""
     return store.run_read(
-        """
+        f"""
         MATCH (c:CVE)
-        RETURN c.entity_id AS entity_id, c.name AS name, c.external_id AS external_id
+        {source_clause}
+        RETURN c.entity_id AS entity_id, c.name AS name, c.external_id AS external_id,
+               c.cve_source AS cve_source
         ORDER BY c.name
-        """
+        """,
+        **({"cve_source": cve_source} if cve_source else {}),
     )
 
 
@@ -301,8 +318,12 @@ def main(argv: list[str] | None = None) -> int:
         database=settings.neo4j_database,
     )
     try:
-        cves = _fetch_cves(store)
-        logging.info("Found %d CVE nodes in the graph.", len(cves))
+        cves = _fetch_cves(store, args.cve_source)
+        logging.info(
+            "Found %d CVE nodes in the graph (cve_source=%s).",
+            len(cves),
+            args.cve_source or "all",
+        )
         if not cves:
             raise SystemExit("No CVE nodes found. Run eval/AttackGraph/load_attack.py --enrich first.")
         per_cve: list[dict[str, object]] = []
@@ -331,6 +352,9 @@ def main(argv: list[str] | None = None) -> int:
                 "max_paths_per_pair": args.max_paths_per_pair,
                 "max_hops": args.max_hops,
                 "pagerank_property": args.pagerank_property,
+                "cve_source": args.cve_source,
+                "ingestion_model": args.ingestion_model,
+                "variant": args.variant,
             },
             "aggregate": _aggregate(per_cve),
             "per_cve": per_cve,
@@ -342,6 +366,8 @@ def main(argv: list[str] | None = None) -> int:
             script="eval_cve_apt.py",
             config={
                 "variant": args.variant or "(none)",
+                "cve_source": args.cve_source or "all",
+                "ingestion_model": args.ingestion_model or "(none)",
                 "top_actors": args.top_actors,
                 "max_paths_per_pair": args.max_paths_per_pair,
                 "max_hops": args.max_hops,

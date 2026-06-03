@@ -1,351 +1,242 @@
-# MITRE ATT&CK experiment for GraphoDynamo
+# MITRE ATT&CK experiments for GraphoDynamo
 
 ## Motivation
 
-WildGraphBench evaluates GraphoDynamo on general IT reference text. By design,
-that benchmark does not exercise the system's ability to map *specialised*
-cybersecurity relationships — vulnerabilities (CVEs), techniques, malware,
-campaigns and threat actors — nor does it ground the claim that PageRank and
-Louvain community detection are useful for analytical navigation over a
-security knowledge base. This experiment closes both gaps using the MITRE
-ATT&CK Enterprise STIX 2.1 bundle as a curated security graph.
+WildGraphBench evaluates GraphoDynamo on general IT reference text. It does not
+exercise **security-specific** relationships (CVEs, techniques, malware, campaigns,
+threat actors) or whether **PageRank** and **Louvain** help analysts navigate a
+security knowledge graph.
 
-## Evaluation
+This folder holds two complementary evaluations on the MITRE ATT&CK Enterprise
+STIX 2.1 bundle:
 
-### What was done
-
-Three artefacts were produced over the same Neo4j subgraph (~1840 entities,
-~21 100 relationships) loaded from the official ATT&CK Enterprise bundle:
-
-1. **Held-out link prediction** for `(ThreatActor)-[:USES]->(Technique)`
-   edges, comparing four ranking strategies on a fixed 20% test split:
-   `random`, `popularity` (Technique PageRank), `neighbour` (2-hop co-use
-   through other actors), `neighbour_pagerank` (neighbour × PageRank).
-2. **Community + centrality report** over the labelled ATT&CK subgraph,
-   recording top-PageRank nodes overall and per label, Louvain community
-   sizes, label distributions and label purity.
-3. **CVE → APT mapping** evaluated as **baseline** (deterministic ATT&CK
-   only) and **enriched** (after a controlled LLM enrichment step that
-   extracts verbatim CVE / actor mentions from entity descriptions with
-   strict validation). Each variant reports per-CVE top actors with full
-   evidence paths plus aggregate coverage.
-
-### How and why
-
-The deterministic loader writes STIX directly into Neo4j without any LLM
-round-trip. ATT&CK is canonical structured data, so any LLM re-extraction
-would inject noise and obscure whether the analytical signal comes from the
-*graph layer* or the *extractor*. PageRank and Louvain run via the same
-`enrich_subgraph` primitive GraphoDynamo uses elsewhere — no shadow analytics.
-
-The link-prediction test isolates the **structural recoverability** of removed
-`USES` edges from random and popularity-only baselines, which is the most
-direct empirical test of "does the graph capture meaningful actor–technique
-relationships?" The CVE → APT evaluator enumerates concrete evidence paths
-between each CVE node and candidate threat actors, scoring them by
-`path_count × (1 + actor.pagerank)`; this produces both an aggregate coverage
-number and ready-to-cite reasoning chains.
-
-The LLM enrichment is intentionally **narrow and conservative**: only verbatim
-CVE identifiers and only threat-actor names that already exist as ATT&CK
-nodes are accepted, and every added node or edge carries full provenance
-(`source`, `extracted_from`, `context`, `llm_provenance_id`, `created_at`).
-Pre-existing ATT&CK edges are corroborated rather than overwritten.
-
-### Scope and denominators
-
-All numbers in the next section are computed over the **entire MITRE ATT&CK
-Enterprise Matrix v18** STIX bundle — nothing is sampled or filtered for the
-evaluation. Every count below comes directly from the bundle's STIX objects:
-
-| Label | Count | Source in bundle |
-| :--- | ---: | :--- |
-| `ThreatActor` | 174 | every non-revoked `intrusion-set` object |
-| `Technique` | 697 | every non-revoked `attack-pattern` object (incl. sub-techniques) |
-| `Malware` | 726 | every non-revoked `malware` object |
-| `Tool` | 95 | every non-revoked `tool` object |
-| `Campaign` | 56 | every non-revoked `campaign` object |
-| `Mitigation` | 44 | every non-revoked `course-of-action` object |
-| `Tactic` | 15 | every `x-mitre-tactic` object |
-| `CVE` | 33 | every distinct `CVE-YYYY-NNNN` that appears in a STIX `external_references` entry with `source_name='cve'`, or as literal text inside an entity's description/name/external references |
-
-The reason "only 33 CVEs" and "only 56 campaigns" surface in the evaluation
-is that **these are the universes ATT&CK itself publishes**: ATT&CK is an
-actor- and TTP-centric ontology, and historically catalogues a CVE only when
-it has been observed in real intrusions and processed by MITRE. There is no
-selection by GraphoDynamo — every CVE node and every campaign node present in
-the bundle is included.
-
-The 18 220 `USES` edges are split 80% / 20% (deterministic, seeded) for the
-link-prediction experiment; the 20% test split contains the 909 held-out
-edges over 150 distinct actors reported below.
-
-### Results
-
-#### Held-out link prediction
-
-For each evaluated threat actor we hide a random 20% of its
-`(ThreatActor)-[:USES]->(Technique)` edges, then ask every ranking strategy:
-*given the remaining graph, where in your top-K list of the 697 candidate
-techniques does the hidden technique appear?* Metrics are averaged over the
-150 actors with at least one held-out technique.
-
-| Strategy | Hits@5 | Hits@10 | Hits@20 | Hits@50 | MRR |
-| :--- | ---: | ---: | ---: | ---: | ---: |
-| `random` | 2.7% | 6.7% | 16.0% | 36.0% | 0.033 |
-| `popularity` (PageRank only) | 34.7% | 46.7% | 60.7% | 78.0% | 0.204 |
-| `neighbour` (graph traversal) | **60.7%** | **72.0%** | **82.7%** | **92.7%** | **0.407** |
-| `neighbour_pagerank` | 43.3% | 58.0% | 78.7% | 88.0% | 0.320 |
-
-**How to read these numbers.** Each ranking strategy outputs an ordered list
-of all 697 techniques per actor.
-
-* **Hits@K** = fraction of evaluated actors for whom at least one of their
-  held-out techniques appears in the strategy's top-K list. Higher is
-  better. `random` is the chance-level baseline (≈ K/697 ≈ 0.7% at K=5);
-  `popularity` is the strongest non-relational baseline; `neighbour` is
-  the actual graph-aware strategy.
-* **MRR** (mean reciprocal rank) = average of 1/rank-of-first-hit across
-  actors. Higher = the first correct technique appears earlier in the list.
-  0.407 means on average the first correct hidden technique appears around
-  position 2–3.
-
-**What this shows.** Using only structural information from the ATT&CK
-graph (`neighbour`), we recover 72% of hidden actor↔technique edges in the
-top 10 candidates out of 697 — ten times better than chance and 1.5×
-better than ranking by raw technique popularity. The graph encodes
-actor-specific behavioural signal, not just hub centrality.
-
-#### CVE → APT mapping coverage
-
-For each of the 33 CVE nodes in ATT&CK we ask: *can we reach at least one
-named threat actor from this CVE by walking the graph through any approved
-evidence-path shape?*
-
-| Variant | CVEs mapped to ≥1 threat actor / total CVEs | Coverage | Mean actors / CVE | Mean evidence paths / CVE |
-| :--- | :---: | ---: | ---: | ---: |
-| Baseline (deterministic ATT&CK only) | 19 / 33 | 57.6% | 9.79 | 12.94 |
-| Enriched (loader + evaluator + LLM attribution) | **26 / 33** | **78.8%** | **10.58** | **14.55** |
-
-**How to read the `X / Y` fraction.** The fraction means *"covered CVEs /
-total CVEs in the loaded ATT&CK graph"*. The denominator `33` is the full
-ATT&CK Enterprise CVE universe (see *Scope and denominators* above) and is
-identical across both rows. So `19 / 33` means the baseline produces at
-least one threat-actor attribution path for 19 of the 33 ATT&CK CVEs, and
-`26 / 33` means the enriched pipeline produces at least one such path for 26
-of those same 33 CVEs — i.e. 7 additional CVEs gained an actor mapping
-without any of the previously covered ones losing one.
-
-**How to read the other columns.**
-
-* **Coverage** = the same fraction expressed as a percentage. This is the
-  primary outcome metric — it answers "for how many CVEs can the system
-  give the SOC analyst an attribution hypothesis at all?".
-* **Mean actors / CVE** = average number of distinct threat actors surfaced
-  per CVE. Computed across **all 33** CVEs (including the uncovered ones,
-  which contribute zero), so the denominator stays constant between rows
-  and the metric is directly comparable.
-* **Mean evidence paths / CVE** = average number of distinct walks
-  (technique-, malware-, tool- or campaign-mediated) that justify the
-  surfaced actors, again over all 33 CVEs.
-
-**What this shows.** The deterministic ATT&CK graph alone already attributes
-57.6% of CVEs to at least one actor. Adding actor/campaign description
-ingestion (loader fix), three extra path shapes (evaluator extension), and
-the bounded LLM campaign-attribution pass raises that to 78.8%, with no
-regression on the previously covered CVEs and with mean actors per covered
-CVE almost unchanged (≈ 10–11), confirming the new coverage is genuine new
-attribution rather than noise.
-
-#### LLM enrichment quality (campaigns only)
-
-The campaign LLM enrichment pass processed all 56 ATT&CK campaigns and
-returned:
-
-| Counter | Value | Meaning |
-| :--- | ---: | :--- |
-| `new_attribution_edges` | 13 | New `Campaign -[:ATTRIBUTED_TO]-> ThreatActor` edges added to the graph. |
-| `parse_failures` | 0 | LLM responses that failed JSON parsing. |
-| `dropped_unmatched_actors` | 28 | Actor names extracted by the LLM that did NOT correspond to any existing ATT&CK `ThreatActor` node and were therefore rejected. |
-| `dropped_unquoted` | 0 | CVE / actor mentions that could not be verified as literal text from the source description. |
-
-**What this shows.** The LLM never invented data: every extraction was either
-written as a new edge (because the actor exists in ATT&CK and is literally
-named in the description) or silently rejected. The 28 dropped mentions are
-the validator doing its job — not pipeline failures.
-
-#### Centrality and community structure
-
-| What | Examples surfaced by PageRank |
+| Experiment | Question |
 | :--- | :--- |
-| Top techniques | `T1105 Ingress Tool Transfer`, `T1027 Obfuscated Files or Information`, `T1059 Command and Scripting Interpreter` |
-| Top threat actors | Sandworm Team, APT5, APT41, Volt Typhoon |
-| Top CVEs | `CVE-2017-11774`, `CVE-2014-7169`, `CVE-2016-6662` |
+| **A** — LLM extraction + link prediction | When actor→technique edges come from **LLM extraction** on CTI-style text (not deterministic STIX), does graph-based link prediction still beat trivial baselines? |
+| **B** — CVE → APT at scale *(pending)* | On a **much larger CVE universe** (CISA KEV), does bounded LLM enrichment improve attribution coverage and stay stable at scale? |
 
-Louvain partitions the 1840 ATT&CK nodes into 30 communities. The largest
-communities are deliberately label-mixed — each cluster contains a tactic
-plus the techniques and malware used to execute it plus the actors that wield
-them — which is the expected structure for a "campaign neighbourhood" view
-and matches the qualitative use case (a SOC analyst navigating from one
-artefact to related ones via the graph).
-
-### Discussion
-
-The link-prediction numbers give the headline finding: a purely structural
-neighbour-based ranking recovers 72% of held-out actor↔technique edges in the
-top 10, versus 47% for a PageRank-only popularity baseline and 7% random.
-This is a direct, quantitative answer to *"does the graph map specialised
-actor–technique relationships?"*, and confirms that PageRank and Louvain are
-not decorative on this knowledge base.
-
-For CVE → APT mapping, the deterministic ATT&CK subgraph alone reaches 57.6%
-coverage, which already shows that the schema and the analytical layer can
-connect CVEs to threat actors through technique, malware and campaign
-intermediaries. Three additions push coverage to 78.8%:
-
-* a loader extension that also creates `EXPLOITS` edges when CVEs appear in
-  the descriptions of `ThreatActor` and `Campaign` (not only `Technique` /
-  `Malware` / `Tool`);
-* an evaluator extension that traverses three additional path shapes —
-  `Campaign -[:ATTRIBUTED_TO]-> ThreatActor`,
-  `Campaign -[:USES]-> Software -[:EXPLOITS]-> CVE` paired with attribution,
-  and direct `ThreatActor -[:EXPLOITS]-> CVE`;
-* a tightly bounded LLM enrichment pass that recovers `Campaign ↔ ThreatActor`
-  attributions from campaign descriptions where ATT&CK has not yet published
-  an explicit `attributed-to` edge.
-
-The remaining seven uncovered CVEs cluster into two categories: (i) CVEs
-referenced inside techniques or malware that no ATT&CK threat actor currently
-`USES` (e.g. `CVE-2021-30724`, `CVE-2022-42475`, `CVE-2025-22457`), and (ii)
-unattributed recent campaigns for which the LLM did not find an in-ontology
-actor name (e.g. `CVE-2023-48022`, `CVE-2024-3400`). These are upstream
-ATT&CK knowledge gaps rather than pipeline failures, and they could be
-addressed in future work by ingesting external CTI sources.
-
-The LLM enrichment is **complementary, not foundational**: the
-`dropped_unmatched_actors = 28` counter shows the validator actively rejected
-extracted actor names that were not part of ATT&CK, which keeps the graph
-conservative and the provenance audit-friendly.
-
-### What this experiment does *not* claim
-
-* It does not evaluate performance on real SIEM tickets or firewall logs —
-  that is a separate "unstructured incidents" experiment.
-* The deterministic ATT&CK graph is built without any LLM. LLM-derived nodes
-  and edges only appear after the optional `enrich_with_llm.py` step and are
-  tagged with explicit `source` and `created_via='llm-enrichment'` provenance
-  so any downstream metric can separate ATT&CK ground truth from LLM-derived
-  content.
-* The held-out link-prediction setup measures structural recoverability of
-  removed edges, not generalisation to unseen actors.
-
-### Artefacts
-
-All artefacts live inside the run folder selected via `--run-dir` (see
-*Setup and execution* below). For the runs cited here:
-
-| File | Cite for |
-| :--- | :--- |
-| `RUN.md` | Reproducibility card: every script invocation, parameters, output files. |
-| `load_summary.json` | Graph size and per-label / per-relation counts. |
-| `link_prediction.json` | Hits@K / Precision@K / Recall@K / MRR for the four ranking strategies. |
-| `community_report.json` | Top-PageRank entities and Louvain community structure. |
-| `cve_apt_paths_baseline.json` | CVE → APT mapping on the deterministic graph. |
-| `cve_apt_paths_enriched.json` | CVE → APT mapping after loader / evaluator / LLM enrichment. |
-| `llm_enrichment.json` | Per-entity / aggregate counts from the LLM enrichment pass. |
+Both use the same Neo4j ATT&CK subgraph loaded by `load_attack.py`. Experiment A
+never overwrites deterministic `USES` edges; it writes parallel `USES_EXTRACTED`
+relationships tagged by `graph_variant`.
 
 ---
 
-## Setup and execution
+## Setup
 
 ### Prerequisites
 
-Neo4j 5 with APOC + GDS plugins (provided by the project `docker-compose.yml`).
+Neo4j 5 with APOC + GDS (project `docker-compose.yml`).
 
 ```bash
 cd DocsBasedSupport
-docker compose up -d           # start Neo4j with APOC + GDS
+docker compose up -d
 pip install -r requirements.txt
 ```
 
-### Data source
+### Data and schema
 
-| Source | What it contributes | License |
-| :--- | :--- | :--- |
-| [MITRE ATT&CK Enterprise STIX 2.1](https://github.com/mitre/cti) (`enterprise-attack.json`) | All entities and explicit relationships (`uses`, `mitigates`, `subtechnique-of`, `attributed-to`, `targets`) plus CVE references and Technique→Tactic mappings via kill-chain phases. | [ATT&CK terms](https://attack.mitre.org/resources/terms-of-use/) |
-
-Downloaded on first run and stored at
-`DocsBasedSupport/data/ontologies/mitre_attack/enterprise-attack.json`
-(git-ignored).
-
-### Schema in Neo4j
-
-Every node carries `:Entity` (so existing GraphRAG retrieval keeps working)
-plus the ATT&CK-specific label below and a marker `:AttackEntity` for scoped
-Cypher queries.
-
-| Cypher label | STIX type |
+| Source | Path / note |
 | :--- | :--- |
-| `ThreatActor` | `intrusion-set` |
-| `Technique` | `attack-pattern` |
-| `Tactic` | `x-mitre-tactic` |
-| `Malware` | `malware` |
-| `Tool` | `tool` |
-| `Mitigation` | `course-of-action` |
-| `Campaign` | `campaign` |
-| `CVE` | derived from CVE references in `external_references` / descriptions |
+| [MITRE ATT&CK Enterprise STIX 2.1](https://github.com/mitre/cti) | `data/ontologies/mitre_attack/enterprise-attack.json` (downloaded on first run, git-ignored) |
 
-Edge types: `USES`, `MITIGATES`, `SUBTECHNIQUE_OF`, `ATTRIBUTED_TO`, `TARGETS`
-(STIX-direct), plus `EXPLOITS` (Technique / Malware / Tool / Campaign /
-ThreatActor → CVE) and `IN_TACTIC` (Technique → Tactic, derived from
-`kill_chain_phases`).
+Nodes: `:Entity` + ATT&CK labels (`ThreatActor`, `Technique`, `Malware`, `Tool`,
+`Campaign`, `Mitigation`, `Tactic`, `CVE`). Core edges: `USES`, `MITIGATES`,
+`SUBTECHNIQUE_OF`, `ATTRIBUTED_TO`, `TARGETS`, `EXPLOITS`, `IN_TACTIC`.
 
-### Tracking runs
+### Run folders
 
-All scripts accept a shared `--run-dir <path>` argument that follows the
-WildGraphBench `runs_*/` convention:
+Scripts accept `--run-dir eval/AttackGraph/runs/<name>/`. Each run appends a
+timestamped section to `RUN.md` with parameters and outputs.
 
-```
-eval/AttackGraph/runs/<run_name>/
-    load_summary.json
-    link_prediction.json
-    community_report.json
-    cve_apt_paths_<variant>.json
-    llm_enrichment.json
-    RUN.md
-```
-
-`RUN.md` is auto-appended by each script invocation with a timestamped
-section recording every parameter and output file. If `--run-dir` is omitted,
-each script falls back to an auto-timestamped folder under `runs/`.
-
-### Baseline run
+**Load ATT&CK (required before A or B):**
 
 ```bash
-RUN_DIR=eval/AttackGraph/runs/2026-05-31_baseline
-
-PYTHONPATH=. python eval/AttackGraph/load_attack.py --enrich --reset --run-dir $RUN_DIR
-PYTHONPATH=. python eval/AttackGraph/eval_link_prediction.py --run-dir $RUN_DIR
-PYTHONPATH=. python eval/AttackGraph/community_report.py    --run-dir $RUN_DIR
-PYTHONPATH=. python eval/AttackGraph/eval_cve_apt.py        --run-dir $RUN_DIR --variant baseline
+PYTHONPATH=. python eval/AttackGraph/load_attack.py --enrich --reset \
+    --run-dir eval/AttackGraph/runs/baseline
 ```
 
-### Enriched run
+**Clean STIX link-prediction baseline** (deterministic `USES`, no LLM — reference
+for Experiment A):
 
 ```bash
-RUN_DIR_ENRICHED=eval/AttackGraph/runs/2026-05-31_enriched_<model-tag>
-
-PYTHONPATH=. python eval/AttackGraph/enrich_with_llm.py \
-    --labels ThreatActor Malware Tool Campaign \
-    --run-dir $RUN_DIR_ENRICHED
-PYTHONPATH=. python eval/AttackGraph/load_attack.py  --enrich --run-dir $RUN_DIR_ENRICHED
-PYTHONPATH=. python eval/AttackGraph/eval_cve_apt.py --run-dir $RUN_DIR_ENRICHED --variant enriched
+PYTHONPATH=. python eval/AttackGraph/eval_link_prediction.py \
+    --run-dir eval/AttackGraph/runs/baseline
+# Canonical copy: eval/AttackGraph/reports/link_prediction.json
 ```
 
-CLI knobs of interest:
+Optional diagnostics on the same graph: `community_report.py`, `eval_cve_apt.py`
+(`--cve-source mitre-attack`) — not part of the thesis claims for A/B.
+
+### CLI knobs (shared)
 
 * `eval_link_prediction.py`: `--seed`, `--hold-out-fraction`, `--top-ks`,
-  `--max-actors`.
-* `eval_cve_apt.py`: `--variant`, `--top-actors`, `--max-paths-per-pair`,
-  `--max-hops`.
-* `enrich_with_llm.py`: `--labels`, `--limit`, `--force`, `--model`.
+  `--max-actors`, `--graph-variant` (LLM arms only).
+* `extract_stix_uses_graph.py`: `--model`, `--structure-profile`, `--limit`, `--reset`.
+
+---
+
+## Experiment A: LLM extraction on STIX text
+
+**Problem.** A held-out link-prediction score on the **deterministic** STIX graph
+(e.g. neighbour Hits@10 ≈ 72%) does not test GraphoDynamo’s **LLM extraction**
+path. We need **real extraction noise**: rebuild `(ThreatActor)-[:USES]->(Technique)`
+from prose, then re-run the same link-prediction protocol.
+
+### Methodology
+
+1. **Gold** — STIX `USES` pairs per intrusion-set (`stix_actor_reports.py`).
+2. **Documents** — Group description + MITRE prose on each `uses` relationship.
+3. **Extraction** — `extract_stix_uses_graph.py` → `USES_EXTRACTED` with
+   `graph_variant=llm-extracted:<model>`; deterministic `USES` unchanged.
+4. **Structure sweep (optional)** — `--structure-profile {structured,mild,moderate,severe}`
+   via `stix_document_structure.py`; variants
+   `llm-extracted:<model>:struct-<profile>` + `structure_metrics.json`.
+5. **Quality** — `eval_stix_extraction_quality.py`: P/R/F1 vs STIX gold.
+6. **Link prediction** — `eval_link_prediction.py --graph-variant …`; non-USES
+   structure remains deterministic STIX.
+
+| Arm | `--graph-variant` | USES layer |
+| :--- | :--- | :--- |
+| Clean baseline | *(omit)* | STIX `USES` |
+| LLM-extracted | `llm-extracted:<model>` | `USES_EXTRACTED` for that model / profile |
+
+### Commands
+
+```bash
+cd DocsBasedSupport
+RUN=eval/AttackGraph/runs/stix-llm-gpt-oss-20b-cloud
+MODEL=gpt-oss:20b-cloud
+
+PYTHONPATH=. python eval/AttackGraph/load_attack.py --enrich --reset
+
+PYTHONPATH=. python eval/AttackGraph/extract_stix_uses_graph.py \
+    --model $MODEL --reset --run-dir $RUN
+
+PYTHONPATH=. python eval/AttackGraph/eval_stix_extraction_quality.py \
+    --graph-variant llm-extracted:gpt-oss-20b-cloud --run-dir $RUN
+
+PYTHONPATH=. python eval/AttackGraph/eval_link_prediction.py \
+    --graph-variant llm-extracted:gpt-oss-20b-cloud --run-dir $RUN
+```
+
+Smoke: add `--limit N` to extraction. Compare LLM runs to clean STIX via
+`reports/link_prediction.json` or `runs/baseline/link_prediction.json`.
+
+**Structure sweep (mild / moderate / severe):**
+
+```bash
+PYTHONPATH=. python eval/AttackGraph/run_stix_structure_sweep.py \
+    --model gpt-oss:20b-cloud --profiles mild,moderate,severe
+```
+
+Summary table: `runs/structure_sweep_summary.json` (neighbour Hits@10 vs clean STIX).
+
+**Parser robustness:** list or `{"uses":[...]}` JSON, trailing-comma repair, retry
+prompt, regex fallback for `Txxxx` in text (`parse_failure_actors` in
+`stix_uses_extraction.json`). Re-extract after parser updates to refresh failure counts.
+
+### Artefacts (Experiment A)
+
+| File | Purpose |
+| :--- | :--- |
+| `stix_actor_corpus.json` | Gold pairs + document stats |
+| `structure_metrics.json` | Lack-of-structure heuristics per profile |
+| `stix_uses_extraction.json` | Extraction summary + next steps |
+| `extraction_quality.json` | P/R/F1 vs STIX gold |
+| `link_prediction.json` | Hits@K / MRR |
+
+### Results (measured)
+
+Run `runs/stix-llm-gpt-oss-20b-cloud` — model `gpt-oss:20b-cloud`, 170 actor
+documents, link-pred seed 20260529, hold-out 20%.
+
+**Extraction vs STIX gold:**
+
+| Metric | Value |
+| :--- | ---: |
+| Gold USES pairs | 4,546 |
+| Extracted edges | 2,693 |
+| Pair precision | **1.00** |
+| Pair recall | **0.592** |
+| Pair F1 | **0.744** |
+| Parse failures (first run) | 12 / 170 |
+
+Noise is **recall-dominated** (sparser graph, no contradicting pairs after validation).
+
+**Link prediction — neighbour Hits@10:**
+
+| Strategy | Clean STIX | LLM-extracted | Δ |
+| :--- | ---: | ---: | ---: |
+| random | 6.7% | 2.6% | −4.1 pp |
+| popularity | 46.7% | 42.1% | −4.6 pp |
+| **neighbour** | **72.0%** | **61.4%** | **−10.6 pp** |
+| neighbour × PageRank | 58.0% | 52.6% | −5.4 pp |
+
+MRR (neighbour): 0.407 → 0.339. `neighbour` still beats `popularity` on the extracted graph.
+
+Structure-sweep rows (mild / moderate / severe) — *pending full run*.
+
+### Claims and scope (Experiment A)
+
+**Support.** LLM-rebuilt actor→technique graphs retain useful structure for link
+prediction (neighbour Hits@10 ≈ 61% vs 72% clean) with **100% pair precision /
+~59% recall** under quote + canonicalization guards.
+
+**Caveats.** Input is **MITRE STIX-shaped prose**, not arbitrary vendor PDFs or
+tickets. Precision is pipeline-dependent. Single model, single pass. Structure
+sweep and additional models optional.
+
+---
+
+## Experiment B: CVE → APT at scale (CISA KEV)
+
+*Status: **not yet run** — section reserved for results and commands.*
+
+**Goal.** The ATT&CK graph contains only ~33 CVEs with actor linkage; reviewers
+rightly question generalisation from that denominator. Experiment B evaluates
+**coverage and enrichment lift** on the full
+[CISA KEV catalog](https://www.cisa.gov/known-exploited-vulnerabilities-catalog)
+(~1,600 CVEs), with the MITRE 33-CVE case as an optional
+`--cve-source mitre-attack` baseline.
+
+**Planned pipeline**
+
+1. `load_attack.py` — ATT&CK subgraph (path traversal + actor catalogs).
+2. `load_kev.py` — ingest KEV CVE nodes.
+3. `eval_cve_apt.py --cve-source cisa-kev --variant baseline` — graph paths only.
+4. `enrich_with_llm.py` on KEV descriptions — bounded reverse attribution.
+5. `eval_cve_apt.py --variant enriched` — post-enrichment coverage.
+6. `cve_scaling_report.py` — bootstrap stability + precision sample export.
+
+**Planned LLM variants:** `gpt-oss:20b`, `gemma3:4b` (separate run dirs per model).
+
+**Expected artefacts**
+
+| File | Purpose |
+| :--- | :--- |
+| `kev_load_summary.json` | Feed version + CVE count |
+| `cve_apt_paths_baseline.json` | Coverage without LLM |
+| `cve_apt_paths_enriched.json` | Coverage after enrichment |
+| `cve_scaling_report.json` | Bootstrap CI at subsample sizes |
+| `cve_attribution_sample.csv` | Manual precision spot-check sample |
+
+**Interpretation (when run).** KEV coverage will likely be **lower** than the
+curated ATT&CK 33-CVE figure; the valid claim is **marginal lift** and **stability**
+of enrichment at scale, not parity with small-corpus headline percentages.
+
+Commands and measured results will be added here after the run completes.
+
+---
+
+## Script index
+
+| Script | Experiment |
+| :--- | :--- |
+| `load_attack.py` | A, B |
+| `extract_stix_uses_graph.py` | A |
+| `eval_stix_extraction_quality.py` | A |
+| `eval_link_prediction.py` | A (baseline + LLM variants) |
+| `stix_actor_reports.py`, `stix_document_structure.py` | A |
+| `run_stix_structure_sweep.py`, `summarize_structure_sweep.py` | A |
+| `load_kev.py`, `enrich_with_llm.py`, `eval_cve_apt.py`, `cve_scaling_report.py` | B |
+| `community_report.py` | Optional / legacy diagnostic |

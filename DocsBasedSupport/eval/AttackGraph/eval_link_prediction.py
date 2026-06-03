@@ -48,6 +48,13 @@ from eval.AttackGraph._run_utils import (  # noqa: E402
     resolve_report_path,
     resolve_run_dir,
 )
+from eval.AttackGraph.graph_constants import (  # noqa: E402
+    GRAPH_VARIANT_STIX,
+    USES_EXTRACTED_REL,
+    actor_technique_uses_rel,
+    is_clean_stix_variant,
+    is_llm_extracted_variant,
+)
 
 DEFAULT_REPORT_FILENAME = "link_prediction.json"
 
@@ -98,6 +105,14 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         help="Explicit override for the report path. Wins over --run-dir.",
     )
     parser.add_argument(
+        "--graph-variant",
+        default=None,
+        help=(
+            "Scope evaluation to USES edges with this graph_variant. "
+            "Omit for clean MITRE STIX. Use llm-extracted:<model> from extract_stix_uses_graph.py."
+        ),
+    )
+    parser.add_argument(
         "--log-level",
         default="INFO",
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
@@ -105,13 +120,33 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _fetch_uses_edges(store: Neo4jStore) -> list[HeldOutEdge]:
+def _uses_edge_filter(graph_variant: str | None, *, rel: str = "r") -> tuple[str, dict[str, str]]:
+    """Cypher WHERE fragment and params for graph_variant-scoped USES edges."""
+    if graph_variant and is_llm_extracted_variant(graph_variant):
+        return f"AND {rel}.graph_variant = $graph_variant", {"graph_variant": graph_variant}
+    return (
+        f"AND ({rel}.graph_variant IS NULL OR {rel}.graph_variant = $graph_variant)",
+        {"graph_variant": GRAPH_VARIANT_STIX},
+    )
+
+
+def _uses_edge_filter_multi(graph_variant: str | None, rels: tuple[str, ...]) -> tuple[str, dict[str, str]]:
+    parts = [_uses_edge_filter(graph_variant, rel=rel)[0] for rel in rels]
+    _, params = _uses_edge_filter(graph_variant)
+    return " ".join(parts), params
+
+
+def _fetch_uses_edges(store: Neo4jStore, graph_variant: str | None) -> list[HeldOutEdge]:
+    uses_rel = actor_technique_uses_rel(graph_variant)
+    variant_clause, variant_params = _uses_edge_filter(graph_variant)
     rows = store.run_read(
-        """
-        MATCH (a:ThreatActor)-[r:USES]->(t:Technique)
+        f"""
+        MATCH (a:ThreatActor)-[r:{uses_rel}]->(t:Technique)
+        WHERE 1=1 {variant_clause}
         RETURN a.entity_id AS actor_id, a.name AS actor_name,
                t.entity_id AS technique_id, t.name AS technique_name
-        """
+        """,
+        **variant_params,
     )
     return [
         HeldOutEdge(
@@ -124,45 +159,79 @@ def _fetch_uses_edges(store: Neo4jStore) -> list[HeldOutEdge]:
     ]
 
 
-def _mark_held_out(store: Neo4jStore, edges: Iterable[HeldOutEdge]) -> int:
+def _mark_held_out(store: Neo4jStore, edges: Iterable[HeldOutEdge], graph_variant: str | None) -> int:
     pairs = [{"a": e.actor_id, "t": e.technique_id} for e in edges]
     if not pairs:
         return 0
+    uses_rel = actor_technique_uses_rel(graph_variant)
+    variant_clause, variant_params = _uses_edge_filter(graph_variant)
     result = store.run_write(
-        """
+        f"""
         UNWIND $pairs AS pair
-        MATCH (a:ThreatActor {entity_id: pair.a})-[r:USES]->(t:Technique {entity_id: pair.t})
+        MATCH (a:ThreatActor {{entity_id: pair.a}})-[r:{uses_rel}]->(t:Technique {{entity_id: pair.t}})
+        WHERE 1=1 {variant_clause}
         SET r.held_out = true
         RETURN count(r) AS updated
         """,
         pairs=pairs,
+        **variant_params,
     )
     return int(result[0]["updated"]) if result else 0
 
 
-def _reset_held_out(store: Neo4jStore) -> int:
+def _reset_held_out(store: Neo4jStore, graph_variant: str | None) -> int:
+    uses_rel = actor_technique_uses_rel(graph_variant)
+    variant_clause, variant_params = _uses_edge_filter(graph_variant, rel="r")
     result = store.run_write(
-        """
-        MATCH ()-[r {held_out: true}]->()
+        f"""
+        MATCH ()-[r:{uses_rel}]->()
+        WHERE r.held_out = true {variant_clause}
         SET r.held_out = false
         RETURN count(r) AS updated
-        """
+        """,
+        **variant_params,
     )
     return int(result[0]["updated"]) if result else 0
 
 
-def _project_train_graph(store: Neo4jStore) -> None:
+def _project_train_graph(store: Neo4jStore, graph_variant: str | None) -> None:
     # Drop any leftover projection first so reruns are idempotent.
     store.run_write("CALL gds.graph.drop('attack_train', false) YIELD graphName RETURN graphName")
-    store.run_write(
-        """
-        CALL gds.graph.project.cypher(
-          'attack_train',
-          'MATCH (n) WHERE n:ThreatActor OR n:Technique OR n:Tactic OR n:Malware OR n:Tool OR n:Mitigation OR n:CVE OR n:Campaign RETURN id(n) AS id, labels(n) AS labels',
+    if graph_variant and is_llm_extracted_variant(graph_variant):
+        # Keep full ATT&CK structure for context, but only the LLM-extracted USES layer.
+        rel_query = f"""
           'MATCH (a:AttackEntity)-[r]->(b:AttackEntity)
            WHERE coalesce(r.held_out, false) = false
+             AND (
+               (type(r) <> "{USES_EXTRACTED_REL}"
+                AND (r.graph_variant IS NULL OR r.graph_variant = "mitre-stix")
+                AND type(r) IN ["USES", "MITIGATES", "SUBTECHNIQUE_OF", "ATTRIBUTED_TO", "TARGETS", "EXPLOITS", "IN_TACTIC"])
+               OR (type(r) = "{USES_EXTRACTED_REL}" AND r.graph_variant = "{graph_variant}")
+             )
+           RETURN id(a) AS source, id(b) AS target, type(r) AS type'
+        """
+        node_query = (
+          "'MATCH (n) WHERE n:ThreatActor OR n:Technique OR n:Tactic OR n:Malware OR n:Tool "
+          "OR n:Mitigation OR n:CVE OR n:Campaign RETURN id(n) AS id, labels(n) AS labels'"
+        )
+    else:
+        rel_query = """
+          'MATCH (a:AttackEntity)-[r]->(b:AttackEntity)
+           WHERE coalesce(r.held_out, false) = false
+             AND (r.graph_variant IS NULL OR r.graph_variant = "mitre-stix")
              AND type(r) IN ["USES", "MITIGATES", "SUBTECHNIQUE_OF", "ATTRIBUTED_TO", "TARGETS", "EXPLOITS", "IN_TACTIC"]
            RETURN id(a) AS source, id(b) AS target, type(r) AS type'
+        """
+        node_query = (
+          "'MATCH (n) WHERE n:ThreatActor OR n:Technique OR n:Tactic OR n:Malware OR n:Tool "
+          "OR n:Mitigation OR n:CVE OR n:Campaign RETURN id(n) AS id, labels(n) AS labels'"
+        )
+    store.run_write(
+        f"""
+        CALL gds.graph.project.cypher(
+          'attack_train',
+          {node_query},
+          {rel_query}
         ) YIELD graphName, nodeCount, relationshipCount
         RETURN graphName, nodeCount, relationshipCount
         """
@@ -178,7 +247,7 @@ def _project_train_graph(store: Neo4jStore) -> None:
     store.run_write("CALL gds.graph.drop('attack_train') YIELD graphName RETURN graphName")
 
 
-def _all_technique_candidates(store: Neo4jStore) -> list[dict[str, object]]:
+def _all_technique_candidates(store: Neo4jStore, graph_variant: str | None) -> list[dict[str, object]]:
     rows = store.run_read(
         """
         MATCH (t:Technique)
@@ -192,32 +261,39 @@ def _all_technique_candidates(store: Neo4jStore) -> list[dict[str, object]]:
 
 
 def _actor_known_techniques(
-    store: Neo4jStore, actor_id: str
+    store: Neo4jStore, actor_id: str, graph_variant: str | None
 ) -> set[str]:
+    uses_rel = actor_technique_uses_rel(graph_variant)
+    variant_clause, variant_params = _uses_edge_filter(graph_variant)
     rows = store.run_read(
-        """
-        MATCH (a:ThreatActor {entity_id: $actor_id})-[r:USES]->(t:Technique)
-        WHERE coalesce(r.held_out, false) = false
+        f"""
+        MATCH (a:ThreatActor {{entity_id: $actor_id}})-[r:{uses_rel}]->(t:Technique)
+        WHERE coalesce(r.held_out, false) = false {variant_clause}
         RETURN t.entity_id AS technique_id
         """,
         actor_id=actor_id,
+        **variant_params,
     )
     return {row["technique_id"] for row in rows}
 
 
-def _neighbour_scores(store: Neo4jStore, actor_id: str) -> dict[str, int]:
+def _neighbour_scores(store: Neo4jStore, actor_id: str, graph_variant: str | None) -> dict[str, int]:
     """For a query actor, count 2-hop co-use paths through other actors (train edges only)."""
+    uses_rel = actor_technique_uses_rel(graph_variant)
+    variant_clause, variant_params = _uses_edge_filter_multi(graph_variant, ("r1", "r2", "r3"))
     rows = store.run_read(
-        """
-        MATCH (a:ThreatActor {entity_id: $actor_id})-[r1:USES]->(t:Technique)
-              <-[r2:USES]-(other:ThreatActor)-[r3:USES]->(candidate:Technique)
+        f"""
+        MATCH (a:ThreatActor {{entity_id: $actor_id}})-[r1:{uses_rel}]->(t:Technique)
+              <-[r2:{uses_rel}]-(other:ThreatActor)-[r3:{uses_rel}]->(candidate:Technique)
         WHERE coalesce(r1.held_out, false) = false
           AND coalesce(r2.held_out, false) = false
           AND coalesce(r3.held_out, false) = false
           AND other <> a
+          {variant_clause}
         RETURN candidate.entity_id AS technique_id, count(*) AS shared_path_count
         """,
         actor_id=actor_id,
+        **variant_params,
     )
     return {row["technique_id"]: int(row["shared_path_count"]) for row in rows}
 
@@ -308,20 +384,20 @@ def main(argv: list[str] | None = None) -> int:
     )
     try:
         # Always start from a clean held-out state so reruns reflect a fresh split.
-        cleared = _reset_held_out(store)
+        cleared = _reset_held_out(store, args.graph_variant)
         if cleared:
             logging.info("Cleared held_out flag on %d existing edges before split.", cleared)
 
-        all_edges = _fetch_uses_edges(store)
+        all_edges = _fetch_uses_edges(store, args.graph_variant)
         if not all_edges:
             raise SystemExit(
-                "No (ThreatActor)-[:USES]->(Technique) edges found. Run "
-                "eval/AttackGraph/load_attack.py first."
+                "No (ThreatActor)-[:USES]->(Technique) edges found for graph_variant="
+                f"{args.graph_variant!r}. Run load_attack.py and extract_stix_uses_graph.py first."
             )
         rng.shuffle(all_edges)
         held_out_count = max(1, int(len(all_edges) * args.hold_out_fraction))
         held_out = all_edges[:held_out_count]
-        marked = _mark_held_out(store, held_out)
+        marked = _mark_held_out(store, held_out, args.graph_variant)
         logging.info(
             "Held out %d/%d USES edges (%.1f%%); marked in Neo4j: %d",
             len(held_out),
@@ -330,9 +406,9 @@ def main(argv: list[str] | None = None) -> int:
             marked,
         )
 
-        _project_train_graph(store)
+        _project_train_graph(store, args.graph_variant)
 
-        candidates = _all_technique_candidates(store)
+        candidates = _all_technique_candidates(store, args.graph_variant)
         logging.info("Scoring against %d candidate techniques.", len(candidates))
 
         # Group held-out edges by actor; each actor's gold set is the techniques we hid.
@@ -352,8 +428,8 @@ def main(argv: list[str] | None = None) -> int:
 
         for actor_id in actors:
             gold = actor_to_gold[actor_id]
-            known = _actor_known_techniques(store, actor_id)
-            neighbour_scores = _neighbour_scores(store, actor_id)
+            known = _actor_known_techniques(store, actor_id, args.graph_variant)
+            neighbour_scores = _neighbour_scores(store, actor_id, args.graph_variant)
 
             rankings = {
                 "random": _filter_unseen(_rank_random(candidates, rng), known),
@@ -387,6 +463,7 @@ def main(argv: list[str] | None = None) -> int:
                 "hold_out_fraction": args.hold_out_fraction,
                 "top_ks": args.top_ks,
                 "max_actors": args.max_actors,
+                "graph_variant": args.graph_variant,
                 "num_held_out_edges": len(held_out),
                 "num_total_edges": len(all_edges),
                 "num_evaluated_actors": len(actors),
@@ -407,6 +484,7 @@ def main(argv: list[str] | None = None) -> int:
                 "hold_out_fraction": args.hold_out_fraction,
                 "top_ks": args.top_ks,
                 "max_actors": args.max_actors,
+                "graph_variant": args.graph_variant,
                 "num_held_out_edges": len(held_out),
                 "num_total_edges": len(all_edges),
                 "num_evaluated_actors": len(actors),
@@ -416,7 +494,7 @@ def main(argv: list[str] | None = None) -> int:
         )
 
         # Restore held_out flags so the graph is back to its loaded state.
-        restored = _reset_held_out(store)
+        restored = _reset_held_out(store, args.graph_variant)
         logging.info("Restored %d held-out edges to full visibility.", restored)
 
         # Pretty-print the summary table to stdout for convenience.

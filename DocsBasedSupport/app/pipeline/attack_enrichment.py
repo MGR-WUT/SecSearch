@@ -47,6 +47,8 @@ class EnrichmentResult:
     new_cve_nodes: int = 0
     new_exploits_edges: int = 0
     new_attribution_edges: int = 0
+    new_actor_exploit_edges: int = 0
+    new_malware_exploit_edges: int = 0
     skipped_no_description: bool = False
     parse_failed: bool = False
     extracted_count: int = 0
@@ -54,6 +56,7 @@ class EnrichmentResult:
     raw_response_chars: int = 0
     dropped_unquoted: int = 0
     dropped_unmatched_actors: int = 0
+    dropped_unmatched_malware: int = 0
 
 
 @dataclass
@@ -66,8 +69,11 @@ class EnrichmentSummary:
     new_cve_nodes: int = 0
     new_exploits_edges: int = 0
     new_attribution_edges: int = 0
+    new_actor_exploit_edges: int = 0
+    new_malware_exploit_edges: int = 0
     dropped_unquoted: int = 0
     dropped_unmatched_actors: int = 0
+    dropped_unmatched_malware: int = 0
     per_entity: list[EnrichmentResult] = field(default_factory=list)
 
     def as_dict(self) -> dict[str, Any]:
@@ -80,8 +86,11 @@ class EnrichmentSummary:
             "new_cve_nodes": self.new_cve_nodes,
             "new_exploits_edges": self.new_exploits_edges,
             "new_attribution_edges": self.new_attribution_edges,
+            "new_actor_exploit_edges": self.new_actor_exploit_edges,
+            "new_malware_exploit_edges": self.new_malware_exploit_edges,
             "dropped_unquoted": self.dropped_unquoted,
             "dropped_unmatched_actors": self.dropped_unmatched_actors,
+            "dropped_unmatched_malware": self.dropped_unmatched_malware,
         }
 
 
@@ -115,6 +124,33 @@ Reply with strict JSON only, no markdown:
 }}
 """
 
+_KEV_PROMPT_TEMPLATE = """You extract threat attribution mentions from a CISA KEV vulnerability entry.
+
+CVE id: {cve_id}
+Vendor / product: {vendor} / {product}
+
+Description:
+\"\"\"
+{description}
+\"\"\"
+
+Rules:
+- Return threat actor / APT group names that appear LITERALLY in the description (must match ATT&CK group names when possible).
+- Return malware or tool names that appear LITERALLY and are used to exploit this CVE.
+- For every mention include a short verbatim quote (<=200 chars) from the description.
+- DO NOT invent names not present in the text.
+
+Reply with strict JSON only:
+{{
+  "threat_actors": [
+    {{"name": "<actor/group name as written>", "context": "<short verbatim quote>"}}
+  ],
+  "malware": [
+    {{"name": "<malware name as written>", "context": "<short verbatim quote>"}}
+  ]
+}}
+"""
+
 
 LlmFn = Callable[[str], str]
 
@@ -140,6 +176,7 @@ class AttackDescriptionEnricher:
         # Used to seed a deterministic UUID-ish identifier per (entity, cve) pair.
         self._namespace = uuid.uuid5(uuid.NAMESPACE_URL, f"attack-enrichment::{self.source_label}")
         self._actor_catalog: dict[str, str] | None = None
+        self._malware_catalog: dict[str, str] | None = None
 
     def enrich(
         self,
@@ -159,19 +196,32 @@ class AttackDescriptionEnricher:
                 summary.skipped_no_description += 1
                 self._mark_processed(entity_id, parsed=False, extracted=0)
                 continue
-            result = self._enrich_one(
-                entity_id=entity_id,
-                name=str(entity.get("name") or entity_id),
-                label=str(entity.get("primary_label") or entity.get("label") or "AttackEntity"),
-                external_id=str(entity.get("external_id") or ""),
-                description=str(description),
-            )
+            label = str(entity.get("primary_label") or entity.get("label") or "AttackEntity")
+            if label == "CVE":
+                result = self._enrich_cve_one(
+                    entity_id=entity_id,
+                    cve_id=str(entity.get("external_id") or entity.get("name") or entity_id),
+                    vendor=str(entity.get("vendor_project") or ""),
+                    product=str(entity.get("product") or ""),
+                    description=str(description),
+                )
+            else:
+                result = self._enrich_one(
+                    entity_id=entity_id,
+                    name=str(entity.get("name") or entity_id),
+                    label=label,
+                    external_id=str(entity.get("external_id") or ""),
+                    description=str(description),
+                )
             summary.processed_entities += 1
             summary.new_cve_nodes += result.new_cve_nodes
             summary.new_exploits_edges += result.new_exploits_edges
             summary.new_attribution_edges += result.new_attribution_edges
+            summary.new_actor_exploit_edges += result.new_actor_exploit_edges
+            summary.new_malware_exploit_edges += result.new_malware_exploit_edges
             summary.dropped_unquoted += result.dropped_unquoted
             summary.dropped_unmatched_actors += result.dropped_unmatched_actors
+            summary.dropped_unmatched_malware += result.dropped_unmatched_malware
             if result.parse_failed:
                 summary.parse_failures += 1
             summary.per_entity.append(result)
@@ -247,6 +297,57 @@ class AttackDescriptionEnricher:
                 )
                 if created_attribution:
                     result.new_attribution_edges += 1
+        return result
+
+    def _enrich_cve_one(
+        self,
+        *,
+        entity_id: str,
+        cve_id: str,
+        vendor: str,
+        product: str,
+        description: str,
+    ) -> EnrichmentResult:
+        prompt = _KEV_PROMPT_TEMPLATE.format(
+            cve_id=cve_id,
+            vendor=vendor or "(unknown)",
+            product=product or "(unknown)",
+            description=description[:6000],
+        )
+        try:
+            raw = self._invoke_llm(prompt)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("LLM call failed for CVE %s: %s", entity_id, exc)
+            return EnrichmentResult(entity_id=entity_id, parse_failed=True)
+        result = EnrichmentResult(entity_id=entity_id, raw_response_chars=len(raw))
+        parsed = self._parse_response(raw)
+        if parsed is None:
+            result.parse_failed = True
+            return result
+        extracted_actors = self._validate_actors(parsed.get("threat_actors") or [], description)
+        extracted_malware = self._validate_malware(parsed.get("malware") or [], description)
+        result.extracted_actor_count = len(extracted_actors)
+        result.extracted_count = len(extracted_malware)
+        result.dropped_unmatched_actors = max(
+            0, len(parsed.get("threat_actors") or []) - len(extracted_actors)
+        )
+        result.dropped_unmatched_malware = max(0, len(parsed.get("malware") or []) - len(extracted_malware))
+        for actor in extracted_actors:
+            if self._write_reverse_exploit_link(
+                source_entity_id=actor["actor_entity_id"],
+                cve_entity_id=entity_id,
+                context=actor["context"],
+                created_via="llm-kev-attribution",
+            ):
+                result.new_actor_exploit_edges += 1
+        for malware in extracted_malware:
+            if self._write_reverse_exploit_link(
+                source_entity_id=malware["malware_entity_id"],
+                cve_entity_id=entity_id,
+                context=malware["context"],
+                created_via="llm-kev-malware",
+            ):
+                result.new_malware_exploit_edges += 1
         return result
 
     def _invoke_llm(self, prompt: str) -> str:
@@ -357,6 +458,115 @@ class AttackDescriptionEnricher:
                 catalog.setdefault(name.strip().lower(), str(entity_id))
         self._actor_catalog = catalog
         return catalog
+
+    def _validate_malware(self, items: Any, description: str) -> list[dict[str, str]]:
+        if not isinstance(items, list):
+            return []
+        catalog = self._get_malware_catalog()
+        kept: list[dict[str, str]] = []
+        seen_ids: set[str] = set()
+        description_lower = description.lower()
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            name = str(item.get("name", "")).strip()
+            context = str(item.get("context", "")).strip()
+            if not name or name.lower() not in description_lower:
+                continue
+            malware_entity_id = catalog.get(name.lower())
+            if not malware_entity_id:
+                continue
+            if malware_entity_id in seen_ids:
+                continue
+            if context and context not in description and context.lower() not in description_lower:
+                context = ""
+            kept.append(
+                {
+                    "name": name,
+                    "malware_entity_id": malware_entity_id,
+                    "context": context[:500],
+                }
+            )
+            seen_ids.add(malware_entity_id)
+        return kept
+
+    def _get_malware_catalog(self) -> dict[str, str]:
+        if self._malware_catalog is not None:
+            return self._malware_catalog
+        rows = self.graph_store.run_read(
+            """
+            MATCH (m:Malware)
+            RETURN m.entity_id AS entity_id, m.name AS name, m.aliases AS aliases
+            """
+        )
+        catalog: dict[str, str] = {}
+        for row in rows:
+            entity_id = row.get("entity_id")
+            if not entity_id:
+                continue
+            names: list[str] = []
+            if row.get("name"):
+                names.append(str(row["name"]))
+            aliases = row.get("aliases")
+            if isinstance(aliases, list):
+                names.extend(str(alias) for alias in aliases if alias)
+            elif aliases:
+                names.append(str(aliases))
+            for name in names:
+                catalog.setdefault(name.strip().lower(), str(entity_id))
+        self._malware_catalog = catalog
+        return catalog
+
+    def _write_reverse_exploit_link(
+        self,
+        *,
+        source_entity_id: str,
+        cve_entity_id: str,
+        context: str,
+        created_via: str,
+    ) -> bool:
+        """Write (ThreatActor|Malware)-[:EXPLOITS]->(CVE) from KEV description extraction."""
+        now = datetime.now(timezone.utc).isoformat()
+        provenance_id = str(uuid.uuid5(self._namespace, f"{source_entity_id}::EXPLOITS::{cve_entity_id}"))
+        edge_check = self.graph_store.run_read(
+            """
+            MATCH (a:AttackEntity {entity_id: $source_id})-[r:EXPLOITS]->(c:CVE {entity_id: $cve_id})
+            RETURN count(r) AS n
+            """,
+            source_id=source_entity_id,
+            cve_id=cve_entity_id,
+        )
+        if edge_check and int(edge_check[0]["n"]) > 0:
+            self.graph_store.run_write(
+                """
+                MATCH (a:AttackEntity {entity_id: $source_id})-[r:EXPLOITS]->(c:CVE {entity_id: $cve_id})
+                SET r.corroborated_by = coalesce(r.corroborated_by, [])
+                  + CASE WHEN $tag IN coalesce(r.corroborated_by, []) THEN [] ELSE [$tag] END,
+                  r.corroborated_at = $now
+                RETURN count(r) AS n
+                """,
+                source_id=source_entity_id,
+                cve_id=cve_entity_id,
+                tag=self.source_label,
+                now=now,
+            )
+            return False
+        self.graph_store.upsert_relation(
+            GraphRelation(
+                source_id=source_entity_id,
+                target_id=cve_entity_id,
+                relation_type=ENRICHMENT_RELATION,
+                properties={
+                    "source": self.source_label,
+                    "extracted_from": cve_entity_id,
+                    "context": context,
+                    "llm_provenance_id": provenance_id,
+                    "created_via": created_via,
+                    "created_at": now,
+                },
+            )
+        )
+        return True
 
     def _write_cve_link(self, *, entity_id: str, cve_id: str, context: str) -> tuple[bool, bool]:
         now = datetime.now(timezone.utc).isoformat()

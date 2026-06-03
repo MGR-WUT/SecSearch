@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-06-03T15:37:29.767568+00:00",
+  "config": {
+    "model": "gpt-oss:20b-cloud",
+    "graph_variant": "llm-extracted:gpt-oss-20b-cloud:struct-moderate",
+    "structure_profile": "moderate",
+    "structure_seed": 20260603,
+    "structure_metrics": {
+      "header_line_ratio": 0.0,
+      "technique_id_per_100_words": 3.2862,
+      "avg_paragraph_words": 681.5941,
+      "paragraph_count": 1.0,
+      "mean_lack_of_structure_score": 0.6491,
+      "documents": 170
+    },
+    "bundle_path": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/data/ontologies/mitre_attack/enterprise-attack.json",
+    "limit": null,
+    "reset": true,
+    "prior_edges_deleted": 0
+  },
+  "summary": {
+    "model": "llm:gpt-oss:20b-cloud",
+    "graph_variant": "llm-extracted:gpt-oss-20b-cloud:struct-moderate",
+    "processed_actors": 170,
+    "parse_failures": 0,
+    "parse_recoveries": 39,
+    "total_extracted_raw": 2774,
+    "total_canonicalized": 2644,
+    "total_dropped_unquoted": 90,
+    "total_dropped_unmatched": 40
+  },
+  "parse_failure_actors": [],
+  "edges_written": 2644,
+  "next_commands": [
+    "PYTHONPATH=. python eval/AttackGraph/eval_stix_extraction_quality.py --graph-variant \"llm-extracted:gpt-oss-20b-cloud:struct-moderate\" --run-dir /Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/eval/AttackGraph/runs/stix-llm-gpt-oss-20b-cloud-struct-moderate",
+    "PYTHONPATH=. python eval/AttackGraph/eval_link_prediction.py --graph-variant \"llm-extracted:gpt-oss-20b-cloud:struct-moderate\" --run-dir /Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/eval/AttackGraph/runs/stix-llm-gpt-oss-20b-cloud-struct-moderate"
+  ]
+}

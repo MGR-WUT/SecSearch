@@ -1,0 +1,44 @@
+{
+  "generated_at": "2026-06-03T16:18:21.166771+00:00",
+  "config": {
+    "model": "gpt-oss:20b-cloud",
+    "graph_variant": "llm-extracted:gpt-oss-20b-cloud:struct-severe",
+    "structure_profile": "severe",
+    "structure_seed": 20260603,
+    "structure_metrics": {
+      "header_line_ratio": 0.0,
+      "technique_id_per_100_words": 0.0,
+      "avg_paragraph_words": 681.7176,
+      "paragraph_count": 1.0,
+      "mean_lack_of_structure_score": 0.9989,
+      "documents": 170
+    },
+    "bundle_path": "/Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/data/ontologies/mitre_attack/enterprise-attack.json",
+    "limit": null,
+    "reset": true,
+    "prior_edges_deleted": 0
+  },
+  "summary": {
+    "model": "llm:gpt-oss:20b-cloud",
+    "graph_variant": "llm-extracted:gpt-oss-20b-cloud:struct-severe",
+    "processed_actors": 170,
+    "parse_failures": 5,
+    "parse_recoveries": 14,
+    "total_extracted_raw": 2870,
+    "total_canonicalized": 407,
+    "total_dropped_unquoted": 2411,
+    "total_dropped_unmatched": 51
+  },
+  "parse_failure_actors": [
+    "MuddyWater",
+    "Gamaredon Group",
+    "Leafminer",
+    "MoustachedBouncer",
+    "Silent Librarian"
+  ],
+  "edges_written": 407,
+  "next_commands": [
+    "PYTHONPATH=. python eval/AttackGraph/eval_stix_extraction_quality.py --graph-variant \"llm-extracted:gpt-oss-20b-cloud:struct-severe\" --run-dir /Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/eval/AttackGraph/runs/stix-llm-gpt-oss-20b-cloud-struct-severe",
+    "PYTHONPATH=. python eval/AttackGraph/eval_link_prediction.py --graph-variant \"llm-extracted:gpt-oss-20b-cloud:struct-severe\" --run-dir /Users/bkosinski/Desktop/STUDIA/MGR/SecSearch/DocsBasedSupport/eval/AttackGraph/runs/stix-llm-gpt-oss-20b-cloud-struct-severe"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "structure_profile": "mild",
+  "structure_seed": 20260603,
+  "header_line_ratio": 0.0,
+  "technique_id_per_100_words": 3.2862,
+  "avg_paragraph_words": 22.4106,
+  "paragraph_count": 27.9824,
+  "mean_lack_of_structure_score": 0.4342,
+  "documents": 170
+}

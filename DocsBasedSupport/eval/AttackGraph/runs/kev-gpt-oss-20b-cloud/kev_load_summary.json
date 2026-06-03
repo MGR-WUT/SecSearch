@@ -1,0 +1,13 @@
+{
+  "generated_at": "2026-06-03T15:07:02.094006+00:00",
+  "config": {
+    "kev_url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
+    "sample": null,
+    "seed": 20260603,
+    "reset": true
+  },
+  "catalog_version": "2026.06.02",
+  "date_released": "2026-06-02T17:04:13.1193Z",
+  "num_cves_loaded": 1610,
+  "num_cves_in_feed": 1610
+}
