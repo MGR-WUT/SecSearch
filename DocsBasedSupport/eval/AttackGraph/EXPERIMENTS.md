@@ -94,7 +94,23 @@ documents, link-pred seed 20260529, hold-out 20%.
 
 Noise is **recall-dominated** (sparser graph, no contradicting pairs after validation).
 
-**Link prediction — neighbour Hits@10:**
+**Link prediction on the LLM-extracted graph** (`USES_EXTRACTED`,
+`graph_variant=llm-extracted:gpt-oss-20b-cloud`). 538 held-out edges across 114
+actors, 697 candidate techniques, seed 20260529, hold-out 20%. Non-USES structure
+remains deterministic STIX.
+
+| Strategy | Hits@5 | Hits@10 | Hits@20 | Hits@50 | MRR |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Random | 1.8% | 2.6% | 5.3% | 21.9% | 0.025 |
+| Popularity (PageRank only) | 33.3% | 42.1% | 53.5% | 74.6% | 0.223 |
+| **Neighbour (graph traversal)** | **50.0%** | **61.4%** | **73.7%** | **88.6%** | **0.339** |
+| Neighbour + PageRank | 39.5% | 52.6% | 71.1% | 86.8% | 0.280 |
+
+As on the clean STIX graph, the `neighbour` strategy dominates: it recovers 61.4% of
+hidden actor--technique relationships within the top ten candidates and achieves the
+highest MRR (0.339), versus 42.1% Hits@10 for the popularity-only baseline.
+
+**Link prediction — neighbour Hits@10 (clean STIX vs LLM-extracted):**
 
 | Strategy | Clean STIX | LLM-extracted | Δ |
 | :--- | ---: | ---: | ---: |
@@ -119,6 +135,50 @@ to remove structure (higher *lack-of-structure score*), re-extracted, and re-eva
 Precision stays ≥ 0.96 across all profiles; recall (and thus graph density) is what
 collapses under severe destructuring. Even at the severe extreme — 407 extracted edges
 over 33 actors — `neighbour` (39.1%) stays ahead of `popularity` (26.1%) on the same graph.
+
+**Full link-prediction metrics per noise profile.** Same protocol as above (seed
+20260529, hold-out 20%, 697 candidate techniques); held-out edge / actor counts shrink
+with recall as structure is removed.
+
+*Structured* — 538 held-out edges, 114 actors:
+
+| Strategy | Hits@5 | Hits@10 | Hits@20 | Hits@50 | MRR |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Random | 1.8% | 2.6% | 5.3% | 21.9% | 0.025 |
+| Popularity (PageRank only) | 33.3% | 42.1% | 53.5% | 74.6% | 0.223 |
+| **Neighbour (graph traversal)** | **50.0%** | **61.4%** | **73.7%** | **88.6%** | **0.339** |
+| Neighbour + PageRank | 39.5% | 52.6% | 71.1% | 86.8% | 0.280 |
+
+*Mild* (lack 0.434) — 645 held-out edges, 137 actors:
+
+| Strategy | Hits@5 | Hits@10 | Hits@20 | Hits@50 | MRR |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Random | 2.2% | 6.6% | 10.9% | 24.1% | 0.028 |
+| Popularity (PageRank only) | 27.0% | 44.5% | 62.0% | 75.9% | 0.202 |
+| **Neighbour (graph traversal)** | **54.7%** | **65.0%** | **75.2%** | **91.2%** | **0.373** |
+| Neighbour + PageRank | 40.1% | 59.1% | 74.5% | 88.3% | 0.269 |
+
+*Moderate* (lack 0.649) — 528 held-out edges, 118 actors:
+
+| Strategy | Hits@5 | Hits@10 | Hits@20 | Hits@50 | MRR |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Random | 0.8% | 3.4% | 7.6% | 24.6% | 0.026 |
+| Popularity (PageRank only) | 31.4% | 39.8% | 52.5% | 77.1% | 0.200 |
+| **Neighbour (graph traversal)** | **47.5%** | **60.2%** | **69.5%** | **80.5%** | **0.363** |
+| Neighbour + PageRank | 36.4% | 45.8% | 68.6% | 82.2% | 0.261 |
+
+*Severe* (lack 0.999) — 81 held-out edges, 23 actors:
+
+| Strategy | Hits@5 | Hits@10 | Hits@20 | Hits@50 | MRR |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Random | 8.7% | 8.7% | 13.0% | 26.1% | 0.066 |
+| Popularity (PageRank only) | 17.4% | 26.1% | 30.4% | 52.2% | 0.115 |
+| **Neighbour (graph traversal)** | **21.7%** | **39.1%** | **39.1%** | 52.2% | **0.186** |
+| Neighbour + PageRank | 17.4% | 21.7% | 30.4% | **60.9%** | 0.171 |
+
+`neighbour` leads on Hits@5–20 and MRR across every profile; only at the severe
+extreme (23 actors, very sparse graph) does `neighbour + PageRank` overtake it at
+Hits@50.
 
 ### Claims and scope
 
