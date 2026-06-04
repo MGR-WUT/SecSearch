@@ -12,7 +12,7 @@ measured results live in [`EXPERIMENTS.md`](./EXPERIMENTS.md).
 | Experiment | Question |
 | :--- | :--- |
 | **A** — LLM extraction + link prediction | When actor→technique edges come from **LLM extraction** on CTI-style text (not deterministic STIX), does graph-based link prediction still beat trivial baselines? |
-| **B** — CVE → APT at scale (CISA KEV) | On a **much larger CVE universe** (CISA KEV), does bounded LLM enrichment improve attribution coverage at scale? |
+| **B** — CVE → APT at scale (ATT&CK-to-CVE) | On a **much larger CVE universe** that keeps ATT&CK technique linkage (CTID ATT&CK-to-CVE), does deterministic CVE→APT actor coverage hold at scale? (CISA KEV kept as a no-linkage negative control.) |
 | **B′** — CVE → actor from CTI prose (MISP + ETDA) | Can bounded LLM extraction recover `(ThreatActor)-[:EXPLOITS]->(CVE)` attribution from independent CTI narratives? |
 
 All experiments share the same Neo4j ATT&CK subgraph loaded by
@@ -36,7 +36,8 @@ pip install -r requirements.txt
 | Source | Path / note |
 | :--- | :--- |
 | [MITRE ATT&CK Enterprise STIX 2.1](https://github.com/mitre/cti) | `data/ontologies/mitre_attack/enterprise-attack.json` (downloaded on first run, git-ignored) |
-| [CISA KEV catalog](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) | fetched at run time by `loaders/load_kev.py` |
+| [CISA KEV catalog](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) | fetched at run time by `loaders/load_kev.py` (Experiment B negative control) |
+| [CTID ATT&CK-to-CVE mappings](https://github.com/center-for-threat-informed-defense/attack_to_cve) | fetched at run time by `loaders/load_attack_to_cve.py` (Experiment B primary source) |
 | MISP galaxy `threat-actor` + ETDA threat cards | fetched at run time by `loaders/build_cti_cve_corpus.py` |
 
 Nodes: `:Entity` + ATT&CK labels (`ThreatActor`, `Technique`, `Malware`, `Tool`,
@@ -83,7 +84,7 @@ Python files are grouped by function:
 | Folder | Purpose | Files |
 | :--- | :--- | :--- |
 | `lib/` | Shared helpers + importable libraries (no standalone graph writes) | `_run_utils.py`, `graph_constants.py`, `cti_cve_sources.py`, `stix_actor_reports.py`, `stix_document_structure.py` |
-| `loaders/` | Ingest data / build corpora | `load_attack.py`, `load_kev.py`, `load_cti_actors.py`, `build_cti_cve_corpus.py` |
+| `loaders/` | Ingest data / build corpora | `load_attack.py`, `load_attack_to_cve.py`, `load_kev.py`, `load_cti_actors.py`, `build_cti_cve_corpus.py` |
 | `extractors/` | LLM extraction / enrichment → edges | `extract_stix_uses_graph.py`, `extract_cti_cve_graph.py`, `enrich_with_llm.py` |
 | `evals/` | Scoring, reports, sweep drivers | `eval_link_prediction.py`, `eval_stix_extraction_quality.py`, `eval_cve_apt.py`, `eval_cti_cve_extraction_quality.py`, `cve_scaling_report.py`, `run_stix_structure_sweep.py`, `summarize_structure_sweep.py`, `community_report.py` |
 | `runs/`, `reports/` | Per-run artefacts and canonical report copies | — |
@@ -96,12 +97,14 @@ Invoke scripts from the `DocsBasedSupport` root with `PYTHONPATH=.`, e.g.
 | Script | Experiment |
 | :--- | :--- |
 | `loaders/load_attack.py` | A, B, B′ |
+| `loaders/load_attack_to_cve.py` | B (primary CVE source) |
 | `extractors/extract_stix_uses_graph.py` | A |
 | `evals/eval_stix_extraction_quality.py` | A |
 | `evals/eval_link_prediction.py` | A (baseline + LLM variants) |
 | `lib/stix_actor_reports.py`, `lib/stix_document_structure.py` | A |
 | `evals/run_stix_structure_sweep.py`, `evals/summarize_structure_sweep.py` | A |
-| `loaders/load_kev.py`, `extractors/enrich_with_llm.py`, `evals/eval_cve_apt.py`, `evals/cve_scaling_report.py` | B |
+| `loaders/load_attack_to_cve.py`, `evals/eval_cve_apt.py`, `evals/cve_scaling_report.py` | B (primary) |
+| `loaders/load_kev.py`, `extractors/enrich_with_llm.py` | B (KEV negative control) |
 | `lib/cti_cve_sources.py`, `loaders/build_cti_cve_corpus.py`, `loaders/load_cti_actors.py` | B′ |
 | `extractors/extract_cti_cve_graph.py`, `evals/eval_cti_cve_extraction_quality.py` | B′ |
 | `evals/community_report.py` | Optional / legacy diagnostic |

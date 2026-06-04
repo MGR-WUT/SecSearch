@@ -136,9 +136,25 @@ Precision stays ≥ 0.96 across all profiles; recall (and thus graph density) is
 collapses under severe destructuring. Even at the severe extreme — 407 extracted edges
 over 33 actors — `neighbour` (39.1%) stays ahead of `popularity` (26.1%) on the same graph.
 
+**Document-structure noise profiles.** To test robustness of LLM extraction (not the
+deterministic STIX graph), the same actor-level MITRE prose is reflowed through four
+controlled profiles before re-extraction (`lib/stix_document_structure.py`):
+
+| Profile | Transformations | Mean lack-of-structure score |
+| :--- | :--- | ---: |
+| **Structured** | Original markdown: headings, technique IDs, paragraph breaks | — |
+| **Mild** | Markdown headings removed; technique IDs and content preserved | 0.434 |
+| **Moderate** | Single narrative block: sections merged into continuous prose | 0.649 |
+| **Severe** | Shuffled technique sections, `Txxxx` IDs redacted to `[TECHNIQUE]`, group IDs redacted | 0.999 |
+
+Higher *lack-of-structure score* means less salient ATT&CK identifiers and weaker
+document scaffolding—closer to unstructured vendor reports or ticket prose. Gold
+`USES` pairs are unchanged; only the text seen by the extractor differs. Figures:
+`figures/hits_at_k_<strategy>.png`, `figures/mrr_by_noise.png` (regenerate with
+`evals/plot_structure_sweep.py`).
+
 **Full link-prediction metrics per noise profile.** Same protocol as above (seed
-20260529, hold-out 20%, 697 candidate techniques); held-out edge / actor counts shrink
-with recall as structure is removed.
+20260529, hold-out 20%, 697 candidate techniques).
 
 *Structured* — 538 held-out edges, 114 actors:
 
@@ -196,43 +212,129 @@ models optional.
 
 ---
 
-## Experiment B: CVE → APT at scale (CISA KEV)
+## Experiment B: CVE → APT at scale (ATT&CK-to-CVE)
 
-*Status: **not yet run** — section reserved for results and commands.*
+**Goal.** The ATT&CK graph links only ~33 CVEs to actors; reviewers rightly
+question generalisation from that denominator. Experiment B scales the CVE
+universe by ~25× while preserving the **graph mechanism** that gives the
+baseline its signal, then measures whether deterministic CVE→APT actor coverage
+holds and is statistically stable.
 
-**Goal.** The ATT&CK graph contains only ~33 CVEs with actor linkage; reviewers
-rightly question generalisation from that denominator. Experiment B evaluates
-**coverage and enrichment lift** on the full
-[CISA KEV catalog](https://www.cisa.gov/known-exploited-vulnerabilities-catalog)
-(~1,600 CVEs), with the MITRE 33-CVE case as an optional
-`--cve-source mitre-attack` baseline.
+### CVE-source selection (why ATT&CK-to-CVE)
 
-**Planned pipeline**
+The baseline 33-CVE coverage comes entirely from graph linkage:
+`(CVE)<-[:EXPLOITS]-(Technique)<-[:USES]-(ThreatActor)`. A scaled CVE source is
+only comparable if its CVEs attach to the **same technique / actor nodes**. We
+evaluated five candidate sources against that requirement:
 
-1. `loaders/load_attack.py` — ATT&CK subgraph (path traversal + actor catalogs).
-2. `loaders/load_kev.py` — ingest KEV CVE nodes.
-3. `evals/eval_cve_apt.py --cve-source cisa-kev --variant baseline` — graph paths only.
-4. `extractors/enrich_with_llm.py` on KEV descriptions — bounded reverse attribution.
-5. `evals/eval_cve_apt.py --variant enriched` — post-enrichment coverage.
-6. `evals/cve_scaling_report.py` — bootstrap stability + precision sample export.
+| Candidate source | Links CVE → ATT&CK technique/actor? | Verdict |
+| :--- | :--- | :--- |
+| **[Center for Threat-Informed Defense — ATT&CK-to-CVE](https://github.com/center-for-threat-informed-defense/attack_to_cve/blob/master/Att%26ckToCveMappings.csv)** | **Yes** — every CVE carries ≥1 ATT&CK technique ID | **Selected** |
+| [CISA KEV catalog](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) | No — standalone CVE descriptions, no technique edge | Negative control (see below) |
+| [FalconFeeds threat-actor repository](https://falconfeeds.io/features/largest-threat-actor-repository/) | No bulk/API export; marketing surface only | Rejected — not machine-ingestible |
+| [Databricks CyberIQ dataset](https://marketplace.databricks.com/details/a9688160-f841-44d3-9634-ce675cf0c01c/Kaze-Consulting_CyberIQ-Dataset) | Paywalled marketplace listing, no schema available | Rejected — inaccessible |
+| [SOCRadar free Threat Actor tool](https://socradar.io/free-tools/threat-actor) | Interactive lookup, no bulk technique/CVE mapping | Rejected — no dataset export |
+| [HF `reloading0101/threat-intelligence-dataset`](https://huggingface.co/datasets/reloading0101/threat-intelligence-dataset) | AI-generated synthetic CTI prose, no curated CVE→technique edges | Rejected — off-distribution synthetic; would only add noise to a *deterministic* baseline |
 
-**Planned LLM variants:** `gpt-oss:20b`, `gemma3:4b` (separate run dirs per model).
+Only the CTID ATT&CK-to-CVE CSV maps each CVE to curated ATT&CK technique IDs,
+so it reproduces the baseline's deterministic, technique-mediated path structure
+at scale — exactly the property the other four sources lack. The CISA KEV run is
+retained as a **negative control** that shows what happens when the CVE source
+has no technique linkage.
 
-**Expected artefacts**
+### Methodology
+
+1. `loaders/load_attack.py --enrich --reset` — ATT&CK subgraph (techniques,
+   actors, PageRank).
+2. `loaders/load_attack_to_cve.py --enrich --reset` — parse the CTID CSV; per CVE
+   collect technique IDs across *Primary/Secondary Impact*, *Exploitation
+   Technique*, *Uncategorized*; write `(Technique)-[:EXPLOITS]->(CVE)` against
+   matching `Technique.external_id` (sub-technique → base fallback); re-run
+   PageRank/Louvain over the enlarged subgraph.
+3. `evals/eval_cve_apt.py --cve-source attack-to-cve --variant baseline` —
+   deterministic graph-traversal coverage, identical scoring to the 33-CVE case.
+4. `evals/cve_scaling_report.py` — bootstrap stability + scaling curve +
+   precision-sample export.
+
+ICS (`T08xx`), mobile (`T1404`, `T1456`, …) and deprecated technique IDs in the
+CSV have no Enterprise node and are reported as `unmatched_technique_ids` rather
+than silently dropped.
+
+### Commands
+
+```bash
+cd DocsBasedSupport
+B=eval/AttackGraph/runs/attack-to-cve-baseline
+
+# Experiment B uses the isolated graph on 7688 (docker-compose service neo4j_b)
+export NEO4J_URI=bolt://localhost:7688
+
+PYTHONPATH=. python eval/AttackGraph/loaders/load_attack.py --enrich --reset --run-dir $B
+PYTHONPATH=. python eval/AttackGraph/loaders/load_attack_to_cve.py --enrich --reset --run-dir $B
+PYTHONPATH=. python eval/AttackGraph/evals/eval_cve_apt.py \
+    --cve-source attack-to-cve --variant baseline --run-dir $B
+PYTHONPATH=. python eval/AttackGraph/evals/cve_scaling_report.py \
+    --baseline-report $B/cve_apt_paths_baseline.json --run-dir $B
+```
+
+Offline / pinned snapshot: pass `--csv-path <file>` to `load_attack_to_cve.py`.
+
+### Artefacts
 
 | File | Purpose |
 | :--- | :--- |
-| `kev_load_summary.json` | Feed version + CVE count |
-| `cve_apt_paths_baseline.json` | Coverage without LLM |
-| `cve_apt_paths_enriched.json` | Coverage after enrichment |
-| `cve_scaling_report.json` | Bootstrap CI at subsample sizes |
+| `attack_to_cve_load_summary.json` | CVE count, edges, unmatched technique IDs |
+| `cve_apt_paths_baseline.json` | Per-CVE actors + aggregate coverage |
+| `cve_scaling_report.json` | Bootstrap CI + scaling curve (n = 33…800) |
 | `cve_attribution_sample.csv` | Manual precision spot-check sample |
 
-**Interpretation (when run).** KEV coverage will likely be **lower** than the
-curated ATT&CK 33-CVE figure; the valid claim is **marginal lift** and **stability**
-of enrichment at scale, not parity with small-corpus headline percentages.
+### Results (measured)
 
-Commands and measured results will be added here after the run completes.
+Run `runs/attack-to-cve-baseline`, ATT&CK-to-CVE CSV, graph `bolt://localhost:7688`.
+
+**Load:** 825 CVEs parsed and loaded, **815 with ≥1 technique edge**, 1,651
+`EXPLOITS` edges (1 base-technique fallback), 23 unmatched technique IDs
+(ICS / mobile / deprecated).
+
+**Deterministic CVE → APT coverage (no LLM):**
+
+| CVE source | # CVEs | Coverage (≥1 actor) | Mean actors / CVE | Mean evidence paths / CVE |
+| :--- | ---: | ---: | ---: | ---: |
+| MITRE ATT&CK (curated) | 33 | **57.6%** | 9.8 | 12.9 |
+| CISA KEV (negative control) | 1,585 | **0.06%** | 0.02 | 0.02 |
+| **ATT&CK-to-CVE (this run)** | **825** | **97.7%** | **66.6** | **132.3** |
+
+**Scaling stability** (`cve_scaling_report.json`, 200-iteration bootstrap):
+
+| Subsample n | Coverage mean | 95% CI |
+| ---: | ---: | :--- |
+| 33 | 0.977 | [0.909, 1.000] |
+| 100 | 0.974 | [0.940, 1.000] |
+| 200 | 0.977 | [0.955, 0.995] |
+| 400 | 0.979 | [0.965, 0.988] |
+| 800 | 0.977 | [0.976, 0.979] |
+
+Coverage is flat at ≈97.7% from n=33 to n=800 with CIs tightening as n grows —
+the headline figure is **not** an artefact of the small 33-CVE denominator.
+
+### Claims and scope
+
+**Support.** When the scaled CVE source preserves ATT&CK technique linkage
+(ATT&CK-to-CVE), deterministic graph traversal recovers ≥1 actor for **97.7%** of
+825 CVEs, and bootstrap resampling shows the coverage is **stable across scale**
+(n = 33 → 800). This directly answers the generalisation concern: the 33-CVE
+baseline's mechanism holds — and strengthens — at 25× the denominator.
+
+**Negative control.** The same pipeline on CISA KEV scores **0.06%** (1/1,585)
+with zero LLM-enrichment lift. Coverage therefore tracks **technique linkage**,
+not CVE count: KEV CVE nodes are isolated, ATT&CK-to-CVE CVE nodes are not.
+
+**Caveats.** High coverage trades off **specificity**: technique-mediated paths
+attach a mean of **66.6 actors per CVE** (vs 9.8 for the hand-curated 33), because
+common techniques (e.g. T1059, T1190, T1068) are used by many actors. Coverage
+here is a *reachability* claim, not a precise single-actor attribution; the
+top-K ranking (`score = path_count × (1 + PageRank)`) and `cve_attribution_sample.csv`
+exist to inspect that ranking quality. Mappings are curated, single-snapshot.
 
 ---
 
