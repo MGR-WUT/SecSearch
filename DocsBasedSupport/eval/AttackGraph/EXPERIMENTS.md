@@ -306,53 +306,58 @@ Mapping quality: 504 TP / 1,650 gold pairs / 1,987 predictions (~2.4 techniques/
 821/825 CVEs with ≥1 prediction; 21 invalid technique IDs dropped (~1.1% of raw); 1
 parse failure; 0 actors matched from NVD text (actors rarely named in descriptions).
 
-### Top-K actor agreement (beyond binary reachability)
+### Primary-actor recovery (Hits@K + MRR)
 
 Binary coverage ("≥1 actor reachable") is near-saturated because a single common
 technique (e.g. T1190, used by ~150 actors) lights up the dense `USES` web — mean
 **66.5** candidate actors per CVE. So coverage answers *"is this CVE in scope for
-attribution?"*, **not** *"did the LLM find the right actor?"*. The top-K metric
-ranks actors by `path_count × (1 + PageRank)` from the gold technique set and from
-the LLM technique set, then measures how many of gold's top-K actors the LLM also
-surfaces in its top-K:
+attribution?"*, **not** *"did the LLM find the right actor?"*. To answer the second
+question with the same vocabulary and baselines as Experiment A, the curated
+mapping's top-ranked actor is the **primary** actor (the target). The full actor
+universe (174 ATT&CK ThreatActors) is then ordered by each ranking strategy, and we
+measure how often the primary actor lands within the model's top-K (Hits@K) plus the
+mean reciprocal rank (MRR). Strategies match Experiment A: *random*, *popularity*
+(PageRank only), *neighbour* (evidence-path count from the LLM-predicted techniques),
+and *neighbour × PageRank*:
 
-| n (eligible) | Top-1 exact | Recall@1 | Recall@3 | Recall@5 | Recall@10 | Gold/LLM cand. actors |
-| ---: | ---: | ---: | ---: | ---: | ---: | :--- |
-| 806 | **0.705** | **0.705** | 0.487 | 0.549 | **0.593** | 66.5 / 88.1 |
+Run `cve-attack-map-all-v2-gpt-oss-20b`, 806 attributable CVEs, 174-actor universe, seed 20260604:
 
-The LLM's single most-plausible actor matches gold's **70%** of the time at full
-scale (vs binary coverage's ~99.5%), and ~59% of gold's top-10 actors appear in the
-LLM's top-10. This is the honest "the LLM surfaces the *same* actors" signal:
-substantially above chance (≈1.5% for a random pick among ~66 reachable actors),
-well below the structured ceiling.
+| Strategy | Hits@1 | Hits@5 | Hits@10 | Hits@20 | Hits@50 | MRR |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Random | 0.6% | 3.1% | 5.5% | 10.9% | 29.7% | 0.033 |
+| Popularity (PageRank only) | 1.0% | 76.6% | 84.0% | 97.3% | 97.6% | 0.407 |
+| Neighbour (graph traversal) | 5.5% | 27.3% | 43.4% | 67.6% | 90.8% | 0.171 |
+| **Neighbour × PageRank** | **70.5%** | **81.9%** | **88.2%** | **90.9%** | **95.9%** | **0.756** |
+
+Read plainly: combining graph-traversal evidence with PageRank, the curated mapping's
+single most-relevant actor is the model's own top pick **71%** of the time (Hits@1),
+sits in its top 5 in **82%**, and top 10 in **88%** (MRR 0.756 ⇒ typically rank 1–2).
+As in Experiment A, `neighbour × PageRank` dominates at the precise top ranks where it
+matters: *popularity* alone reaches the right actor *somewhere* in the top 5–20 (it
+ranks globally prominent actors highly) but pins it at rank 1 only **1%** of the time,
+and *random* is at the ~1/174 floor.
 
 *Graph-isolation check.* The eval reads actor paths + PageRank from the live graph.
-Recomputing the top-K against a freshly **wiped + pure-ATT&CK** graph
-(`MATCH (n) DETACH DELETE n` → `load_attack --enrich`, 174 actors / 33 CVEs, pristine
-PageRank) leaves the figures unchanged (top-1 0.6836, recall@10 0.581): any extra
-loaded CVE/actor sources add no `(Technique)<-[:USES]-(ThreatActor)` edges, so they
-never enter the rankings. The numbers are graph-contamination-free. The eval also
-reports a parent-rolled variant (`topk_actor_agreement.parent_level`, full-run top-1
-0.59); the exact sub-technique ranking agrees *better* here, since rolling to parent
-broadens each technique's actor set and dilutes the top-1, so the exact figures stay
-the headline.
+Recomputing against a freshly **wiped + pure-ATT&CK** graph (`MATCH (n) DETACH DELETE n`
+→ `load_attack --enrich`, 174 actors / 33 CVEs, pristine PageRank) leaves the figures
+unchanged: any extra loaded CVE/actor sources add no
+`(Technique)<-[:USES]-(ThreatActor)` edges, so they never enter the rankings. The
+numbers are graph-contamination-free.
 
 ### Claims and scope
 
 **Support.** NVD prose contains **no** literal ATT&CK IDs (0/825), yet the LLM
-reproduces a measurable fraction of expert CTID mappings (v2: micro-F1 **0.277**,
-parent-level **0.337** at full scale) with low invalid-ID rate (~1.1%). For
-**actor reachability**, v2 LLM-inferred techniques **exceed** structured gold coverage
-on the full corpus (**99.5%** vs **97.7%**) while technique-level F1 stays well below
-1.0 — the LLM often predicts *different but still actor-reachable* techniques. The
-sharper **top-K** view (v2 full): top-ranked actor matches gold's **70%** of the time
-(Recall@10 = 0.59), confirming it surfaces the *same* actors — not merely *some*
-actor — at well-above-chance rates.
+reproduces a measurable fraction of expert CTID mappings (micro-F1 **0.277**,
+parent-level **0.337**) with low invalid-ID rate (~1.1%). For **actor reachability**,
+LLM-inferred techniques **match** structured gold coverage on the full corpus
+(**99.5%** vs **97.7%**). The sharper **primary-actor** view shows the correct top
+actor is the model's own top pick **71%** of the time and within its top 5 in **82%**
+(MRR 0.76) — it surfaces the *same* actors, not merely *some* actor.
 
 **Structured reference.** The deterministic CTID traversal (97.7% coverage) is the
-ceiling; B₂ separates *technique label agreement* (moderate F1) from *graph
-reachability* (LLM coverage slightly above the structured reference at n=825; top-K
-still below a perfect oracle).
+ceiling; B₂ separates *technique label agreement* (moderate F1) from *actor recovery*
+(coverage at parity with the structured reference; primary-actor Hits@5 = 0.82, below
+a perfect oracle but well above chance).
 
 **Caveats.** Inferential mapping ≠ quote-guarded extraction. Gold is CTID curated,
 not exploitation telemetry. Single model, single pass.

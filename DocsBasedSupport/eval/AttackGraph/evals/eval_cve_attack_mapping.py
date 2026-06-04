@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import random
 import statistics
 import sys
 from datetime import datetime, timezone
@@ -47,12 +48,16 @@ DEFAULT_REPORT_FILENAME = "cve_attack_map_eval.json"
 
 
 DEFAULT_TOP_KS = [1, 3, 5, 10]
+DEFAULT_HITS_KS = [1, 5, 10, 20, 50]
+PRIMARY_STRATEGIES = ("random", "popularity", "neighbour", "neighbour_pagerank")
 
 
 def _build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--predictions-path", type=Path, default=None)
     parser.add_argument("--top-ks", type=int, nargs="+", default=DEFAULT_TOP_KS)
+    parser.add_argument("--hits-ks", type=int, nargs="+", default=DEFAULT_HITS_KS)
+    parser.add_argument("--seed", type=int, default=20260604, help="Seed for random/tie-break ordering.")
     parser.add_argument("--run-dir", type=Path, default=None)
     parser.add_argument("--report-path", type=Path, default=None)
     parser.add_argument("--log-level", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"])
@@ -170,6 +175,66 @@ def _rank_actors(
     return [actor_id for actor_id, _ in ranked]
 
 
+def _all_actor_pageranks(store: Neo4jStore) -> dict[str, float]:
+    """{actor entity_id -> PageRank} for every ThreatActor (the ranking universe)."""
+    rows = store.run_read(
+        "MATCH (a:ThreatActor) WHERE a.entity_id IS NOT NULL "
+        "RETURN a.entity_id AS id, coalesce(a.pagerank, 0.0) AS pr"
+    )
+    return {str(r["id"]): float(r["pr"] or 0.0) for r in rows if r.get("id")}
+
+
+def _neighbour_scores(
+    technique_ids: set[str], tech_actor_paths: dict[str, list[dict[str, object]]]
+) -> dict[str, float]:
+    """{actor_id -> summed evidence-path count} reachable from a technique set."""
+    agg: dict[str, float] = {}
+    for ext in technique_ids:
+        for hit in tech_actor_paths.get(ext, []):
+            actor_id = str(hit["actor_id"])
+            agg[actor_id] = agg.get(actor_id, 0.0) + float(hit["paths"])
+    return agg
+
+
+def _target_rank(
+    target: str,
+    all_actors: list[str],
+    neighbour: dict[str, float],
+    pagerank: dict[str, float],
+    strategy: str,
+    rng: random.Random,
+) -> int | None:
+    """1-based rank of ``target`` when all actors are ordered by ``strategy``.
+
+    Strategies mirror the Experiment A link-prediction baselines:
+    ``random`` (shuffle), ``popularity`` (PageRank only), ``neighbour`` (evidence
+    path count from the predicted techniques), ``neighbour_pagerank`` (path count ×
+    (1 + PageRank)). A per-actor random value breaks ties so zero-score actors are
+    not advantaged by insertion order.
+    """
+    if target not in all_actors:
+        return None
+    keyed: list[tuple[float, float, str]] = []
+    for actor in all_actors:
+        nb = neighbour.get(actor, 0.0)
+        pr = pagerank.get(actor, 0.0)
+        jitter = rng.random()
+        if strategy == "random":
+            score = jitter
+        elif strategy == "popularity":
+            score = pr
+        elif strategy == "neighbour":
+            score = nb
+        else:  # neighbour_pagerank
+            score = nb * (1.0 + pr)
+        keyed.append((score, jitter, actor))
+    keyed.sort(key=lambda t: (t[0], t[1]), reverse=True)
+    for rank, (_, _, actor) in enumerate(keyed, start=1):
+        if actor == target:
+            return rank
+    return None
+
+
 def _safe_div(num: float, den: float) -> float:
     return round(num / den, 4) if den else 0.0
 
@@ -198,6 +263,8 @@ def main(argv: list[str] | None = None) -> int:
         known = _technique_external_ids(store)
         tech_actor_paths = _technique_actor_paths(store)
         tech_actor_paths_parent = _rollup_index(tech_actor_paths)
+        actor_pageranks = _all_actor_pageranks(store)
+        all_actors = sorted(actor_pageranks)
         logging.info(
             "Actor-reachable techniques: %d / %d known (%d techniques carry actor paths).",
             len(reachable),
@@ -230,6 +297,16 @@ def main(argv: list[str] | None = None) -> int:
     topk_eligible_parent = 0
     gold_actor_counts: list[int] = []
     llm_actor_counts: list[int] = []
+    # Primary-actor recovery (Experiment-A vocabulary): does the curated mapping's
+    # single most-relevant ("primary") actor appear within the model's top-K ranked
+    # actors, under each ranking strategy? Hits@K + MRR per strategy.
+    hits_ks = sorted({k for k in args.hits_ks if k > 0})
+    primary_hits: dict[str, dict[int, int]] = {
+        s: {k: 0 for k in hits_ks} for s in PRIMARY_STRATEGIES
+    }
+    primary_rr: dict[str, list[float]] = {s: [] for s in PRIMARY_STRATEGIES}
+    primary_eligible = 0
+    rng = random.Random(args.seed)
 
     for entry in predictions:
         # Restrict gold to techniques actually present in the loaded matrix so the
@@ -289,6 +366,18 @@ def main(argv: list[str] | None = None) -> int:
                 hit = sum(1 for a in gold_topk if a in llm_topk) / len(gold_topk)
                 topk_hits[k].append(hit)
                 cve_topk[f"recall_at_{k}"] = round(hit, 4)
+
+            primary_actor = gold_ranked[0]
+            primary_eligible += 1
+            neighbour = _neighbour_scores(pred, tech_actor_paths)
+            for strategy in PRIMARY_STRATEGIES:
+                rank = _target_rank(
+                    primary_actor, all_actors, neighbour, actor_pageranks, strategy, rng
+                )
+                primary_rr[strategy].append(1.0 / rank if rank else 0.0)
+                for k in hits_ks:
+                    if rank is not None and rank <= k:
+                        primary_hits[strategy][k] += 1
 
         gold_ranked_par = _rank_actors(gold_par, tech_actor_paths_parent)
         llm_ranked_par = _rank_actors(pred_par, tech_actor_paths_parent)
@@ -395,6 +484,29 @@ def main(argv: list[str] | None = None) -> int:
                 },
             },
         },
+        "primary_actor_recovery": {
+            "description": (
+                "Is the curated mapping's single most-relevant ('primary') actor found "
+                "within the model's top-K ranked actors, ranking the full actor universe "
+                "by each strategy? Hits@K + MRR, same baselines/vocabulary as the "
+                "Experiment A link-prediction evaluation."
+            ),
+            "eligible_cves": primary_eligible,
+            "actor_universe": len(all_actors),
+            "seed": args.seed,
+            "strategies": {
+                strategy: {
+                    "hits_at_k": {
+                        str(k): _safe_div(primary_hits[strategy][k], primary_eligible)
+                        for k in hits_ks
+                    },
+                    "mrr": round(statistics.fmean(primary_rr[strategy]), 4)
+                    if primary_rr[strategy]
+                    else 0.0,
+                }
+                for strategy in PRIMARY_STRATEGIES
+            },
+        },
         "per_cve": per_cve,
     }
     report_path = resolve_report_path(args.report_path, run_dir, DEFAULT_REPORT_FILENAME)
@@ -418,6 +530,7 @@ def main(argv: list[str] | None = None) -> int:
                     "mapping_quality_parent_level",
                     "attribution_coverage",
                     "topk_actor_agreement",
+                    "primary_actor_recovery",
                 )
             },
             indent=2,
