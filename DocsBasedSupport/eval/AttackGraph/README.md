@@ -13,6 +13,7 @@ measured results live in [`EXPERIMENTS.md`](./EXPERIMENTS.md).
 | :--- | :--- |
 | **A** — LLM extraction + link prediction | When actor→technique edges come from **LLM extraction** on CTI-style text (not deterministic STIX), does graph-based link prediction still beat trivial baselines? |
 | **B** — CVE → APT at scale (ATT&CK-to-CVE) | On a **much larger CVE universe** that keeps ATT&CK technique linkage (CTID ATT&CK-to-CVE), does deterministic CVE→APT actor coverage hold at scale? (CISA KEV kept as a no-linkage negative control.) |
+| **B₂** — NVD → ATT&CK mapping (inferential) | Can the LLM reproduce CTID expert CVE→technique mappings from **NVD prose only**, and how far does that support CVE→actor reachability vs structured gold? |
 | **B′** — CVE → actor from CTI prose (MISP + ETDA) | Can bounded LLM extraction recover `(ThreatActor)-[:EXPLOITS]->(CVE)` attribution from independent CTI narratives? |
 
 All experiments share the same Neo4j ATT&CK subgraph loaded by
@@ -105,6 +106,7 @@ Invoke scripts from the `DocsBasedSupport` root with `PYTHONPATH=.`, e.g.
 | `evals/run_stix_structure_sweep.py`, `evals/summarize_structure_sweep.py` | A |
 | `loaders/load_attack_to_cve.py`, `evals/eval_cve_apt.py`, `evals/cve_scaling_report.py` | B (primary) |
 | `loaders/load_kev.py`, `extractors/enrich_with_llm.py` | B (KEV negative control) |
+| `loaders/build_nvd_cve_corpus.py`, `extractors/map_cve_attack_with_llm.py`, `evals/eval_cve_attack_mapping.py` | B₂ (NVD inferential mapping) |
 | `lib/cti_cve_sources.py`, `loaders/build_cti_cve_corpus.py`, `loaders/load_cti_actors.py` | B′ |
 | `extractors/extract_cti_cve_graph.py`, `evals/eval_cti_cve_extraction_quality.py` | B′ |
 | `evals/community_report.py` | Optional / legacy diagnostic |

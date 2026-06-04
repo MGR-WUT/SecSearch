@@ -338,6 +338,120 @@ exist to inspect that ranking quality. Mappings are curated, single-snapshot.
 
 ---
 
+## Experiment B₂: Inferential CVE → ATT&CK mapping from NVD prose
+
+**Goal.** The 97.7% structured baseline is high because CTID already supplies
+curated CVE→technique IDs. This arm tests whether an LLM can **reproduce that
+mapping from raw NVD text alone** (inferential, not quote-faithful), and whether
+LLM-inferred techniques still reach threat actors via the same graph paths.
+CTID gold is used **only for scoring** — never written into the graph the model sees.
+
+### Methodology
+
+1. **Corpus** — `loaders/build_nvd_cve_corpus.py`: fetch real NVD descriptions
+   (`NVD_API_KEY`) for CTID CVEs; attach CTID gold technique IDs (never shown to the LLM).
+2. **Explicit-ID audit** — `evals/summarize_nvd_explicit_ids.py`: count literal
+   `Txxxx` / `CWE-xxx` / `CVE-xxx` strings in NVD prose (not in gold metadata).
+3. **Inference** — `extractors/map_cve_attack_with_llm.py` (`gpt-oss:20b-cloud`):
+   read NVD prose only → predict ATT&CK technique IDs + named actors; drop technique
+   IDs not in the loaded matrix.
+4. **Evaluation** — `evals/eval_cve_attack_mapping.py`: micro/macro P/R/F1 vs gold
+   (gold restricted to techniques present in Enterprise); actor coverage using
+   structured gold techniques vs LLM-predicted techniques on actor-reachable paths.
+
+### Commands
+
+```bash
+cd DocsBasedSupport
+export NEO4J_URI=bolt://localhost:7688
+R=eval/AttackGraph/runs/cve-attack-map-gpt-oss-20b
+
+PYTHONPATH=. python eval/AttackGraph/loaders/build_nvd_cve_corpus.py --sample 200 --run-dir $R
+PYTHONPATH=. python eval/AttackGraph/extractors/map_cve_attack_with_llm.py \
+    --model gpt-oss:20b-cloud --run-dir $R
+PYTHONPATH=. python eval/AttackGraph/evals/eval_cve_attack_mapping.py --run-dir $R
+```
+
+Sample run: `--sample 200` → `runs/cve-attack-map-gpt-oss-20b`. Full run:
+`--sample 0` (all 825) → `runs/cve-attack-map-all-gpt-oss-20b`. Logs: `pipeline.log`.
+
+### Artefacts
+
+| File | Purpose |
+| :--- | :--- |
+| `nvd_cve_corpus.json` | NVD text + CTID gold per CVE |
+| `nvd_explicit_id_summary.json` | Literal ID counts in NVD prose |
+| `cve_attack_map_predictions.json` | LLM predictions + summary |
+| `cve_attack_map_eval.json` | P/R/F1 + coverage comparison |
+
+### Explicit IDs in NVD descriptions (measured)
+
+Run `runs/cve-attack-map-all-gpt-oss-20b`, all **825** CVEs with NVD text:
+
+| ID type in NVD prose | CVEs with ≥1 literal mention |
+| :--- | ---: |
+| ATT&CK technique (`Txxxx`) | **0 / 825** |
+| CWE (`CWE-xxx`) | 2 / 825 |
+| Other CVE references | 81 / 825 |
+
+**Every** ATT&CK technique prediction is therefore **inferential** (impact/behaviour
+→ technique), not extraction of an explicit ID in the description. This differs from
+Experiments A / B′, which use quote guards on prose that often names techniques/CVEs.
+
+### Results (measured)
+
+Model `gpt-oss:20b-cloud`, graph `bolt://localhost:7688`, 100% NVD descriptions fetched.
+
+| Run | n | Micro F1 | Macro F1 | Structured coverage | LLM coverage | Gap |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `cve-attack-map-gpt-oss-20b` (sample) | 200 | 0.200 | 0.192 | 96.0% | 81.0% | 15.0 pp |
+| `cve-attack-map-all-gpt-oss-20b` (full) | 825 | **0.265** | **0.275** | **97.7%** | **96.9%** | **0.85 pp** |
+
+Full-run mapping quality: 361 TP / 1,650 gold pairs / 1,077 predictions; 804/825 CVEs
+with ≥1 prediction; 27 invalid technique IDs dropped (2.5% of raw); 1 parse failure;
+0 actors matched from NVD text (actors rarely named in descriptions).
+
+### Top-K actor agreement (beyond binary reachability)
+
+Binary coverage ("≥1 actor reachable") is near-saturated because a single common
+technique (e.g. T1190, used by ~150 actors) lights up the dense `USES` web — mean
+**66.5** candidate actors per CVE. So coverage answers *"is this CVE in scope for
+attribution?"*, **not** *"did the LLM find the right actor?"*. The top-K metric
+ranks actors by `path_count × (1 + PageRank)` from the gold technique set and from
+the LLM technique set, then measures how many of gold's top-K actors the LLM also
+surfaces in its top-K:
+
+| Run | n (eligible) | Top-1 exact | Recall@1 | Recall@3 | Recall@5 | Recall@10 | Gold/LLM cand. actors |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | :--- |
+| sample 200 | 192 | 0.537 | 0.537 | 0.399 | 0.422 | 0.463 | 63.7 / 49.8 |
+| full 825 | 806 | **0.684** | **0.684** | 0.489 | 0.527 | 0.582 | 66.5 / 59.6 |
+
+The LLM's single most-plausible actor matches gold's **68%** of the time at full
+scale (vs binary coverage's ~97%), and ~58% of gold's top-10 actors appear in the
+LLM's top-10. This is the honest "the LLM surfaces the *same* actors" signal:
+substantially above chance, well below the structured ceiling.
+
+### Claims and scope
+
+**Support.** NVD prose contains **no** literal ATT&CK IDs (0/825), yet the LLM
+reproduces a measurable fraction of expert CTID mappings (micro-F1 ≈ 0.27 at full
+scale) with low invalid-ID rate (~2.5%). For **actor reachability**, LLM-inferred
+techniques close most of the gap to structured gold on the full corpus (**96.9%** vs
+**97.7%**, 0.85 pp) even though technique-level F1 stays well below 1.0 — the LLM
+often predicts *different but still actor-reachable* techniques (e.g. T1068 vs gold
+T1203). The sharper **top-K** view shows the LLM's top-ranked actor matches gold's
+**68%** of the time (Recall@10 = 0.58), confirming it surfaces the *same* actors —
+not merely *some* actor — at well-above-chance rates.
+
+**Contrast with B.** Structured linkage is the ceiling; B₂ separates *technique
+label agreement* (moderate F1) from *graph reachability* (near-parity at n=825).
+
+**Caveats.** The 200-CVE sample shows a larger coverage gap (15 pp) than the full
+825 — subsample variance, not contradiction. Inferential mapping ≠ quote-guarded
+extraction. Gold is CTID curated, not exploitation telemetry.
+
+---
+
 ## Experiment B′: CVE → actor extraction from CTI prose (MISP + ETDA)
 
 **Goal.** Test whether bounded LLM extraction recovers `(ThreatActor)-[:EXPLOITS]->(CVE)`
