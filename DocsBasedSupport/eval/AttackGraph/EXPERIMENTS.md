@@ -212,168 +212,53 @@ models optional.
 
 ---
 
-## Experiment B: CVE → APT at scale (ATT&CK-to-CVE)
-
-**Goal.** The ATT&CK graph links only ~33 CVEs to actors; reviewers rightly
-question generalisation from that denominator. Experiment B scales the CVE
-universe by ~25× while preserving the **graph mechanism** that gives the
-baseline its signal, then measures whether deterministic CVE→APT actor coverage
-holds and is statistically stable.
-
-### CVE-source selection (why ATT&CK-to-CVE)
-
-The baseline 33-CVE coverage comes entirely from graph linkage:
-`(CVE)<-[:EXPLOITS]-(Technique)<-[:USES]-(ThreatActor)`. A scaled CVE source is
-only comparable if its CVEs attach to the **same technique / actor nodes**. We
-evaluated five candidate sources against that requirement:
-
-| Candidate source | Links CVE → ATT&CK technique/actor? | Verdict |
-| :--- | :--- | :--- |
-| **[Center for Threat-Informed Defense — ATT&CK-to-CVE](https://github.com/center-for-threat-informed-defense/attack_to_cve/blob/master/Att%26ckToCveMappings.csv)** | **Yes** — every CVE carries ≥1 ATT&CK technique ID | **Selected** |
-| [CISA KEV catalog](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) | No — standalone CVE descriptions, no technique edge | Negative control (see below) |
-| [FalconFeeds threat-actor repository](https://falconfeeds.io/features/largest-threat-actor-repository/) | No bulk/API export; marketing surface only | Rejected — not machine-ingestible |
-| [Databricks CyberIQ dataset](https://marketplace.databricks.com/details/a9688160-f841-44d3-9634-ce675cf0c01c/Kaze-Consulting_CyberIQ-Dataset) | Paywalled marketplace listing, no schema available | Rejected — inaccessible |
-| [SOCRadar free Threat Actor tool](https://socradar.io/free-tools/threat-actor) | Interactive lookup, no bulk technique/CVE mapping | Rejected — no dataset export |
-| [HF `reloading0101/threat-intelligence-dataset`](https://huggingface.co/datasets/reloading0101/threat-intelligence-dataset) | AI-generated synthetic CTI prose, no curated CVE→technique edges | Rejected — off-distribution synthetic; would only add noise to a *deterministic* baseline |
-
-Only the CTID ATT&CK-to-CVE CSV maps each CVE to curated ATT&CK technique IDs,
-so it reproduces the baseline's deterministic, technique-mediated path structure
-at scale — exactly the property the other four sources lack. The CISA KEV run is
-retained as a **negative control** that shows what happens when the CVE source
-has no technique linkage.
-
-### Methodology
-
-1. `loaders/load_attack.py --enrich --reset` — ATT&CK subgraph (techniques,
-   actors, PageRank).
-2. `loaders/load_attack_to_cve.py --enrich --reset` — parse the CTID CSV; per CVE
-   collect technique IDs across *Primary/Secondary Impact*, *Exploitation
-   Technique*, *Uncategorized*; write `(Technique)-[:EXPLOITS]->(CVE)` against
-   matching `Technique.external_id` (sub-technique → base fallback); re-run
-   PageRank/Louvain over the enlarged subgraph.
-3. `evals/eval_cve_apt.py --cve-source attack-to-cve --variant baseline` —
-   deterministic graph-traversal coverage, identical scoring to the 33-CVE case.
-4. `evals/cve_scaling_report.py` — bootstrap stability + scaling curve +
-   precision-sample export.
-
-ICS (`T08xx`), mobile (`T1404`, `T1456`, …) and deprecated technique IDs in the
-CSV have no Enterprise node and are reported as `unmatched_technique_ids` rather
-than silently dropped.
-
-### Commands
-
-```bash
-cd DocsBasedSupport
-B=eval/AttackGraph/runs/attack-to-cve-baseline
-
-# Experiment B uses the isolated graph on 7688 (docker-compose service neo4j_b)
-export NEO4J_URI=bolt://localhost:7688
-
-PYTHONPATH=. python eval/AttackGraph/loaders/load_attack.py --enrich --reset --run-dir $B
-PYTHONPATH=. python eval/AttackGraph/loaders/load_attack_to_cve.py --enrich --reset --run-dir $B
-PYTHONPATH=. python eval/AttackGraph/evals/eval_cve_apt.py \
-    --cve-source attack-to-cve --variant baseline --run-dir $B
-PYTHONPATH=. python eval/AttackGraph/evals/cve_scaling_report.py \
-    --baseline-report $B/cve_apt_paths_baseline.json --run-dir $B
-```
-
-Offline / pinned snapshot: pass `--csv-path <file>` to `load_attack_to_cve.py`.
-
-### Artefacts
-
-| File | Purpose |
-| :--- | :--- |
-| `attack_to_cve_load_summary.json` | CVE count, edges, unmatched technique IDs |
-| `cve_apt_paths_baseline.json` | Per-CVE actors + aggregate coverage |
-| `cve_scaling_report.json` | Bootstrap CI + scaling curve (n = 33…800) |
-| `cve_attribution_sample.csv` | Manual precision spot-check sample |
-
-### Results (measured)
-
-Run `runs/attack-to-cve-baseline`, ATT&CK-to-CVE CSV, graph `bolt://localhost:7688`.
-
-**Load:** 825 CVEs parsed and loaded, **815 with ≥1 technique edge**, 1,651
-`EXPLOITS` edges (1 base-technique fallback), 23 unmatched technique IDs
-(ICS / mobile / deprecated).
-
-**Deterministic CVE → APT coverage (no LLM):**
-
-| CVE source | # CVEs | Coverage (≥1 actor) | Mean actors / CVE | Mean evidence paths / CVE |
-| :--- | ---: | ---: | ---: | ---: |
-| MITRE ATT&CK (curated) | 33 | **57.6%** | 9.8 | 12.9 |
-| CISA KEV (negative control) | 1,585 | **0.06%** | 0.02 | 0.02 |
-| **ATT&CK-to-CVE (this run)** | **825** | **97.7%** | **66.6** | **132.3** |
-
-**Scaling stability** (`cve_scaling_report.json`, 200-iteration bootstrap):
-
-| Subsample n | Coverage mean | 95% CI |
-| ---: | ---: | :--- |
-| 33 | 0.977 | [0.909, 1.000] |
-| 100 | 0.974 | [0.940, 1.000] |
-| 200 | 0.977 | [0.955, 0.995] |
-| 400 | 0.979 | [0.965, 0.988] |
-| 800 | 0.977 | [0.976, 0.979] |
-
-Coverage is flat at ≈97.7% from n=33 to n=800 with CIs tightening as n grows —
-the headline figure is **not** an artefact of the small 33-CVE denominator.
-
-### Claims and scope
-
-**Support.** When the scaled CVE source preserves ATT&CK technique linkage
-(ATT&CK-to-CVE), deterministic graph traversal recovers ≥1 actor for **97.7%** of
-825 CVEs, and bootstrap resampling shows the coverage is **stable across scale**
-(n = 33 → 800). This directly answers the generalisation concern: the 33-CVE
-baseline's mechanism holds — and strengthens — at 25× the denominator.
-
-**Negative control.** The same pipeline on CISA KEV scores **0.06%** (1/1,585)
-with zero LLM-enrichment lift. Coverage therefore tracks **technique linkage**,
-not CVE count: KEV CVE nodes are isolated, ATT&CK-to-CVE CVE nodes are not.
-
-**Caveats.** High coverage trades off **specificity**: technique-mediated paths
-attach a mean of **66.6 actors per CVE** (vs 9.8 for the hand-curated 33), because
-common techniques (e.g. T1059, T1190, T1068) are used by many actors. Coverage
-here is a *reachability* claim, not a precise single-actor attribution; the
-top-K ranking (`score = path_count × (1 + PageRank)`) and `cve_attribution_sample.csv`
-exist to inspect that ranking quality. Mappings are curated, single-snapshot.
-
----
-
 ## Experiment B₂: Inferential CVE → ATT&CK mapping from NVD prose
 
-**Goal.** The 97.7% structured baseline is high because CTID already supplies
-curated CVE→technique IDs. This arm tests whether an LLM can **reproduce that
-mapping from raw NVD text alone** (inferential, not quote-faithful), and whether
-LLM-inferred techniques still reach threat actors via the same graph paths.
-CTID gold is used **only for scoring** — never written into the graph the model sees.
+**Goal.** The CTID ATT&CK-to-CVE source supplies curated CVE→technique IDs, and a
+deterministic graph traversal over those edges reaches ≥1 actor for **97.7%** of the
+825 CVEs (the *structured* reference computed by the eval). This arm tests whether an
+LLM can **reproduce that CVE→technique mapping from raw NVD text alone** (inferential,
+not quote-faithful), and whether LLM-inferred techniques still reach threat actors via
+the same graph paths. CTID gold is used **only for scoring** — never written into the
+graph the model sees.
 
 ### Methodology
 
-1. **Corpus** — `loaders/build_nvd_cve_corpus.py`: fetch real NVD descriptions
-   (`NVD_API_KEY`) for CTID CVEs; attach CTID gold technique IDs (never shown to the LLM).
-2. **Explicit-ID audit** — `evals/summarize_nvd_explicit_ids.py`: count literal
+1. **Graph + gold** — `loaders/load_attack.py --enrich --reset` then
+   `loaders/load_attack_to_cve.py --enrich --reset`: load the ATT&CK subgraph
+   (techniques, actors, PageRank) and the CTID ATT&CK-to-CVE mappings, which store
+   each CVE's gold technique IDs on its node (`mapped_technique_ids`). The CTID
+   technique→CVE edges supply the gold; they are not shown to the LLM.
+2. **Corpus** — `loaders/build_nvd_cve_corpus.py --sample 0`: fetch real NVD
+   descriptions (`NVD_API_KEY`) for all CTID CVEs; attach the gold technique IDs.
+3. **Explicit-ID audit** — `evals/summarize_nvd_explicit_ids.py`: count literal
    `Txxxx` / `CWE-xxx` / `CVE-xxx` strings in NVD prose (not in gold metadata).
-3. **Inference** — `extractors/map_cve_attack_with_llm.py` (`gpt-oss:20b-cloud`):
+4. **Inference** — `extractors/map_cve_attack_with_llm.py` (`gpt-oss:20b-cloud`):
    read NVD prose only → predict ATT&CK technique IDs + named actors; drop technique
-   IDs not in the loaded matrix.
-4. **Evaluation** — `evals/eval_cve_attack_mapping.py`: micro/macro P/R/F1 vs gold
+   IDs not in the loaded matrix. The prompt uses few-shot exploitation-chain examples
+   and asks for up to 5 techniques ordered most-likely-first.
+5. **Evaluation** — `evals/eval_cve_attack_mapping.py`: micro/macro P/R/F1 vs gold
    (gold restricted to techniques present in Enterprise); actor coverage using
-   structured gold techniques vs LLM-predicted techniques on actor-reachable paths.
+   structured gold techniques vs LLM-predicted techniques on actor-reachable paths;
+   top-K actor agreement.
 
 ### Commands
 
 ```bash
 cd DocsBasedSupport
 export NEO4J_URI=bolt://localhost:7688
-R=eval/AttackGraph/runs/cve-attack-map-gpt-oss-20b
+R=eval/AttackGraph/runs/cve-attack-map-all-v2-gpt-oss-20b
 
-PYTHONPATH=. python eval/AttackGraph/loaders/build_nvd_cve_corpus.py --sample 200 --run-dir $R
+PYTHONPATH=. python eval/AttackGraph/loaders/load_attack.py --enrich --reset
+PYTHONPATH=. python eval/AttackGraph/loaders/load_attack_to_cve.py --enrich --reset
+PYTHONPATH=. python eval/AttackGraph/loaders/build_nvd_cve_corpus.py --sample 0 --run-dir $R
+PYTHONPATH=. python eval/AttackGraph/evals/summarize_nvd_explicit_ids.py --run-dir $R
 PYTHONPATH=. python eval/AttackGraph/extractors/map_cve_attack_with_llm.py \
     --model gpt-oss:20b-cloud --run-dir $R
 PYTHONPATH=. python eval/AttackGraph/evals/eval_cve_attack_mapping.py --run-dir $R
 ```
 
-Sample run: `--sample 200` → `runs/cve-attack-map-gpt-oss-20b`. Full run:
-`--sample 0` (all 825) → `runs/cve-attack-map-all-gpt-oss-20b`. Logs: `pipeline.log`.
+Full run only: `--sample 0` (all 825 CVEs) → `runs/cve-attack-map-all-v2-gpt-oss-20b`.
 
 ### Artefacts
 
@@ -386,7 +271,7 @@ Sample run: `--sample 200` → `runs/cve-attack-map-gpt-oss-20b`. Full run:
 
 ### Explicit IDs in NVD descriptions (measured)
 
-Run `runs/cve-attack-map-all-gpt-oss-20b`, all **825** CVEs with NVD text:
+Run `runs/cve-attack-map-all-v2-gpt-oss-20b`, all **825** CVEs with NVD text:
 
 | ID type in NVD prose | CVEs with ≥1 literal mention |
 | :--- | ---: |
@@ -396,20 +281,30 @@ Run `runs/cve-attack-map-all-gpt-oss-20b`, all **825** CVEs with NVD text:
 
 **Every** ATT&CK technique prediction is therefore **inferential** (impact/behaviour
 → technique), not extraction of an explicit ID in the description. This differs from
-Experiments A / B′, which use quote guards on prose that often names techniques/CVEs.
+Experiment A, which uses quote guards on prose that often names techniques.
 
 ### Results (measured)
 
-Model `gpt-oss:20b-cloud`, graph `bolt://localhost:7688`, 100% NVD descriptions fetched.
+Model `gpt-oss:20b-cloud`, graph `bolt://localhost:7688`, all **825** CVEs, 100% NVD
+descriptions fetched. Run `runs/cve-attack-map-all-v2-gpt-oss-20b`.
 
-| Run | n | Micro F1 | Macro F1 | Structured coverage | LLM coverage | Gap |
-| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `cve-attack-map-gpt-oss-20b` (sample) | 200 | 0.200 | 0.192 | 96.0% | 81.0% | 15.0 pp |
-| `cve-attack-map-all-gpt-oss-20b` (full) | 825 | **0.265** | **0.275** | **97.7%** | **96.9%** | **0.85 pp** |
+| n | Micro F1 | Macro F1 | Structured coverage | LLM coverage | Gap |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 825 | **0.277** | **0.290** | **97.7%** | **99.5%** | **−1.8 pp** |
 
-Full-run mapping quality: 361 TP / 1,650 gold pairs / 1,077 predictions; 804/825 CVEs
-with ≥1 prediction; 27 invalid technique IDs dropped (2.5% of raw); 1 parse failure;
-0 actors matched from NVD text (actors rarely named in descriptions).
+**Parent-level scoring (granularity-fair).** CTID gold carries 334 sub-technique IDs
+(`T1059.001`); exact match penalises the LLM for naming the right *family* but the
+wrong granularity. Rolling both sides to the parent technique (`T1059.001` → `T1059`)
+before scoring:
+
+| Scoring (full 825) | Micro-P | Micro-R | Micro-F1 | Macro-F1 |
+| :--- | ---: | ---: | ---: | ---: |
+| Exact | 0.254 | 0.306 | 0.277 | 0.290 |
+| **Parent-level** | 0.309 | **0.371** | **0.337** | **0.348** |
+
+Mapping quality: 504 TP / 1,650 gold pairs / 1,987 predictions (~2.4 techniques/CVE);
+821/825 CVEs with ≥1 prediction; 21 invalid technique IDs dropped (~1.1% of raw); 1
+parse failure; 0 actors matched from NVD text (actors rarely named in descriptions).
 
 ### Top-K actor agreement (beyond binary reachability)
 
@@ -421,108 +316,43 @@ ranks actors by `path_count × (1 + PageRank)` from the gold technique set and f
 the LLM technique set, then measures how many of gold's top-K actors the LLM also
 surfaces in its top-K:
 
-| Run | n (eligible) | Top-1 exact | Recall@1 | Recall@3 | Recall@5 | Recall@10 | Gold/LLM cand. actors |
-| :--- | ---: | ---: | ---: | ---: | ---: | ---: | :--- |
-| sample 200 | 192 | 0.537 | 0.537 | 0.399 | 0.422 | 0.463 | 63.7 / 49.8 |
-| full 825 | 806 | **0.684** | **0.684** | 0.489 | 0.527 | 0.582 | 66.5 / 59.6 |
+| n (eligible) | Top-1 exact | Recall@1 | Recall@3 | Recall@5 | Recall@10 | Gold/LLM cand. actors |
+| ---: | ---: | ---: | ---: | ---: | ---: | :--- |
+| 806 | **0.705** | **0.705** | 0.487 | 0.549 | **0.593** | 66.5 / 88.1 |
 
-The LLM's single most-plausible actor matches gold's **68%** of the time at full
-scale (vs binary coverage's ~97%), and ~58% of gold's top-10 actors appear in the
+The LLM's single most-plausible actor matches gold's **70%** of the time at full
+scale (vs binary coverage's ~99.5%), and ~59% of gold's top-10 actors appear in the
 LLM's top-10. This is the honest "the LLM surfaces the *same* actors" signal:
-substantially above chance, well below the structured ceiling.
+substantially above chance (≈1.5% for a random pick among ~66 reachable actors),
+well below the structured ceiling.
+
+*Graph-isolation check.* The eval reads actor paths + PageRank from the live graph.
+Recomputing the top-K against a freshly **wiped + pure-ATT&CK** graph
+(`MATCH (n) DETACH DELETE n` → `load_attack --enrich`, 174 actors / 33 CVEs, pristine
+PageRank) leaves the figures unchanged (top-1 0.6836, recall@10 0.581): any extra
+loaded CVE/actor sources add no `(Technique)<-[:USES]-(ThreatActor)` edges, so they
+never enter the rankings. The numbers are graph-contamination-free. The eval also
+reports a parent-rolled variant (`topk_actor_agreement.parent_level`, full-run top-1
+0.59); the exact sub-technique ranking agrees *better* here, since rolling to parent
+broadens each technique's actor set and dilutes the top-1, so the exact figures stay
+the headline.
 
 ### Claims and scope
 
 **Support.** NVD prose contains **no** literal ATT&CK IDs (0/825), yet the LLM
-reproduces a measurable fraction of expert CTID mappings (micro-F1 ≈ 0.27 at full
-scale) with low invalid-ID rate (~2.5%). For **actor reachability**, LLM-inferred
-techniques close most of the gap to structured gold on the full corpus (**96.9%** vs
-**97.7%**, 0.85 pp) even though technique-level F1 stays well below 1.0 — the LLM
-often predicts *different but still actor-reachable* techniques (e.g. T1068 vs gold
-T1203). The sharper **top-K** view shows the LLM's top-ranked actor matches gold's
-**68%** of the time (Recall@10 = 0.58), confirming it surfaces the *same* actors —
-not merely *some* actor — at well-above-chance rates.
+reproduces a measurable fraction of expert CTID mappings (v2: micro-F1 **0.277**,
+parent-level **0.337** at full scale) with low invalid-ID rate (~1.1%). For
+**actor reachability**, v2 LLM-inferred techniques **exceed** structured gold coverage
+on the full corpus (**99.5%** vs **97.7%**) while technique-level F1 stays well below
+1.0 — the LLM often predicts *different but still actor-reachable* techniques. The
+sharper **top-K** view (v2 full): top-ranked actor matches gold's **70%** of the time
+(Recall@10 = 0.59), confirming it surfaces the *same* actors — not merely *some*
+actor — at well-above-chance rates.
 
-**Contrast with B.** Structured linkage is the ceiling; B₂ separates *technique
-label agreement* (moderate F1) from *graph reachability* (near-parity at n=825).
+**Structured reference.** The deterministic CTID traversal (97.7% coverage) is the
+ceiling; B₂ separates *technique label agreement* (moderate F1) from *graph
+reachability* (LLM coverage slightly above the structured reference at n=825; top-K
+still below a perfect oracle).
 
-**Caveats.** The 200-CVE sample shows a larger coverage gap (15 pp) than the full
-825 — subsample variance, not contradiction. Inferential mapping ≠ quote-guarded
-extraction. Gold is CTID curated, not exploitation telemetry.
-
----
-
-## Experiment B′: CVE → actor extraction from CTI prose (MISP + ETDA)
-
-**Goal.** Test whether bounded LLM extraction recovers `(ThreatActor)-[:EXPLOITS]->(CVE)`
-attribution from independent CTI narratives — the CVE→actor analogue of Experiment A.
-Gold pairs come from structured MISP galaxy + ETDA threat-actor cards; the LLM reads
-**narrative prose only**, so scoring is non-circular (structured gold edges are never
-written into the graph the model sees).
-
-### Methodology
-
-1. **Gold + documents** — `loaders/build_cti_cve_corpus.py` merges MISP galaxy + ETDA
-   cards into `cti_cve_actor_corpus.json`: per-actor narrative text plus structured CVE
-   gold, with an `in_narrative` flag per pair.
-2. **Load** — `loaders/load_cti_actors.py` upserts CTI `ThreatActor` / `CVE` nodes (no
-   gold edges).
-3. **Extraction** — `extractors/extract_cti_cve_graph.py` → `EXPLOITS` edges tagged
-   `extraction_variant=llm-cti-cve:<model>` (quote-required, CVE-substring guard).
-4. **Quality** — `evals/eval_cti_cve_extraction_quality.py`: P/R/F1 vs gold, primary
-   benchmark against the narrative-only subset.
-
-### Commands
-
-```bash
-cd DocsBasedSupport
-CTI_RUN=eval/AttackGraph/runs/cti-cve-gpt-oss-20b-cloud
-CTI_MODEL=gpt-oss:20b-cloud
-
-PYTHONPATH=. python eval/AttackGraph/loaders/build_cti_cve_corpus.py --run-dir $CTI_RUN
-PYTHONPATH=. python eval/AttackGraph/loaders/load_cti_actors.py --run-dir $CTI_RUN
-PYTHONPATH=. python eval/AttackGraph/extractors/extract_cti_cve_graph.py \
-    --model $CTI_MODEL --reset --run-dir $CTI_RUN
-PYTHONPATH=. python eval/AttackGraph/evals/eval_cti_cve_extraction_quality.py \
-    --extraction-variant llm-cti-cve:gpt-oss-20b-cloud --run-dir $CTI_RUN
-```
-
-### Results (measured)
-
-Run `runs/cti-cve-gpt-oss-20b-cloud` — model `gpt-oss:20b-cloud`, 103 actor documents
-(20 matched to ATT&CK, 83 CTI-only), 150 structured gold pairs / 105 distinct CVEs.
-
-**Corpus:**
-
-| Metric | Value |
-| :--- | ---: |
-| Actor documents | 103 |
-| Structured gold pairs | 150 |
-| Gold pairs present in narrative | 98 |
-| Distinct CVEs | 105 |
-
-**Extraction vs gold:**
-
-| Metric | vs narrative gold (98) | vs all structured gold (150) |
-| :--- | ---: | ---: |
-| Precision | **1.00** | **1.00** |
-| Recall | **0.582** | 0.380 |
-| F1 | **0.736** | 0.551 |
-| True positives | 57 | 57 |
-| False positives | **0** | **0** |
-
-Extraction: 64 raw → **57 validated** edges (7 dropped unquoted), 19 parse failures.
-The all-structured recall gap is expected: 52 gold pairs appear only in card metadata,
-never in the narrative the model reads.
-
-### Claims and scope
-
-**Support.** Bounded LLM extraction reproduces Experiment A's profile (**100% precision,
-~58% recall, F1 ≈ 0.74**) on a **different relation** (CVE→actor) and an **independent
-corpus** (MISP + ETDA), showing the quote-guarded method generalises beyond STIX-shaped
-ATT&CK prose with zero fabrication.
-
-**Caveats.** Recall is bounded by parse failures (19 actors) and by attribution that
-lives only in card metadata. Public CVE→actor gold is small (~150 pairs); this is a
-precision/recall benchmark, not a scale claim. Contrast with Experiment B (KEV), where
-the signal is absent from the data entirely.
+**Caveats.** Inferential mapping ≠ quote-guarded extraction. Gold is CTID curated,
+not exploitation telemetry. Single model, single pass.

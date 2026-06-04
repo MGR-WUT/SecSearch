@@ -10,15 +10,14 @@ Two questions:
    *structured/gold* technique mapping vs via the *LLM* technique mapping
    (+ any actor the LLM named directly)?
 
-A technique is "actor-reachable" if it matches the same actor paths used by
-``eval_cve_apt.py``: used by an actor directly, used by a software/campaign that
-is itself tied to an actor.
+A technique is "actor-reachable" via the standard ATT&CK actor paths: used by an
+actor directly, used by a software/campaign that is itself tied to an actor.
 
 Usage::
 
     NEO4J_URI=bolt://localhost:7688 PYTHONPATH=. python \
         eval/AttackGraph/evals/eval_cve_attack_mapping.py \
-        --run-dir eval/AttackGraph/runs/cve-attack-map-gpt-oss-20b
+        --run-dir eval/AttackGraph/runs/cve-attack-map-all-v2-gpt-oss-20b
 """
 
 from __future__ import annotations
@@ -61,7 +60,7 @@ def _build_arg_parser() -> argparse.ArgumentParser:
 
 
 def _actor_reachable_techniques(store: Neo4jStore) -> set[str]:
-    """External IDs of techniques that reach >=1 ThreatActor via eval_cve_apt paths."""
+    """External IDs of techniques that reach >=1 ThreatActor via standard actor paths."""
     rows = store.run_read(
         """
         MATCH (t:Technique)
@@ -87,8 +86,8 @@ def _technique_external_ids(store: Neo4jStore) -> set[str]:
 def _technique_actor_paths(store: Neo4jStore) -> dict[str, list[dict[str, object]]]:
     """{technique external_id -> [{actor_id, actor_name, paths, pagerank}, ...]}.
 
-    Mirrors the actor paths used by ``eval_cve_apt.py`` but anchored at the
-    technique (since attack-to-cve CVEs reach actors only through techniques):
+    Uses the standard ATT&CK actor paths, anchored at the technique (since
+    attack-to-cve CVEs reach actors only through techniques):
     actor uses the technique directly, actor uses software/tool that uses the
     technique, or a campaign that uses the technique is attributed to the actor.
     ``paths`` counts the distinct evidence paths so the per-CVE actor score can
@@ -136,6 +135,23 @@ def _technique_actor_paths(store: Neo4jStore) -> dict[str, list[dict[str, object
     return index
 
 
+def _parent(ext: str) -> str:
+    """Roll a sub-technique to its parent: ``T1059.001`` -> ``T1059``."""
+    return ext.split(".", 1)[0]
+
+
+def _rollup_index(
+    tech_actor_paths: dict[str, list[dict[str, object]]]
+) -> dict[str, list[dict[str, object]]]:
+    """Merge the per-technique actor index onto parent technique IDs, so a
+    predicted parent (e.g. ``T1059``) still reaches actors that the graph only
+    attaches to its sub-techniques (``T1059.001``)."""
+    rolled: dict[str, list[dict[str, object]]] = {}
+    for ext, hits in tech_actor_paths.items():
+        rolled.setdefault(_parent(ext), []).extend(hits)
+    return rolled
+
+
 def _rank_actors(
     technique_ids: set[str], tech_actor_paths: dict[str, list[dict[str, object]]]
 ) -> list[str]:
@@ -181,6 +197,7 @@ def main(argv: list[str] | None = None) -> int:
         reachable = _actor_reachable_techniques(store)
         known = _technique_external_ids(store)
         tech_actor_paths = _technique_actor_paths(store)
+        tech_actor_paths_parent = _rollup_index(tech_actor_paths)
         logging.info(
             "Actor-reachable techniques: %d / %d known (%d techniques carry actor paths).",
             len(reachable),
@@ -195,14 +212,22 @@ def main(argv: list[str] | None = None) -> int:
     per_cve_precision: list[float] = []
     per_cve_recall: list[float] = []
     per_cve_f1: list[float] = []
+    # Parent-level (sub-technique rolled to parent) granularity-fair scoring.
+    par_micro_tp = par_micro_pred = par_micro_gold = 0
+    par_precision: list[float] = []
+    par_recall: list[float] = []
+    par_f1: list[float] = []
     covered_struct = covered_llm = covered_llm_actor_only = 0
     llm_nonempty = 0
     per_cve: list[dict[str, object]] = []
     # Top-K actor agreement: of the gold mapping's top-K actors, how many appear
     # in the LLM mapping's top-K? Only CVEs whose gold techniques reach >=1 actor.
     topk_hits: dict[int, list[float]] = {k: [] for k in top_ks}
+    topk_hits_parent: dict[int, list[float]] = {k: [] for k in top_ks}
     top1_exact = 0
+    top1_exact_parent = 0
     topk_eligible = 0
+    topk_eligible_parent = 0
     gold_actor_counts: list[int] = []
     llm_actor_counts: list[int] = []
 
@@ -226,6 +251,19 @@ def main(argv: list[str] | None = None) -> int:
         if pred:
             llm_nonempty += 1
 
+        gold_par = {_parent(t) for t in gold}
+        pred_par = {_parent(t) for t in pred}
+        tp_par = len(gold_par & pred_par)
+        par_micro_tp += tp_par
+        par_micro_pred += len(pred_par)
+        par_micro_gold += len(gold_par)
+        p_par = _safe_div(tp_par, len(pred_par))
+        r_par = _safe_div(tp_par, len(gold_par))
+        f1_par = _safe_div(2 * p_par * r_par, (p_par + r_par)) if (p_par + r_par) else 0.0
+        par_precision.append(p_par)
+        par_recall.append(r_par)
+        par_f1.append(f1_par)
+
         struct_cov = bool(gold & reachable)
         llm_tech_cov = bool(pred & reachable)
         llm_cov = llm_tech_cov or bool(actors)
@@ -243,8 +281,7 @@ def main(argv: list[str] | None = None) -> int:
         cve_topk: dict[str, float] = {}
         if gold_ranked:
             topk_eligible += 1
-            llm_set_full = set(llm_ranked)
-            if gold_ranked and gold_ranked[0] in llm_set_full and llm_ranked and llm_ranked[0] == gold_ranked[0]:
+            if llm_ranked and llm_ranked[0] == gold_ranked[0]:
                 top1_exact += 1
             for k in top_ks:
                 gold_topk = gold_ranked[:k]
@@ -252,6 +289,18 @@ def main(argv: list[str] | None = None) -> int:
                 hit = sum(1 for a in gold_topk if a in llm_topk) / len(gold_topk)
                 topk_hits[k].append(hit)
                 cve_topk[f"recall_at_{k}"] = round(hit, 4)
+
+        gold_ranked_par = _rank_actors(gold_par, tech_actor_paths_parent)
+        llm_ranked_par = _rank_actors(pred_par, tech_actor_paths_parent)
+        if gold_ranked_par:
+            topk_eligible_parent += 1
+            if llm_ranked_par and llm_ranked_par[0] == gold_ranked_par[0]:
+                top1_exact_parent += 1
+            for k in top_ks:
+                gold_topk_par = gold_ranked_par[:k]
+                llm_topk_par = set(llm_ranked_par[:k])
+                hit_par = sum(1 for a in gold_topk_par if a in llm_topk_par) / len(gold_topk_par)
+                topk_hits_parent[k].append(hit_par)
 
         per_cve.append(
             {
@@ -292,6 +341,21 @@ def main(argv: list[str] | None = None) -> int:
             "total_pred_pairs": micro_pred,
             "total_true_positives": micro_tp,
         },
+        "mapping_quality_parent_level": {
+            "note": (
+                "Sub-techniques rolled to parent (T1059.001 -> T1059) before scoring; "
+                "removes the granularity penalty when the LLM names the right family."
+            ),
+            "micro_precision": _safe_div(par_micro_tp, par_micro_pred),
+            "micro_recall": _safe_div(par_micro_tp, par_micro_gold),
+            "micro_f1": _safe_div(2 * par_micro_tp, (par_micro_pred + par_micro_gold)),
+            "macro_precision": round(statistics.fmean(par_precision), 4) if par_precision else 0.0,
+            "macro_recall": round(statistics.fmean(par_recall), 4) if par_recall else 0.0,
+            "macro_f1": round(statistics.fmean(par_f1), 4) if par_f1 else 0.0,
+            "total_gold_pairs": par_micro_gold,
+            "total_pred_pairs": par_micro_pred,
+            "total_true_positives": par_micro_tp,
+        },
         "attribution_coverage": {
             "num_cves": n,
             "structured_gold_coverage": _safe_div(covered_struct, n),
@@ -319,6 +383,17 @@ def main(argv: list[str] | None = None) -> int:
             "mean_llm_candidate_actors": round(statistics.fmean(llm_actor_counts), 3)
             if llm_actor_counts
             else 0.0,
+            "parent_level": {
+                "note": "Same metric with predicted/gold/graph techniques rolled to parent.",
+                "eligible_cves": topk_eligible_parent,
+                "top1_exact_match": _safe_div(top1_exact_parent, topk_eligible_parent),
+                "mean_recall_at_k": {
+                    str(k): round(statistics.fmean(topk_hits_parent[k]), 4)
+                    if topk_hits_parent[k]
+                    else 0.0
+                    for k in top_ks
+                },
+            },
         },
         "per_cve": per_cve,
     }
@@ -336,7 +411,15 @@ def main(argv: list[str] | None = None) -> int:
     )
     print(
         json.dumps(
-            {k: report[k] for k in ("mapping_quality", "attribution_coverage", "topk_actor_agreement")},
+            {
+                k: report[k]
+                for k in (
+                    "mapping_quality",
+                    "mapping_quality_parent_level",
+                    "attribution_coverage",
+                    "topk_actor_agreement",
+                )
+            },
             indent=2,
         )
     )

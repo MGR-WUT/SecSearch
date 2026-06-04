@@ -1,20 +1,17 @@
 """Load the Center for Threat-Informed Defense ATT&CK -> CVE mappings into Neo4j.
 
-This is the Experiment B CVE source that *matches the curated MITRE 33-CVE
-baseline*. Where ``load_kev.py`` ingests standalone CISA KEV descriptions that
-have no edge into the ATT&CK subgraph (and therefore yield ~0% actor coverage),
-this loader maps every CVE to one or more ATT&CK **technique IDs** taken from
-the CTID ``Att&ckToCveMappings.csv``. Each mapping becomes a deterministic
-``(Technique)-[:EXPLOITS]->(CVE)`` edge against the techniques already loaded by
-``load_attack.py``, so the CVE nodes inherit the exact
-``(CVE)<-[:EXPLOITS]-(Technique)<-[:USES]-(ThreatActor)`` traversal that the
-33-CVE baseline relies on — only the denominator grows from 33 to ~800.
+This is the **gold source for Experiment B₂**: it maps every CVE to one or more
+ATT&CK **technique IDs** taken from the CTID ``Att&ckToCveMappings.csv``. Each
+mapping becomes a deterministic ``(Technique)-[:EXPLOITS]->(CVE)`` edge against
+the techniques already loaded by ``load_attack.py``, and the CTID technique IDs
+are stored on each CVE node (``mapped_technique_ids``) so the NVD corpus builder
+(``build_nvd_cve_corpus.py``) can pair them with NVD prose for LLM scoring.
 
 Usage::
 
     NEO4J_URI=bolt://localhost:7688 PYTHONPATH=. python \
         eval/AttackGraph/loaders/load_attack_to_cve.py \
-        --enrich --reset --run-dir eval/AttackGraph/runs/attack-to-cve-baseline
+        --enrich --reset --run-dir eval/AttackGraph/runs/cve-attack-map-all-v2-gpt-oss-20b
 
 Run ``load_attack.py --enrich --reset`` against the same graph first so the
 ``Technique`` / ``ThreatActor`` nodes (and their PageRank) exist.

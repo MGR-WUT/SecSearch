@@ -50,6 +50,21 @@ _MAP_PROMPT = """You are a MITRE ATT&CK analyst. Read ONLY the vulnerability des
 and infer which ATT&CK (Enterprise) techniques an attacker would use to exploit
 or leverage this vulnerability, plus any threat actor/APT group explicitly named.
 
+Think about the full exploitation chain the vulnerability enables: the initial
+access / execution primitive AND its typical downstream effect (privilege
+escalation, defense evasion, credential access, etc.). A single vulnerability
+usually maps to MORE THAN ONE technique.
+
+Examples (description -> techniques):
+- "SQL injection in the login form lets a remote attacker run arbitrary SQL."
+  -> T1190 (Exploit Public-Facing Application), T1505 (Server Software Component)
+- "Stack buffer overflow lets a local user run code as SYSTEM."
+  -> T1203 (Exploitation for Client Execution), T1068 (Exploitation for Privilege Escalation)
+- "Improper authentication allows attackers to bypass login and access the API."
+  -> T1190 (Exploit Public-Facing Application), T1078 (Valid Accounts)
+- "Deserialization flaw allows remote code execution via a crafted request."
+  -> T1190 (Exploit Public-Facing Application), T1059 (Command and Scripting Interpreter)
+
 CVE: {cve_id}
 Vulnerability description:
 \"\"\"
@@ -58,7 +73,10 @@ Vulnerability description:
 
 Rules:
 - Output ATT&CK technique IDs in the form Txxxx or Txxxx.yyy (e.g. T1190, T1059.001).
-- Map only techniques clearly implied by the described impact/behaviour.
+- List UP TO 5 techniques, ordered MOST-LIKELY FIRST. Cover both the access/execution
+  primitive and the most probable follow-on effect when the description implies one.
+- Map only techniques clearly implied by the described impact/behaviour; do not pad
+  with generic guesses.
 - Do NOT invent technique IDs that are not real ATT&CK techniques.
 - Only list a threat actor if the description explicitly names one; otherwise leave actors empty.
 - If nothing can be confidently mapped, return empty lists.
